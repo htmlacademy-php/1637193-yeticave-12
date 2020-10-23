@@ -47,6 +47,20 @@ $ad_information = [
         'url_image' => 'img/lot-6.jpg'
     ]
 ];
+
+//функция по выводу форматированной суммы товара
+function formatted_sum ($lot_price) {
+
+    $round_number = ceil($lot_price);
+    if ($round_number < 1000) {
+        $round_number .= ' ' . '₽';
+    }
+    elseif ($round_number >= 1000) {
+        //number_format — Форматирует число с разделением групп
+        $round_number = number_format($round_number, 0, ',', ' ')  . ' ' . '₽';
+    } return $round_number;
+}
+
 ?>
 <!DOCTYPE html>
 <html lang="ru">
@@ -122,7 +136,7 @@ $ad_information = [
                             <div class="lot__state">
                                 <div class="lot__rate">
                                     <span class="lot__amount">Стартовая цена</span>
-                                    <span class="lot__cost"><?=$ad_value['price'];?><b class="rub">р</b></span>
+                                    <span class="lot__cost"><?=formatted_sum($ad_value['price']);?></span>
                                 </div>
                                 <div class="lot__timer timer">
                                     12:23
