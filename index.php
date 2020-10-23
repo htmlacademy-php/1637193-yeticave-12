@@ -3,10 +3,12 @@ $is_auth = rand(0, 1);
 
 $user_name = 'Александр'; // указал здесь имя
 
+//массив с названиями категорий
 $categories = [
     "Доски и лыжи", "Крепления", "Ботинки", "Одежда", "Инструменты", "Разное"
 ];
 
+//массив с информацией о 6 товарах в рекламных объявлениях
 $ad_information = [
     [
         'title' => '2014 Rossignol District Snowboard',
@@ -95,10 +97,10 @@ $ad_information = [
             <h2 class="promo__title">Нужен стафф для катки?</h2>
             <p class="promo__text">На нашем интернет-аукционе ты найдёшь самое эксклюзивное сноубордическое и горнолыжное снаряжение.</p>
             <ul class="promo__list">
-                <!--заполнил этот список из массива категорий $categories-->
-                <?php foreach ($categories as $category_key => $category_name): ?>
+                <!--заполнил этот список из массива категорий $categories товарами $category_name-->
+                <?php foreach ($categories as $category_name): ?>
                     <li class="promo__item promo__item--boards">
-                        <a class="promo__link" href="pages/all-lots.html"><?=$categories[$category_key];?></a>
+                        <a class="promo__link" href="pages/all-lots.html"><?=$category_name;?></a>
                     </li>
                 <?php endforeach; ?>
             </ul>
@@ -138,9 +140,9 @@ $ad_information = [
     <nav class="nav">
         <ul class="nav__list container">
             <!--заполнил этот список из массива категорий $categories товарами $category_name-->
-            <?php foreach ($categories as $category_key => $category_name): ?>
+            <?php foreach ($categories as $category_name): ?>
                 <li class="nav__item">
-                    <a href="pages/all-lots.html"><?=$categories[$category_key];?></a>
+                    <a href="pages/all-lots.html"><?=$category_name;?></a>
                 </li>
             <?php endforeach; ?>
         </ul>
