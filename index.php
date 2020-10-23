@@ -49,16 +49,17 @@ $ad_information = [
 ];
 
 //функция по выводу форматированной суммы товара
-function formatted_sum ($lot_price) {
-
+function formatted_sum ($lot_price)
+{
     $round_number = ceil($lot_price);
     if ($round_number < 1000) {
         $round_number .= ' ' . '₽';
+        return $round_number;
     }
-    elseif ($round_number >= 1000) {
-        //number_format — Форматирует число с разделением групп
-        $round_number = number_format($round_number, 0, ',', ' ')  . ' ' . '₽';
-    } return $round_number;
+    //number_format — Форматирует число с разделением групп
+     $round_number = number_format($round_number, 0, ',', ' ')  . ' ' . '₽';
+
+    return $round_number;
 }
 
 ?>
