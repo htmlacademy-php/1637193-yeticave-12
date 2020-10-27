@@ -17,6 +17,7 @@
             <ul class="lots__list">
                 <!--заполнил этот список из массива $ad_information с товарами $ad_value-->
                 <?php foreach ($ad_information as $ad_value):?>
+                    <?php $remaining_time = get_date_range($ad_value['expiration_date']) ?>
                     <li class="lots__item lot">
                         <div class="lot__image">
                             <img src="<?=htmlspecialchars($ad_value['url_image']) ?>" width="350" height="260" alt="<?=htmlspecialchars($ad_value['title']) ?>">
@@ -29,8 +30,12 @@
                                     <span class="lot__amount">Стартовая цена</span>
                                     <span class="lot__cost"><?= htmlspecialchars(formatted_sum($ad_value['price']))?></span>
                                 </div>
-                                <div class="lot__timer timer">
-                                    12:23
+                                <div class="lot__timer timer
+                                    <?php if($remaining_time[0]=='00'):?>
+                                    timer--finishing
+                                    <?php endif; ?>
+                                    ">
+                                        <?= $remaining_time[0] . ':' . $remaining_time[1] ?>
                                 </div>
                             </div>
                         </div>
