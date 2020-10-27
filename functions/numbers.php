@@ -15,6 +15,6 @@ function formatted_sum ($lot_price)
     $round_number = number_format($round_number, 0, ',', ' ')  . ' ' . '₽';
 
     return $round_number;
-
+}
 
 ?>
