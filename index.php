@@ -1,7 +1,7 @@
 <?php
 require_once './helpers.php';
 require_once './functions/data.php';
-
+require_once './functions/numbers.php';
 
 /**
  * Возвращает оставшееся до переданной в функцию даты время в виде массива [ЧЧ, ММ]
@@ -33,18 +33,9 @@ function get_date_range($get_end_date)
 
     return [$hours_format, $minutes_format];
 }
-//функция по выводу форматированной суммы товара
-function formatted_sum ($lot_price)
-{
-    $round_number = ceil($lot_price);
-    if ($round_number < 1000) {
-        $round_number .= ' ' . '₽';
-        return $round_number;
-    }
-    //number_format — Форматирует число с разделением групп
-    $round_number = number_format($round_number, 0, ',', ' ')  . ' ' . '₽';
 
-    return $round_number;
+
+
 }
 
 $page_content = include_template('main.php', [
