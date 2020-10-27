@@ -29,6 +29,3 @@ function get_date_range($get_end_date)
 
     return [$hours_format, $minutes_format];
 }
-
-
-?>

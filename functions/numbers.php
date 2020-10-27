@@ -17,4 +17,3 @@ function formatted_sum ($lot_price)
     return $round_number;
 }
 
-?>
