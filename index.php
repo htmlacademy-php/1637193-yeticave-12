@@ -1,4 +1,5 @@
 <?php
+//require_once './helpers.php';
 $is_auth = rand(0, 1);
 
 $user_name = 'Александр'; // указал здесь имя
@@ -15,7 +16,7 @@ $ad_information = [
         'category' => 'Доски и лыжи',
         'price' => 10999,
         'url_image' => 'img/lot-1.jpg',
-        'expiration_date' => '2020-10-28'
+        'expiration_date' => '2020-10-26'
     ],
     [
         'title' => 'DC Ply Mens 2016/2017 Snowboard',
@@ -63,23 +64,25 @@ $ad_information = [
 //функция для подсчёта оставшегося времени действия лота в аукционе
 function get_date_range($get_end_date)
 {
-        date_default_timezone_set("Europe/Moscow");
-        setlocale(LC_ALL, 'ru_RU');
-        //сегодняшняя дата
-        $current_date = time();
-        //дата окончания аукциона
-		$future_date = strtotime($get_end_date);
+    date_default_timezone_set("Europe/Moscow");
+    setlocale(LC_ALL, 'ru_RU');
+    //сегодняшняя дата
+    $current_date = time();
+    //дата окончания аукциона
+    $future_date = strtotime($get_end_date);
 
-		// получает экземпляр временного промежутка на основе разницы между двумя датами
-		$diff = $future_date - $current_date;
+    // получает экземпляр временного промежутка на основе разницы между двумя датами
+    $diff = $future_date - $current_date;
+    if ($diff<0) {
+        return [0, 0];
+    }
+    // Приводит временной интервал к нужному формату
+    $hours = floor($diff / 3600);
+    $minutes = ceil(($diff % 3600) / 60);
 
-		// Приводит временной интервал к нужному формату
-        $hours = floor($diff / 3600);
-        $minutes = ceil(($diff % 3600) / 60);
-
-        //дополняет строки, начиная слева, заданными символами до 2-х цифр
-        $hours_format = str_pad($hours, 2, 0, STR_PAD_LEFT);
-        $minutes_format = str_pad($minutes, 2, 0, STR_PAD_LEFT);
+    //дополняет строки, начиная слева, заданными символами до 2-х цифр
+    $hours_format = str_pad($hours, 2, 0, STR_PAD_LEFT);
+    $minutes_format = str_pad($minutes, 2, 0, STR_PAD_LEFT);
 
     return [$hours_format, $minutes_format];
 }
@@ -92,7 +95,7 @@ function formatted_sum ($lot_price)
         return $round_number;
     }
     //number_format — Форматирует число с разделением групп
-     $round_number = number_format($round_number, 0, ',', ' ')  . ' ' . '₽';
+    $round_number = number_format($round_number, 0, ',', ' ')  . ' ' . '₽';
 
     return $round_number;
 }
