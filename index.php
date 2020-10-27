@@ -1,4 +1,11 @@
 <?php
+/**
+ * @var array $categories
+ * @var array $ad_information
+ * @var string $user_name
+ * @var int $is_auth
+ */
+
 require_once './helpers.php';
 require_once './functions/data.php';
 require_once './functions/numbers.php';
