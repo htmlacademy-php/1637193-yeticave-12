@@ -8,7 +8,7 @@
 function get_date_range($get_end_date)
 {
     //проверка корректности ввода даты на соответствие формату 'ГГГГ-ММ-ДД'
-    if (is_date_valid($get_end_date) == false) {
+    if (!is_date_valid($get_end_date)) {
         return [0, 0];
     }
     date_default_timezone_set("Europe/Moscow");
