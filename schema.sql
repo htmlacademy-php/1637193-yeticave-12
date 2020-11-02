@@ -60,12 +60,12 @@ CREATE TABLE bet
     INDEX bet_user_id (user_id),                                 -- создаю индекс для поля, по которому будет поиск
     INDEX bet_item_id (item_id),                                 -- создаю индекс для поля, по которому будет поиск
     CONSTRAINT item                                              -- ограничение внешнего ключа
-        FOREIGN KEY (item_id)                                    -- указываю внешний ключ для поля
+        FOREIGN KEY (item_id)                               -- указываю внешний ключ для поля
             REFERENCES item (item_id)
             ON DELETE CASCADE                                    -- автоматическое удаление записи по ссылке после удаления в первоисточнике
             ON UPDATE CASCADE,                                   -- автоматическое обновление записи по ссылке после обновления в первоисточнике
     CONSTRAINT users                                             -- ограничение внешнего ключа
-        FOREIGN KEY (user_id)                                    -- указываю внешний ключ для поля
+        FOREIGN KEY (user_id)                              -- указываю внешний ключ для поля
             REFERENCES users (user_id)
             ON DELETE CASCADE                                    -- автоматическое удаление записи по ссылке после удаления в первоисточнике
             ON UPDATE CASCADE                                    -- автоматическое обновление записи по ссылке после обновления в первоисточнике
@@ -80,7 +80,7 @@ CREATE TABLE users
     name              VARCHAR(45)  NOT NULL,
     password          VARCHAR(45)  NOT NULL,
     contacts          VARCHAR(255) NOT NULL,
-    INDEX users_user_id (user_id)                                            -- создаю индекс для поля, по которому будет поиск
+    INDEX users_user_id (user_id)                                       -- создаю индекс для поля, по которому будет поиск
 );
 
 
