@@ -15,6 +15,18 @@ CREATE TABLE category
     INDEX (category_title)                                           -- создаю индекс для поля, по которому будет поиск
 );
 
+-- Создание таблицы с пользователями
+CREATE TABLE users
+(
+    user_id           INT          NOT NULL AUTO_INCREMENT PRIMARY KEY, -- первичный ключ, автоматически увеличивается на 1 для новой записи
+    registration_date DATETIME     NOT NULL,
+    email             VARCHAR(100) NOT NULL UNIQUE,
+    name              VARCHAR(45)  NOT NULL,
+    password          VARCHAR(45)  NOT NULL,
+    contacts          VARCHAR(255) NOT NULL,
+    INDEX users_user_id (user_id)                                       -- создаю индекс для поля, по которому будет поиск
+);
+
 -- Создание таблицы с лотами аукциона
 CREATE TABLE item
 (
@@ -32,17 +44,17 @@ CREATE TABLE item
     INDEX item_item_title (item_title),                               -- создаю индекс для поля, по которому будет поиск
     INDEX item_category_id (category_id),                             -- создаю индекс для поля, по которому будет поиск
     INDEX item_author_id (author_id),                                 -- создаю индекс для поля, по которому будет поиск
-    CONSTRAINT category                                               -- ограничение внешнего ключа
+    CONSTRAINT item_category_category_id                              -- ограничение внешнего ключа
         FOREIGN KEY (category_id)                                     -- указываю внешний ключ для поля
             REFERENCES category (category_id)
             ON DELETE CASCADE                                         -- автоматическое удаление записи по ссылке после удаления в первоисточнике
             ON UPDATE CASCADE,                                        -- автоматическое обновление записи по ссылке после обновления в первоисточнике
-    CONSTRAINT users                                                  -- ограничение внешнего ключа
+    CONSTRAINT item_users_author_id                                   -- ограничение внешнего ключа
         FOREIGN KEY (author_id)                                       -- указываю внешний ключ для поля
             REFERENCES users (user_id)
             ON DELETE CASCADE                                         -- автоматическое удаление записи по ссылке после удаления в первоисточнике
             ON UPDATE CASCADE,                                        -- автоматическое обновление записи по ссылке после обновления в первоисточнике
-    CONSTRAINT users                                                  -- ограничение внешнего ключа
+    CONSTRAINT item_users_winner_id                                   -- ограничение внешнего ключа
         FOREIGN KEY (winner_id)                                       -- указываю внешний ключ для поля
             REFERENCES users (user_id)
             ON DELETE CASCADE                                         -- автоматическое удаление записи по ссылке после удаления в первоисточнике
@@ -59,29 +71,19 @@ CREATE TABLE bet
     item_id  INT            NOT NULL,
     INDEX bet_user_id (user_id),                                 -- создаю индекс для поля, по которому будет поиск
     INDEX bet_item_id (item_id),                                 -- создаю индекс для поля, по которому будет поиск
-    CONSTRAINT item                                              -- ограничение внешнего ключа
-        FOREIGN KEY (item_id)                               -- указываю внешний ключ для поля
+    CONSTRAINT bet_item_item_id                                  -- ограничение внешнего ключа
+        FOREIGN KEY (item_id)                                    -- указываю внешний ключ для поля
             REFERENCES item (item_id)
             ON DELETE CASCADE                                    -- автоматическое удаление записи по ссылке после удаления в первоисточнике
             ON UPDATE CASCADE,                                   -- автоматическое обновление записи по ссылке после обновления в первоисточнике
-    CONSTRAINT users                                             -- ограничение внешнего ключа
-        FOREIGN KEY (user_id)                              -- указываю внешний ключ для поля
+    CONSTRAINT bet_users_user_id                                 -- ограничение внешнего ключа
+        FOREIGN KEY (user_id)                                    -- указываю внешний ключ для поля
             REFERENCES users (user_id)
             ON DELETE CASCADE                                    -- автоматическое удаление записи по ссылке после удаления в первоисточнике
             ON UPDATE CASCADE                                    -- автоматическое обновление записи по ссылке после обновления в первоисточнике
 );
 
--- Создание таблицы с пользователями
-CREATE TABLE users
-(
-    user_id           INT          NOT NULL AUTO_INCREMENT PRIMARY KEY, -- первичный ключ, автоматически увеличивается на 1 для новой записи
-    registration_date DATETIME     NOT NULL,
-    email             VARCHAR(100) NOT NULL UNIQUE,
-    name              VARCHAR(45)  NOT NULL,
-    password          VARCHAR(45)  NOT NULL,
-    contacts          VARCHAR(255) NOT NULL,
-    INDEX users_user_id (user_id)                                       -- создаю индекс для поля, по которому будет поиск
-);
+
 
 
 
