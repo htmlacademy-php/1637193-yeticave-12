@@ -64,7 +64,7 @@
             <?php foreach ($categories as $category_name): ?>
                 <li class="nav__item">
                     <!--применяем htmlspecialchars для преобразования спецсимволов в соответствующие мнемоники-->
-                    <a href="pages/all-lots.html"><?= htmlspecialchars($category_name);?></a>
+                    <a href="pages/<?= $category_name['id']; ?>"><?= htmlspecialchars($category_name['title']);?></a>
                 </li>
             <?php endforeach; ?>
         </ul>

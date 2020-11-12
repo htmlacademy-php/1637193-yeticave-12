@@ -112,5 +112,5 @@ FROM bet
          INNER JOIN users ON bet.user_id = users.id
          INNER JOIN item ON bet.item_id = item.id
 WHERE bet.item_id = 6
-ORDER BY bet.created_at ASC
+ORDER BY bet.created_at ASC;
 
