@@ -67,3 +67,4 @@ function get_ad_information_from_db($connect)
     $ad_information = mysqli_fetch_all($result_items, MYSQLI_ASSOC);
     return $ad_information;
 }
+
