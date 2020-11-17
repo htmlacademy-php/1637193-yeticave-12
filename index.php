@@ -10,58 +10,14 @@ require_once './helpers.php'; //дефолтные функции от созд�
 require_once './functions/data.php'; //дефолтные переменные
 require_once './functions/numbers.php'; //числовые функции
 require_once './functions/time.php'; //функции, влияющие на обработку времени
+require_once './functions/sql_connect.php'; //параметры подключения к базе данных
 
+$connect = db_connection();
 
-$connect = mysqli_connect('localhost', 'root', 'root', 'yeticave');
-$categories = [];
-$ad_information = [];
+$categories = get_categories_from_db($connect);
+$ad_information = get_ad_information_from_db($connect);
 
-if (!$connect) {
-    print("Ошибка подключения: " . mysqli_connect_error());
-    die();
-}
-mysqli_set_charset($connect, "utf8");
-
-//получение всех категорий:
-$sql_category = "SELECT title, symbolic_code FROM category";
-$result_category = mysqli_query($connect, $sql_category);
-
-if ($result_category) {
-    $categories = mysqli_fetch_all($result_category, MYSQLI_ASSOC);
-} else {
-    print('Ошибка запроса: ' . mysqli_error($connect));
-    die();
-}
-//получение самых новых, открытых лотов.
-// Каждый лот должен включать название, стартовую цену, ссылку на изображение, текущую цену, название категории;
-$sql_item = "SELECT item.title AS 'title',
-                       item.start_price AS 'start_price',
-                       item.image_url AS 'image_url',
-                       IF(bet.total IS NULL, item.start_price, MAX(bet.total)) AS 'total',
-                       item.created_at AS 'created_at',
-                       item.completed_at AS 'completed_at',
-                       category.title AS 'category_title'
-                FROM item
-                         INNER JOIN category ON item.category_id = category.id
-                         LEFT JOIN bet ON item.id = bet.item_id
-                WHERE item.completed_at > NOW()
-                GROUP BY item.id
-                ORDER BY item.completed_at ASC";
-
-$result_items = mysqli_query($connect, $sql_item);
-
-if ($result_items) {
-    $ad_information = mysqli_fetch_all($result_items, MYSQLI_ASSOC);
-} else {
-    print('Ошибка запроса: ' . mysqli_error($connect));
-    die();
-}
-
-
-$page_content = include_template('main.php', [
-    'categories' => $categories,
-    'ad_information' => $ad_information
-]);
+$page_content = include_template('main.php', compact('categories', 'ad_information'));
 
 $layout_content = include_template('layout.php', [
     'content' => $page_content,
