@@ -56,7 +56,7 @@ function get_ad_information_from_db($connect)
                          LEFT JOIN bet ON item.id = bet.item_id
                 WHERE item.completed_at > NOW()
                 GROUP BY item.id
-                ORDER BY item.completed_at ASC";
+                ORDER BY item.created_at DESC";
 
     $result_items = mysqli_query($connect, $sql_item);
 
