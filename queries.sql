@@ -42,22 +42,22 @@ SET email    = 'vasya@pisem.net',
 INSERT item(title, description, start_price, image_url, created_at, completed_at, bet_step, author_id, category_id,
             winner_id)
 VALUES ('2014 Rossignol District Snowboard', 'Snowboard', 10999, 'img/lot-1.jpg', '2020-10-20 12:00:00',
-        '2020-11-20 12:00:00', 50, 1, 1, 2)
+        '2020-12-20 12:00:00', 50, 1, 1, 2)
         ,
        ('DC Ply Mens 2016/2017 Snowboard', 'Snowboard', 159999, 'img/lot-2.jpg', '2020-10-21 12:00:00',
-        '2020-11-21 12:00:00', 1550, 2, 1, 3)
+        '2020-12-21 12:00:00', 1550, 2, 1, 3)
         ,
        ('Крепления Union Contact Pro 2015 года размер L/XL', 'Крепления размер L/XL', 8000, 'img/lot-3.jpg',
-        '2020-10-22 12:00:00', '2020-10-25 12:00:00', 55, 3, 2,
+        '2020-12-22 12:00:00', '2020-11-25 12:00:00', 55, 3, 2,
         1)
         ,
        ('Ботинки для сноуборда DC Mutiny Charocal', 'Ботинки для сноуборда', 10999, 'img/lot-4.jpg',
-        '2020-10-23 12:00:00', '2020-10-20 12:00:00', 15, 1, 3, 2)
+        '2020-10-23 12:00:00', '2020-12-20 12:00:00', 15, 1, 3, 2)
         ,
        ('Куртка для сноуборда DC Mutiny Charocal', 'Куртка для сноуборда', 7500, 'img/lot-5.jpg', '2020-10-24 12:00:00',
-        '2020-11-10 12:00:00', 150, 2, 4, 3)
+        '2020-12-10 12:00:00', 150, 2, 4, 3)
         ,
-       ('Маска Oakley Canopy', 'Маска', 5400, 'img/lot-6.jpg', '2020-10-25 12:00:00', '2020-11-25 12:00:00', 20, 3, 6,
+       ('Маска Oakley Canopy', 'Маска', 5400, 'img/lot-6.jpg', '2020-10-25 12:00:00', '2020-12-25 12:00:00', 20, 3, 6,
         1);
 -- вопрос по author_id, category_id, winner_id: пока вставил статичные данные. Надо ли было сразу как-то настраивать через внешние данные с созданных таблиц? Как вариант вижу костыль через UPDATE ... SET ... = '...' WHERE
 
@@ -112,5 +112,5 @@ FROM bet
          INNER JOIN users ON bet.user_id = users.id
          INNER JOIN item ON bet.item_id = item.id
 WHERE bet.item_id = 6
-ORDER BY bet.created_at ASC
+ORDER BY bet.created_at ASC;
 
