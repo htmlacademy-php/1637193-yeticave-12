@@ -47,7 +47,7 @@ function get_ad_information_from_db($connect)
     $sql_item = "SELECT item.title AS 'title',
                        item.start_price AS 'start_price',
                        item.image_url AS 'image_url',
-                       IF(bet.total IS NULL, item.start_price, MAX(bet.total)) AS 'total',
+                       IFNULL(MAX(bet.total), item.start_price) AS 'total',
                        item.created_at AS 'created_at',
                        item.completed_at AS 'completed_at',
                        category.title AS 'category_title'
