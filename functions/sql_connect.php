@@ -44,7 +44,8 @@ function get_categories_from_db($connect)
  */
 function get_ad_information_from_db($connect)
 {
-    $sql_item = "SELECT item.title AS 'title',
+    $sql_item = "SELECT item.id,
+                        item.title AS 'title',
                        item.start_price AS 'start_price',
                        item.image_url AS 'image_url',
                        IFNULL(MAX(bet.total), item.start_price) AS 'total',

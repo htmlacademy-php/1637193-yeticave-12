@@ -7,46 +7,49 @@ require_once './functions/sql_connect.php'; //параметры подключ�
 
 $connect = db_connection();
 
-//$lot_id = filter_input(INPUT_GET, 'id');
-
-//if (is_null($lot_id)) {
-//
-//
-//}
-//$tab = $_GET['tab'] ?? 'popular';
-
-$sql_lot = "SELECT bet_step,
-                    completed_at,
-                    description,
-                    category.title AS category_title,
-                    title,
-                    image_url,
-                    start_price,
-                    IF(bet.total IS NULL, item.start_price, MAX(bet.total)) AS current_price
-              FROM item
-                    JOIN category ON item.category_id = category.id
-                    LEFT JOIN bet ON bet.item_id = item.id
-              WHERE item.id = '.$id.'
-              GROUP BY item.id";
-
-$result_lot = mysqli_query($connect, $sql_lot);
-
-if(!$result_lot) {
-    $error = mysqli_error($connect);
-    print 'Ошибка MySQL: '.$error;
+if (isset($_GET['id'])) {
+    $id = (int)$_GET['id'];
+} else {
+    http_response_code(404);
+    exit("Ошибка подключения: не указан id");
 }
 
-if(!mysqli_num_rows($result_lot)) {
-    header("Location: pages/404.html");
-};
+$sql_lot = "SELECT  item.created_at,
+                    item.title AS title,
+                    item.description,
+                    category.title AS category_title,
+                    item.image_url,
+                    item.completed_at,
+                    item.start_price,
+                    item.bet_step,
+                    IFNULL(MAX(bet.total), item.start_price) AS current_price
+              FROM item
+                    JOIN category ON item.category_id = category.id
+              WHERE item.id = '" . $id . "'";
 
-$lot = mysqli_fetch_all($result_lot, MYSQLI_ASSOC);
+$result_lot = mysqli_query($connect, $sql_lot);
+$lot = mysqli_fetch_array($result_lot, MYSQLI_ASSOC);
 
-$categories = get_categories($connect);
+if ($lot === NULL) {
+    http_response_code(404);
+    exit("Страница с id =" . $id . " не найдена.");
+}
+$sql_read_category = "SELECT * FROM category";
+$result_category = mysqli_query($connect, $sql_read_category);
+
+$categories = mysqli_fetch_all($result_category, MYSQLI_ASSOC);
+
+//$categories = get_categories_from_db($connect);
 
 
 $page_content = include_template('lot_page.php', compact('categories', 'lot'));
 
-$layout_content = include_template('layout.php', ['content' => $page_content, 'categories' => $categories, 'title' => $user_name]);
+$layout_content = include_template('layout.php', [
+    'content' => $page_content,
+    'categories' => $categories,
+    'title' => htmlspecialchars($lot['category_title']),
+    'user_name' => $user_name,
+    'is_auth' => $is_auth
+];
 
 print($layout_content);
