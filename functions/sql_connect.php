@@ -69,3 +69,44 @@ function get_ad_information_from_db($connect)
     return $ad_information;
 }
 
+/**
+ * Функция получает массив с информацией о лотах из базы данных yeticave.
+ * Каждый лот включает в себя название, дату создания, описание товара, название категории, ссылку на изображение, дату завершения лота,
+ * стартовую цену, шаг ставки, текущую цену, название категории;
+ * @param $connect
+ * @return array|int
+ */
+function get_info_about_lot_from_db($connect)
+{
+    if (isset($_GET['id'])) {
+        $id = (int)$_GET['id'];
+    } else {
+        http_response_code(400);
+        exit("Ошибка подключения: не указан id");
+    }
+
+    $sql_lot = 'SELECT item.id,
+                    item.created_at,
+                    item.title AS title,
+                    item.description,
+                    category.title AS category_title,
+                    item.image_url,
+                    item.completed_at,
+                    item.start_price,
+                    item.bet_step,
+                    IFNULL(MAX(bet.total), item.start_price) AS current_price
+              FROM item
+                    INNER JOIN category ON item.category_id = category.id
+                    LEFT JOIN bet on bet.item_id = item.id
+              WHERE item.id = ' . $id;
+
+    $info_about_lot = mysqli_query($connect, $sql_lot);
+    $lot_info = mysqli_fetch_array($info_about_lot, MYSQLI_ASSOC);
+
+    if ($lot_info === NULL) {
+        http_response_code(404);
+        exit("Страница с id =" . $id . " не найдена.");
+    }
+
+    return $lot_info;
+}
