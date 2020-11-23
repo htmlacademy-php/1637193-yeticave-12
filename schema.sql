@@ -10,8 +10,8 @@ USE yeticave;
 CREATE TABLE category
 (
     id            INT          NOT NULL AUTO_INCREMENT PRIMARY KEY, -- первичный ключ, автоматически увеличивается на 1 для новой записи
-    title         VARCHAR(100) NOT NULL,                            -- Заголовок категорий лотов
-    symbolic_code VARCHAR(100) NOT NULL,                            --  Символьный код категории для назначения правильного класса в меню категорий
+    title         VARCHAR(100),                            -- Заголовок категорий лотов
+    symbolic_code VARCHAR(100),                            --  Символьный код категории для назначения правильного класса в меню категорий
     INDEX category_title (title)                                    -- создаю индекс для поля, по которому будет поиск
 );
 
@@ -21,10 +21,10 @@ CREATE TABLE users
     id         INT          NOT NULL AUTO_INCREMENT PRIMARY KEY, -- первичный ключ, автоматически увеличивается на 1 для новой записи
     created_at TIMESTAMP DEFAULT NOW(),                          -- дата регистрации: дата и время, когда этот пользователь завёл аккаунт
     updated_at TIMESTAMP ON UPDATE NOW(),                        -- дата и время обновления таблицы
-    email      VARCHAR(100) NOT NULL UNIQUE,                     -- email пользователя
-    name       VARCHAR(45)  NOT NULL,                            -- имя пользователя
-    password   VARCHAR(45)  NOT NULL,                            -- пароль: хэшированный пароль пользователя
-    contacts   VARCHAR(255) NOT NULL,                            -- контакты: контактная информация для связи с пользователем
+    email      VARCHAR(100) UNIQUE,                     -- email пользователя
+    name       VARCHAR(45),                            -- имя пользователя
+    password   VARCHAR(45),                            -- пароль: хэшированный пароль пользователя
+    contacts   VARCHAR(255),                            -- контакты: контактная информация для связи с пользователем
     INDEX users_id (id)                                          -- создаю индекс для поля, по которому будет поиск
 );
 
@@ -34,15 +34,15 @@ CREATE TABLE item
     id           INT          NOT NULL AUTO_INCREMENT PRIMARY KEY, -- первичный ключ, автоматически увеличивается на 1 для новой записи
     created_at   TIMESTAMP DEFAULT NOW(),                          -- дата создания: дата и время, когда этот лот был создан пользователем
     updated_at   TIMESTAMP ON UPDATE NOW(),                        -- дата и время обновления таблицы
-    title        VARCHAR(100) NOT NULL,                            -- название: задается пользователем
-    description  VARCHAR(255) NOT NULL,                            -- описание: задается пользователем
-    image_url    VARCHAR(255) NOT NULL,                            -- изображение: ссылка на файл изображения
-    start_price  INT          NOT NULL,                            -- начальная цена лота
+    title        VARCHAR(100),                            -- название: задается пользователем
+    description  VARCHAR(255),                            -- описание: задается пользователем
+    image_url    VARCHAR(255),                            -- изображение: ссылка на файл изображения
+    start_price  INT,                            -- начальная цена лота
     completed_at TIMESTAMP,                                        -- дата завершения аукциона по данному лоту
-    bet_step     INT          NOT NULL,                            -- шаг ставки
-    author_id    INT          NOT NULL,                            -- связь: - автор: пользователь, создавший лот;
-    category_id  INT          NOT NULL,                            -- связь: - победитель: пользователь, выигравший лот
-    winner_id    INT          NOT NULL,                            -- связь: - категория: категория объявления
+    bet_step     INT,                            -- шаг ставки
+    author_id    INT,                            -- связь: - автор: пользователь, создавший лот;
+    category_id  INT,                            -- связь: - победитель: пользователь, выигравший лот
+    winner_id    INT,                            -- связь: - категория: категория объявления
     INDEX item_title (title),                                      -- создаю индекс для поля, по которому будет поиск
     INDEX item_category_id (category_id),                          -- создаю индекс для поля, по которому будет поиск
     INDEX item_author_id (author_id),                              -- создаю индекс для поля, по которому будет поиск
@@ -69,9 +69,9 @@ CREATE TABLE bet
     id         INT            NOT NULL AUTO_INCREMENT PRIMARY KEY, -- первичный ключ, автоматически увеличивается на 1 для новой записи
     created_at TIMESTAMP DEFAULT NOW(),                            -- дата и время размещения ставки
     updated_at TIMESTAMP ON UPDATE NOW(),                          -- дата и время обновления таблицы
-    total      DECIMAL(10, 2) NOT NULL,                            -- сумма: цена, по которой пользователь готов приобрести лот
-    user_id    INT            NOT NULL,                            -- связь: - пользователь, сделавший ставку
-    item_id    INT            NOT NULL,                            -- связь: - лот, на который сделали ставку
+    total      DECIMAL(10, 2),                            -- сумма: цена, по которой пользователь готов приобрести лот
+    user_id    INT,                            -- связь: - пользователь, сделавший ставку
+    item_id    INT,                            -- связь: - лот, на который сделали ставку
     INDEX bet_user_id (user_id),                                   -- создаю индекс для поля, по которому будет поиск
     INDEX bet_item_id (item_id),                                   -- создаю индекс для поля, по которому будет поиск
     CONSTRAINT bet_item_idx                                        -- ограничение внешнего ключа
