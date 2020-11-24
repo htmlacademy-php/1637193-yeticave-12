@@ -103,3 +103,31 @@ function get_info_about_lot_from_db($id, $connect)
 
     return $lot_info;
 }
+
+/**
+ * Вспомогательная функция для получения значений из POST-запроса
+ * @param $name mixed|string поле, из которого будет браться значение POST
+ * @return mixed|string содержимое POST-запроса
+ */
+function get_post_value($name) {
+    return $_POST[$name] ?? "";
+}
+
+/**
+* Сохраняет файл в папку /uploads/, не изменяя имени файла.
+* @param string $field_name Имя поля файла
+* @return string|null Возвращает url сохраненного файла или возвращает NULL в случае ошибки
+**/
+function save_file(string $field_name) : ?string {
+    if (isset($_FILES[$field_name])) {
+        $file_name = $_FILES[$field_name]['name'];
+        $file_path = $_SERVER['DOCUMENT_ROOT'] . '/uploads/';
+        $file_url = '/uploads/' . $file_name;
+
+        if(move_uploaded_file($_FILES[$field_name]['tmp_name'], $file_path . $file_name))
+        {
+            return $file_url;
+        }
+    }
+    return null;
+}
