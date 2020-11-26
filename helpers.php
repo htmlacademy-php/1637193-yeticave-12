@@ -1,44 +1,23 @@
 <?php
 /**
- * Проверяет переданную дату на соответствие формату 'ГГГГ-ММ-ДД ЧЧ:ММ:СС'
+ * Проверяет переданную дату на соответствие выбранному формату: либо 'ГГГГ-ММ-ДД ЧЧ:ММ:СС', либо 'ГГГГ-ММ-ДД'
  *
  * Примеры использования:
- * is_date_valid('2019-01-01 12:00:55'); // true
- * is_date_valid('2016-02-29 12:00:55'); // true
+ * is_date_valid('2019-01-01 12:00:55', CORRECT_DATE_TIME_FORMAT); // true
+ * is_date_valid('2019-01-01', CORRECT_DATE_TIME); // true
+ * is_date_valid('2016-02-29 12:00:55', CORRECT_DATE_TIME_FORMAT); // true
+ * is_date_valid('2016-02-29', CORRECT_DATE_TIME); // true
  * is_date_valid('2019-04-31 12:00:55'); // false
  * is_date_valid('10.10.2010 52:00:55'); // false
  * is_date_valid('10/10/2010 12:00:55'); // false
  *
  * @param string $date Дата в виде строки
- *
- * @return bool true при совпадении с форматом 'ГГГГ-ММ-ДД', иначе false
+ * @param $required_format string контстанта CORRECT_DATE_TIME при необходимом формате 'ГГГГ-ММ-ДД' или CORRECT_DATE_TIME_FORMAT при необходимом формате 'ГГГГ-ММ-ДД ЧЧ:ММ:СС'
+ * @return bool true при совпадении с форматом 'ГГГГ-ММ-ДД' или 'ГГГГ-ММ-ДД ЧЧ:ММ:СС', иначе false
  */
-function is_date_valid(string $date): bool
+function is_date_valid(string $date, $required_format): bool
 {
-    $format_to_check = 'Y-m-d H:i:s';
-    $dateTimeObj = date_create_from_format($format_to_check, $date);
-
-    return $dateTimeObj !== false && array_sum(date_get_last_errors()) === 0;
-}
-
-/**
- * Проверяет переданную дату на соответствие формату 'ГГГГ-ММ-ДД'
- *
- * Примеры использования:
- * is_date_valid('2019-01-01'); // true
- * is_date_valid('2016-02-29'); // true
- * is_date_valid('2019-04-31'); // false
- * is_date_valid('10.10.2010'); // false
- * is_date_valid('10/10/2010'); // false
- *
- * @param string $date Дата в виде строки
- *
- * @return bool true при совпадении с форматом 'ГГГГ-ММ-ДД', иначе false
- */
-function is_only_date_valid(string $date): bool
-{
-    $format_to_check = 'Y-m-d';
-    $dateTimeObj = date_create_from_format($format_to_check, $date);
+    $dateTimeObj = date_create_from_format($required_format, $date);
 
     return $dateTimeObj !== false && array_sum(date_get_last_errors()) === 0;
 }
