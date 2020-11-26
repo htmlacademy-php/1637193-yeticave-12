@@ -21,6 +21,8 @@ if (isset($_GET['id'])) {
 $lot = get_info_about_lot_from_db($id, $connect);
 $categories = get_categories_from_db($connect);
 
+connect_db_error($connect, $categories);
+
 $page_content = include_template('lot_page.php', compact('categories', 'lot'));
 
 $layout_content = include_template('layout.php', [
