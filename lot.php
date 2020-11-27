@@ -1,4 +1,8 @@
 <?php
+/**
+ * @var string $user_name
+ * @var boolean $is_auth
+ */
 require_once './helpers.php'; //дефолтные функции от создателей курса
 require_once './functions/data.php'; //дефолтные переменные
 require_once './functions/numbers.php'; //числовые функции

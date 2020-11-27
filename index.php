@@ -17,6 +17,8 @@ $connect = db_connection();
 $categories = get_categories_from_db($connect);
 $ad_information = get_ad_information_from_db($connect);
 
+
+
 $page_content = include_template('main.php', compact('categories', 'ad_information'));
 
 $layout_content = include_template('layout.php', [

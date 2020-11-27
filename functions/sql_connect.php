@@ -7,11 +7,27 @@
  */
 function db_connection()
 {
-    $connect = mysqli_connect('localhost', 'root', 'root', 'yeticave');
+    $connect = mysqli_connect(DB_CONNECTION_DATA['host'], DB_CONNECTION_DATA['user'], DB_CONNECTION_DATA['password'], DB_CONNECTION_DATA['database']);
     mysqli_set_charset($connect, "utf8");
 
     if (!$connect) {
-        exit("Ошибка подключения: " . mysqli_connect_error());
+        //exit("Ошибка подключения: " . mysqli_connect_error());
+        $error = 'Ошибка подключения: &#129298; ' . mysqli_connect_error();
+        $page_content = include_template(
+            'error_page.php',
+            [
+                'error' => $error
+            ]
+        );
+        $layout_content = include_template('layout.php', [
+            'content' => $page_content,
+            'categories' => [],
+            'title' => 'Возвращайтесь чуть позже',
+            'user_name' => '',
+            'is_auth' => 0
+        ]);
+
+        exit($layout_content);
     }
     return $connect;
 }
@@ -19,15 +35,15 @@ function db_connection()
 /**
  * Функция получает все категории из базы данных yeticave
  * @param $connect mixed данные о подключении к базе данных yeticave
- * @return array|int массив с категориями
+ * @return array|int  массив с категориями
  */
 function get_categories_from_db($connect)
 {
-    $sql_category = "SELECT title, symbolic_code FROM category";
+    $sql_category = "SELECT id, title, symbolic_code FROM category";
     $result_category = mysqli_query($connect, $sql_category);
 
     if (!$result_category) {
-        exit('Ошибка запроса: ' . mysqli_error($connect));
+        exit('Ошибка запроса: &#129298; ' . mysqli_error($connect));
     }
     $categories = mysqli_fetch_all($result_category, MYSQLI_ASSOC);
     return $categories;
@@ -60,7 +76,7 @@ function get_ad_information_from_db($connect)
     $result_items = mysqli_query($connect, $sql_item);
 
     if (!$result_items) {
-        exit('Ошибка запроса: ' . mysqli_error($connect));
+        exit('Ошибка запроса: &#129298; ' . mysqli_error($connect));
     }
     $ad_information = mysqli_fetch_all($result_items, MYSQLI_ASSOC);
     return $ad_information;
@@ -96,10 +112,66 @@ function get_info_about_lot_from_db($id, $connect)
 
     if (!isset($lot_info['id'])) {
         http_response_code(404);
-        header("Location: 404.php");
+        header("Location: /404.php");
         print("Страница с id = " . $id . " не найдена.");
         die();
     }
 
     return $lot_info;
+}
+
+/**
+ * Вспомогательная функция для получения значений из POST-запроса
+ * @param $name mixed|string поле, из которого будет браться значение POST
+ * @return mixed|string содержимое POST-запроса
+ */
+function get_post_value($name)
+{
+    return $_POST[$name] ?? "";
+}
+
+/**
+ * Сохраняет файл в папку /uploads/, не изменяя имени файла.
+ * @param string $field_name Имя поля файла
+ * @return string|null Возвращает url сохраненного файла или возвращает NULL в случае ошибки
+ **/
+function save_file(string $field_name): ?string
+{
+    if (isset($_FILES[$field_name])) {
+        $prefix = uniqid();
+        $file_name = $prefix . '_' . $_FILES[$field_name]['name'];
+        $file_path = $_SERVER['DOCUMENT_ROOT'] . _DS . NAME_FOLDER_UPLOADS_FILE . _DS;
+        $file_url = _DS . NAME_FOLDER_UPLOADS_FILE . _DS . $file_name;
+
+        if (move_uploaded_file($_FILES[$field_name]['tmp_name'], $file_path . $file_name)) {
+            return $file_url;
+        }
+    }
+    return null;
+}
+
+
+/**
+ * Функция проверяет значение категории в отправленной форме, и выводит страницу для создания нового лота.
+ * @param string $user_name Имя пользователя
+ * @param array $categories Массив с значениями категорий лотов
+ * @param array $errors Массив для записи возможных ошибок
+ */
+function show_add_lot_page(string $user_name, $categories, $errors = []): void
+{
+    $selected_category = $_POST['category'] ?? 0;
+    $page_content = include_template('add_lot.php', compact('categories', 'errors', 'selected_category'));
+
+    $layout_content = include_template(
+        'layout.php',
+        [
+            'content' => $page_content,
+            'categories' => $categories,
+            'title' => 'Добавление нового лота',
+            'user_name' => $user_name,
+            'is_auth' => 1
+        ]
+    );
+
+    print($layout_content);
 }
