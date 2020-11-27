@@ -11,7 +11,23 @@ function db_connection()
     mysqli_set_charset($connect, "utf8");
 
     if (!$connect) {
-        exit("Ошибка подключения: " . mysqli_connect_error());
+        //exit("Ошибка подключения: " . mysqli_connect_error());
+        $error = 'Ошибка подключения: &#129298; ' . mysqli_connect_error();
+        $page_content = include_template(
+            'error_page.php',
+            [
+                'error' => $error
+            ]
+        );
+        $layout_content = include_template('layout.php', [
+            'content' => $page_content,
+            'categories' => [],
+            'title' => 'Возвращайтесь чуть позже',
+            'user_name' => '',
+            'is_auth' => 0
+        ]);
+
+        exit($layout_content);
     }
     return $connect;
 }
@@ -27,7 +43,7 @@ function get_categories_from_db($connect)
     $result_category = mysqli_query($connect, $sql_category);
 
     if (!$result_category) {
-        exit('Ошибка запроса: ' . mysqli_error($connect));
+        exit('Ошибка запроса: &#129298; ' . mysqli_error($connect));
     }
     $categories = mysqli_fetch_all($result_category, MYSQLI_ASSOC);
     return $categories;
@@ -60,7 +76,7 @@ function get_ad_information_from_db($connect)
     $result_items = mysqli_query($connect, $sql_item);
 
     if (!$result_items) {
-        exit('Ошибка запроса: ' . mysqli_error($connect));
+        exit('Ошибка запроса: &#129298; ' . mysqli_error($connect));
     }
     $ad_information = mysqli_fetch_all($result_items, MYSQLI_ASSOC);
     return $ad_information;
@@ -96,7 +112,7 @@ function get_info_about_lot_from_db($id, $connect)
 
     if (!isset($lot_info['id'])) {
         http_response_code(404);
-        header("Location: 404.php");
+        header("Location: /404.php");
         print("Страница с id = " . $id . " не найдена.");
         die();
     }
@@ -158,27 +174,4 @@ function show_add_lot_page(string $user_name, $categories, $errors = []): void
     );
 
     print($layout_content);
-}
-
-
-/**
- * Функция вывода ошибки из-за отсутствия подключения к БД
- * @param $connect string данные о подключении к БД
- * @param $categories array массив с данными о категориях лотов товаров
- * @return array страницу с описанием ошибки
- */
-function connect_db_error($connect, $categories)
-{
-    if (!$connect) {
-        $error = 'Ошибка подключения:' . mysqli_connect_error() . '<br>' . 'Обратитесь к администратору сайта.';
-        $page_content = include_template(
-            '404_page.php',
-            [
-                'error' => $error,
-                'categories' => $categories
-            ]
-        );
-        return $page_content;
-    }
-    return NULL;
 }
