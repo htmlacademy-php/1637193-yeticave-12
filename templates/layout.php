@@ -32,7 +32,6 @@
             </form>
             <a class="main-header__add-lot button" href="/add.php">Добавить лот</a>
             <nav class="user-menu">
-                <!-- здесь PHP код для показа меню и данных пользователя -->
                 <?php if ($is_auth == 1): ?>
                     <div class="user-menu__logged">
                         <p><?= $user_name ?></p>
@@ -42,26 +41,37 @@
                 <?php else: ?>
                     <ul class="user-menu__list">
                         <li class="user-menu__item">
-                            <a href="#">Регистрация</a>
+                            <a href="/sign-up.php">Регистрация</a>
                         </li>
                         <li class="user-menu__item">
-                            <a href="#">Вход</a>
+                            <a href="/enter.php">Вход</a>
                         </li>
                     </ul>
                 <?php endif; ?>
             </nav>
         </div>
     </header>
-    <?= $content; ?>
+    <main <?php if($title == TITLE_MAIN_PAGE): ?>class="container"<?php endif; ?>>
+        <nav class="nav">
+            <ul class="nav__list container">
+                <?php if($title !== TITLE_MAIN_PAGE): ?>
+                <?php foreach ($categories as $category_name): ?>
+                    <li class="nav__item">
+                        <a href="pages/<?= $category_name['id']; ?>"><?= htmlspecialchars($category_name['title'] ?? ""); ?></a>
+                    </li>
+                <?php endforeach; ?>
+                <?php endif; ?>
+            </ul>
+        </nav>
+        <?= $content; ?>
+    </main>
 </div>
 
 <footer class="main-footer">
-    <nav class="nav">
+        <nav class="nav">
         <ul class="nav__list container">
-            <!--заполнил этот список из массива категорий $categories товарами $category_name-->
             <?php foreach ($categories as $category_name): ?>
                 <li class="nav__item">
-                    <!--применяем htmlspecialchars для преобразования спецсимволов в соответствующие мнемоники-->
                     <a href="pages/<?= $category_name['id']; ?>"><?= htmlspecialchars($category_name['title']); ?></a>
                 </li>
             <?php endforeach; ?>

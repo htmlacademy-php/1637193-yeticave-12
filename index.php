@@ -24,7 +24,7 @@ $page_content = include_template('main.php', compact('categories', 'ad_informati
 $layout_content = include_template('layout.php', [
     'content' => $page_content,
     'categories' => $categories,
-    'title' => 'Yeticave - Главная страница by Alexander Galkin',
+    'title' => TITLE_MAIN_PAGE,
     'user_name' => $user_name,
     'is_auth' => $is_auth
 ]);
