@@ -60,13 +60,13 @@
         <div class="form__container-three">
             <div class="form__item form__item--small <?= isset($errors['lot-rate']) ? "form__item--invalid" : "" ?>">
                 <label for="lot-rate">Начальная цена <sup>*</sup></label>
-                <input id="lot-rate" type="number" name="lot-rate" placeholder="0"
+                <input id="lot-rate" type="text" name="lot-rate" placeholder="0"
                        value="<?= get_post_value('lot-rate'); ?>">
                 <span class="form__error"><?= $errors['lot-rate'] ?? "" ?></span>
             </div>
             <div class="form__item form__item--small <?= isset($errors['lot-step']) ? "form__item--invalid" : "" ?>">
                 <label for="lot-step">Шаг ставки <sup>*</sup></label>
-                <input id="lot-step" type="number" name="lot-step" placeholder="0"
+                <input id="lot-step" type="text" name="lot-step" placeholder="0"
                        value="<?= get_post_value('lot-step'); ?>">
                 <span class="form__error"><?= $errors['lot-step'] ?? "" ?></span>
             </div>
