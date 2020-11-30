@@ -55,7 +55,7 @@ foreach ($_POST as $key => $value) {
 }
 
 //валидация файла изображения из массива $_FILES
-$errors['lot-img'] = validate_file('lot-img',);
+$errors['lot-img'] = validate_file('lot-img');
 
 $errors = array_filter($errors); //фильтруем ошибки из массива - добавляем их в новый в случае присутствия самих ошибок
 
