@@ -8,7 +8,7 @@
 function validate_filled($name)
 {
     if (empty($_POST[$name])) {
-        return "Это поле должно быть заполнено";
+        return "Это поле должно быть заполнено: " . $name;
     }
     return null;
 }
@@ -86,6 +86,75 @@ function validate_date_end(string $field_name): ?string
         return 'Некорректный формат даты, исправьте на "ГГГГ-ММ-ДД"';
     } elseif (date_create($_POST[$field_name]) < $tomorrow_date) {
         return 'Некорректная дата завершения лота';
+    }
+    return null;
+}
+
+/**
+ * Функция валидации пароля, в случае успешной валидации возвращает NULL
+ * @param string $password Введеный пароль пользователя
+ * @return string|null Причина ошибки валидации или NULL при отсутствии ошибок
+ */
+function validate_password($password)
+{
+    if (empty($password)) {
+        return "Необходимо придумать и ввести пароль для вашего аккаунта";
+    }
+    if (strlen($password) < 8) {
+        return "Пароль должен быть не менее 8 символов";
+    }
+    if (preg_match("/^([а-яА-ЯЁёa]+)$/u", $password) || (preg_match("/^[а-яА-ЯёЁa-zA-Z0-9]+$/", $password))) {
+        return "В пароле не должно быть русских букв: допустимы только латинские буквы, цифры и спец. символы";
+    }
+    if (!(preg_match("/([0-9]+)/", $password))) {
+        return "В введенном пароле не хватает цифр";
+    }
+    if (!preg_match("/([a-zA-Z]+)/", $password)) {
+        return "В введенном пароле не хватает латинских букв";
+    }
+    return NULL;
+}
+
+/**
+ * Функция валидации адреса электронной почты, в случае успешной валидации возвращает NULL
+ * @param $email string Введеная почта пользователя
+ * @return string|null Причина ошибки валидации или NULL при отсутствии ошибок
+ */
+function validate_email($email)
+{
+    if (empty($email)) {
+        return "Введите адрес электронной почты";
+    }
+    if (!filter_input(INPUT_POST, $email, FILTER_VALIDATE_EMAIL)) {
+        return "Введите корректный e-mail в формате name@post.com";
+    }
+
+    //проверка существования пользователя с email из формы
+    $connect = db_connection();
+
+    $check_email = mysqli_real_escape_string($connect, $_POST['email']); //экранирование спец.символов для использования в SQL-выражении
+    $check_sql = "SELECT id FROM users WHERE email = '$check_email'"; // запрос на поиск записи в таблице пользователей по переданному email
+    $check_result = mysqli_query($connect, $check_sql); // передаем запрос в БД
+
+    if (mysqli_num_rows($check_result) > 0) {
+        return 'Пользователь с этим email уже зарегистрирован';
+    }
+    return NULL;
+
+}
+
+/**
+ * Функция валидации контактных данных пользователя, в случае успешной валидации возвращает NULL
+ * @param $contacts string Контактные данные пользователя
+ * @return string|null Причина ошибки валидации или NULL при отсутствии ошибок
+ */
+function validate_contacts($contacts)
+{
+    if (empty($contacts)) {
+        return "Оставьте свои контактные данные для связи";
+    }
+    if (strlen($contacts) > 255) {
+        return "Контакты должны занимать менее 255 символов";
     }
     return null;
 }
