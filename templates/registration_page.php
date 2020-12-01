@@ -8,7 +8,7 @@
 ?>
 
 
-<form class="form container <?= empty($errors) ? "" : "form--invalid" ?>" action="../sign-up.php" method="post"
+<form class="form container <?= empty($errors) ? "" : "form--invalid" ?>" action="/sign-up.php" method="post"
       autocomplete="off">
     <h2>Регистрация нового аккаунта</h2>
     <?php $classname = isset($errors['email']) ? "form__item--invalid" : "";
@@ -58,6 +58,6 @@
         <br>
     <?php endif; ?>
     <button type="submit" class="button">Зарегистрироваться</button>
-    <a class="text-link" href="../enter.php">Уже есть аккаунт</a>
+    <a class="text-link" href="/enter.php">Уже есть аккаунт</a>
 </form>
 

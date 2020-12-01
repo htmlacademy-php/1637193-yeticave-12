@@ -12,7 +12,7 @@
         <?php foreach ($categories as $category_name): ?>
             <li class="promo__item promo__item--<?= htmlspecialchars($category_name['symbolic_code']) ?>">
                 <a class="promo__link"
-                   href="../pages/all-lots.html"><?= htmlspecialchars($category_name['title']); ?></a>
+                   href="/pages/all-lots.html"><?= htmlspecialchars($category_name['title']); ?></a>
             </li>
         <?php endforeach; ?>
     </ul>
@@ -32,7 +32,7 @@
                 <div class="lot__info">
                     <span class="lot__category"><?= htmlspecialchars($ad_value['category_title']); ?></span>
                     <h3 class="lot__title"><a class="text-link"
-                                              href="../lot.php?id=<?= htmlspecialchars($ad_value['id']) ?>"><?= htmlspecialchars($ad_value['title']) ?></a>
+                                              href="/lot.php?id=<?= htmlspecialchars($ad_value['id']) ?>"><?= htmlspecialchars($ad_value['title']) ?></a>
                     </h3>
                     <div class="lot__state">
                         <div class="lot__rate">
