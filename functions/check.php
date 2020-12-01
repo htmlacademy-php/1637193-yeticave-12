@@ -3,12 +3,16 @@
 /**
  * Функция проверяет, заполнено ли указанное поле
  * @param $name string Проверяемое поле в форме
- * @return string В случае незаполненности возвращает требование о необходимости добавить данные либо NULL
+ * @param $name_in_russian string|null Название поля на русском языке либо NULL
+ * @return string|null В случае незаполненности возвращает требование о необходимости добавить данные либо NULL
  */
-function validate_filled($name)
+function validate_filled(string $name, $name_in_russian)
 {
     if (empty($_POST[$name])) {
-        return "Это поле должно быть заполнено: " . $name;
+        if (!$name_in_russian) {
+            return "Данное поле должно быть заполнено";
+        }
+        return "Необходимо заполнить поле " . '"' . $name_in_russian . '"';
     }
     return null;
 }
@@ -20,8 +24,8 @@ function validate_filled($name)
  **/
 function validate_category(string $field_name)
 {
-    if ($empty = validate_filled($field_name)) {
-        return $empty;
+    if (empty($_POST[$field_name])) {
+        return "Необходимо выбрать категорию у добавляемого лота";
     }
     return null;
 }
@@ -46,9 +50,8 @@ function validate_file(string $field_name): ?string
             return "Максимальный размер файла: 2 Мб";
         }
         return 'Изображение должно быть в одном из данных форматов: jpeg, jpg и png';
-    } else {
-        return 'Поле не заполнено';
     }
+    return 'Поле не заполнено';
 }
 
 
@@ -60,14 +63,14 @@ function validate_file(string $field_name): ?string
  **/
 function validate_number_value(string $field_name): ?string
 {
-    if ($empty = validate_filled($field_name)) {
+    if ($empty = validate_filled($field_name, NULL)) {
         return $empty;
     } elseif (!is_numeric($_POST[$field_name])) {
         return 'Значение должно быть числом';
     } elseif ($_POST[$field_name] <= 0) {
         return 'Значение должно быть больше нуля';
     }
-    return null;
+    return NULL;
 }
 
 
@@ -80,33 +83,33 @@ function validate_date_end(string $field_name): ?string
 {
     $tomorrow_date = date_create('tomorrow');
 
-    if ($empty = validate_filled($field_name)) {
+    if ($empty = validate_filled($field_name, NULL)) {
         return $empty;
     } elseif (!is_date_valid($_POST[$field_name], CORRECT_DATE_TIME)) {
         return 'Некорректный формат даты, исправьте на "ГГГГ-ММ-ДД"';
     } elseif (date_create($_POST[$field_name]) < $tomorrow_date) {
         return 'Некорректная дата завершения лота';
     }
-    return null;
+    return NULL;
 }
 
 /**
  * Функция валидации пароля, в случае успешной валидации возвращает NULL
- * @param string $password Введеный пароль пользователя
+ * @param string $password Введенный пароль пользователя
  * @return string|null Причина ошибки валидации или NULL при отсутствии ошибок
  */
-function validate_password($password)
+function validate_password(string $password)
 {
     if (empty($password)) {
-        return "Необходимо придумать и ввести пароль для вашего аккаунта";
+        return "Придумайте и введите пароль для вашего аккаунта";
     }
     if (strlen($password) < 8) {
-        return "Пароль должен быть не менее 8 символов";
+        return "Придуманный пароль должен быть не менее 8 символов, попробуйте дополнить.";
     }
-    if (preg_match("/^([а-яА-ЯЁёa]+)$/u", $password) || (preg_match("/^[а-яА-ЯёЁa-zA-Z0-9]+$/", $password))) {
-        return "В пароле не должно быть русских букв: допустимы только латинские буквы, цифры и спец. символы";
+    if (preg_match("([а-яА-ЯёЁ]+)", $password)) {
+        return "В придуманном пароле не должно быть букв из кириллицы: допустимы только латинские буквы, цифры и спец. символы";
     }
-    if (!(preg_match("/([0-9]+)/", $password))) {
+    if (!preg_match("([0-9]+)", $password)) {
         return "В введенном пароле не хватает цифр";
     }
     if (!preg_match("/([a-zA-Z]+)/", $password)) {
@@ -117,21 +120,27 @@ function validate_password($password)
 
 /**
  * Функция валидации адреса электронной почты, в случае успешной валидации возвращает NULL
- * @param $email string Введеная почта пользователя
+ * @param $email string Введенная почта пользователя
  * @return string|null Причина ошибки валидации или NULL при отсутствии ошибок
  */
-function validate_email($email)
+function validate_email(string $email)
 {
     if (empty($email)) {
         return "Введите адрес электронной почты";
     }
-    if (!filter_input(INPUT_POST, $email, FILTER_VALIDATE_EMAIL)) {
+    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
         return "Введите корректный e-mail в формате name@post.com";
     }
+    return NULL;
+}
 
-    //проверка существования пользователя с email из формы
-    $connect = db_connection();
-
+/**
+ * Функция валидации уникальности адреса электронной почты, в случае успешной валидации возвращает NULL
+ * @param mysqli $connect Данные о подключении к БД
+ * @return string|null Сообщение о том, что пользователь под данным e-mail уже зарегистрирован или NULL при отсутствии ошибок
+ */
+function validate_unique_email(mysqli $connect)
+{
     $check_email = mysqli_real_escape_string($connect, $_POST['email']); //экранирование спец.символов для использования в SQL-выражении
     $check_sql = "SELECT id FROM users WHERE email = '$check_email'"; // запрос на поиск записи в таблице пользователей по переданному email
     $check_result = mysqli_query($connect, $check_sql); // передаем запрос в БД
@@ -140,7 +149,6 @@ function validate_email($email)
         return 'Пользователь с этим email уже зарегистрирован';
     }
     return NULL;
-
 }
 
 /**
@@ -148,7 +156,7 @@ function validate_email($email)
  * @param $contacts string Контактные данные пользователя
  * @return string|null Причина ошибки валидации или NULL при отсутствии ошибок
  */
-function validate_contacts($contacts)
+function validate_contacts(string $contacts)
 {
     if (empty($contacts)) {
         return "Оставьте свои контактные данные для связи";
@@ -156,5 +164,5 @@ function validate_contacts($contacts)
     if (strlen($contacts) > 255) {
         return "Контакты должны занимать менее 255 символов";
     }
-    return null;
+    return NULL;
 }

@@ -1,6 +1,6 @@
 <?php
 require_once './helpers.php'; //дефолтные функции от создателей курса
-require_once './functions/data.php'; //дефолтные переменные
+require_once './functions/config.php'; //пользовательские константы и данные по подключению к БД
 require_once './functions/numbers.php'; //числовые функции
 require_once './functions/time.php'; //функции, влияющие на обработку времени
 require_once './functions/sql_connect.php'; //параметры подключения к базе данных
@@ -13,32 +13,35 @@ $tpl_data = []; // временный массив для записи данн�
 
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') { //Проверяем, что форма была отправлена
-    $form = $_POST;
     $errors = []; // массив, где будут храниться ошибки
 
     $required = ['email', 'password', 'name', 'message']; //обязательные для заполнения поля
 
     $rules = [
         'email' => function () {
-            return validate_email('email');
+            return validate_email($_POST['email']);
         },
         'password' => function () {
             return validate_password($_POST['password']);
         },
         'name' => function () {
-            return validate_filled('name');
+            return validate_filled('name', 'имя пользователя');
         },
         'message' => function () {
-            return validate_contacts('message');
+            return validate_contacts($_POST['message']);
         }
     ];
 
     //Проверяем все поля на заполненность
-    foreach ($form as $key => $value) {
+    foreach ($form = $_POST as $key => $value) {
         if (isset($rules[$key])) {
             $rule = $rules[$key];
             $errors[$key] = $rule();
         }
+    }
+    //проверка существования пользователя с email из формы
+    if (empty($errors['email'])) {
+        $errors['email'] = validate_unique_email($connect);
     }
     $errors = array_filter($errors);
 
@@ -68,7 +71,8 @@ $page_content = include_template('/registration_page.php', $tpl_data);
 $layout_content = include_template('/layout.php', [
     'content' => $page_content,
     'categories' => $categories,
-    'title' => 'Регистрация в Yeticave'
+    'title' => 'Регистрация в Yeticave',
+    'is_auth' => 0
 ]);
 
 print($layout_content);
