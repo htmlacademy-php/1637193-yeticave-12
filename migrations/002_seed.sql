@@ -59,8 +59,6 @@ VALUES ('2014 Rossignol District Snowboard', 'Snowboard', 10999, 'img/lot-1.jpg'
         ,
        ('Маска Oakley Canopy', 'Маска', 5400, 'img/lot-6.jpg', '2020-10-25 12:00:00', '2020-12-25 12:00:00', 20, 3, 6,
         1);
--- вопрос по author_id, category_id, winner_id: пока вставил статичные данные. Надо ли было сразу как-то настраивать через внешние данные с созданных таблиц? Как вариант вижу костыль через UPDATE ... SET ... = '...' WHERE
-
 
 -- добавление примеров ставок для 1-го объявления
 INSERT bet(total, user_id, item_id, created_at)
@@ -123,24 +121,3 @@ FROM bet
          INNER JOIN item ON bet.item_id = item.id
 WHERE bet.item_id = 6
 ORDER BY bet.created_at ASC;
-
--- Изменение типа поля description на TEXT, т.к. VARCHAR(255) мал по размеру
-ALTER TABLE item
-CHANGE description description TEXT
-    CHARACTER SET utf8
-    COLLATE utf8_general_ci NOT NULL;
-
-
--- Добавление большего по размеру описания для лотов после изменения типа поля
-UPDATE item
-SET item.description = 'Lorem ipsum dolor, sit amet, consectetur adipisicing elit. Veritatis alias quam aperiam, earum sunt, nulla id quis cum totam eaque deleniti qui eligendi nisi beatae? Nisi reprehenderit debitis error voluptate.
-Nulla doloribus repudiandae velit dolore distinctio assumenda nihil, sequi ipsa tenetur dolores, aliquam saepe numquam magni mollitia exercitationem eveniet atque accusamus expedita molestias vero qui non! Voluptate aperiam dolores assumenda.
-Sunt nihil in, similique vero laborum id exercitationem. Ratione corrupti eum voluptate itaque, dolorem temporibus doloremque voluptatum incidunt odio animi officiis ipsa ullam dignissimos. Accusantium omnis, eius reiciendis nesciunt vero!'
-WHERE item.id BETWEEN 1 AND 6;
-
--- Увеличение количества символов в поле "Пароль" для сохранения ХЕШ-пароля в БД
-ALTER TABLE users
-CHANGE password
-    password VARCHAR(60)
-    CHARACTER SET utf8
-    COLLATE utf8_general_ci NULL DEFAULT NULL;
