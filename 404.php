@@ -5,7 +5,7 @@
  * @var boolean $is_auth
  */
 require_once './helpers.php'; //дефолтные функции от создателей курса
-require_once './functions/data.php'; //дефолтные переменные
+require_once './functions/config.php'; //пользовательские константы и данные по подключению к БД
 require_once './functions/sql_connect.php'; //параметры подключения к базе данных
 
 $connect = db_connection();

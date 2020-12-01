@@ -1,6 +1,6 @@
 <?php
 require_once './helpers.php'; //дефолтные функции от создателей курса
-require_once './functions/data.php'; //дефолтные переменные
+require_once './functions/config.php'; //пользовательские константы и данные по подключению к БД
 require_once './functions/numbers.php'; //числовые функции
 require_once './functions/time.php'; //функции, влияющие на обработку времени
 require_once './functions/sql_connect.php'; //параметры подключения к базе данных
@@ -67,7 +67,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') { //Проверяем, что фор�
 }
 
 $layout_content = include_template('layout.php', [
-    'content'    => $page_content,
+    'content'    => 'это только черновик формы аутентификации',
     'categories' => $categories,
     'title'      => 'Тут можно залогиниться',
     'is_auth' => 0

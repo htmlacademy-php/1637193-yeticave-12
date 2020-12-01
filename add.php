@@ -5,7 +5,7 @@
  * @var boolean $is_auth
  */
 require_once './helpers.php'; //дефолтные функции от создателей курса
-require_once './functions/data.php'; //дефолтные переменные
+require_once './functions/config.php'; //пользовательские константы и данные по подключению к БД
 require_once './functions/numbers.php'; //числовые функции
 require_once './functions/time.php'; //функции, влияющие на обработку времени
 require_once './functions/sql_connect.php'; //параметры подключения к базе данных
@@ -26,13 +26,13 @@ $required_fields = ['lot-name', 'category', 'message', 'lot-image', 'lot-price',
 // применение функций для проверки полей формы к каждому элементу формы внутри цикла
 $rules = [
     'lot-name' => function () {
-        return validate_filled('lot-name');
+        return validate_filled('lot-name', 'наименование лота');
     },
     'category' => function () {
         return validate_category('category');
     },
     'message' => function () {
-        return validate_filled('message');
+        return validate_filled('message', 'описание лота');
     },
     'lot-rate' => function () {
         return validate_number_value('lot-rate');
