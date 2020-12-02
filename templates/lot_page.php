@@ -8,7 +8,7 @@
     <div class="lot-item__content">
         <div class="lot-item__left">
             <div class="lot-item__image">
-                <img src="/<?= htmlspecialchars($lot['image_url'] ?? '#') ?>" width="730" height="548"
+                <img src="<?= htmlspecialchars($lot['image_url'] ?? '#') ?>" width="730" height="548"
                      alt="<?= htmlspecialchars($lot['title'] ?? 'Без названия') ?>">
             </div>
             <p class="lot-item__category">Категория:
