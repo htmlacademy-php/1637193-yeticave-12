@@ -11,8 +11,7 @@ function db_connection()
     mysqli_set_charset($connect, "utf8");
 
     if (!$connect) {
-        //exit("Ошибка подключения: " . mysqli_connect_error());
-        $error = 'Ошибка подключения: &#129298; ' . mysqli_connect_error();
+        $error = 'Произошла ошибка подключения: &#129298; ';
         $page_content = include_template(
             'error_page.php',
             [

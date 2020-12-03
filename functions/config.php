@@ -19,3 +19,5 @@ const DB_CONNECTION_DATA = [
     'user' => 'root',
     'password' => 'root'
 ];
+
+define('TITLE_MAIN_PAGE', 'Yeticave - Главная страница by Alexander Galkin'); //Заголовок главной страницы

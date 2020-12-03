@@ -7,7 +7,7 @@
  */
 
 require_once './helpers.php'; //дефолтные функции от создателей курса
-require_once './functions/data.php'; //дефолтные переменные
+require_once './functions/config.php'; //пользовательские константы и данные по подключению к БД
 require_once './functions/numbers.php'; //числовые функции
 require_once './functions/time.php'; //функции, влияющие на обработку времени
 require_once './functions/sql_connect.php'; //параметры подключения к базе данных
@@ -24,7 +24,7 @@ $page_content = include_template('main.php', compact('categories', 'ad_informati
 $layout_content = include_template('layout.php', [
     'content' => $page_content,
     'categories' => $categories,
-    'title' => 'Yeticave - Главная страница by Alexander Galkin',
+    'title' => TITLE_MAIN_PAGE,
     'user_name' => $user_name,
     'is_auth' => $is_auth
 ]);
