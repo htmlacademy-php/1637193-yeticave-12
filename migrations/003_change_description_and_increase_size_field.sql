@@ -17,9 +17,9 @@ WHERE item.id BETWEEN 1 AND 6;
 -- Увеличение количества символов в поле "Пароль" в таблице users для сохранения ХЕШ-пароля в БД
 ALTER TABLE users
     CHANGE password
-        password VARCHAR(60)
+        password VARCHAR(255)
             CHARACTER SET utf8
                 COLLATE utf8_general_ci NULL DEFAULT NULL;
 
 -- Добавление 1го тестового аккаунта для проверки авторизации
-INSERT INTO users (email, name, password, contacts) VALUES ('test@test.ru', 'test account', '90b1f057fbcaf3d1a42dd905ab4e35de', 'пароль от аккаунта: password123 . Хеш получен с сайта http://md5-online.ru/')
+INSERT INTO users (email, name, password, contacts) VALUES ('test@test.ru', 'test account', '$2y$10$SvMpQxMkbOtv3LTN5iQ4M.C62oE0O9Jwr7wkNs5/XsGwrjpyToJI.', 'пароль от аккаунта: Pa$$w0rd!')
