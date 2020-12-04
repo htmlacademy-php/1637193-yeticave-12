@@ -137,14 +137,14 @@ function validate_email(string $email)
 /**
  * Функция запроса на поиск в БД записи в таблице пользователей по введенному в форме email
  * @param mysqli $connect Данные о подключении к БД
- * @return mysqli_result Переданный запрос в БД
+ * @return mysqli_result|false Переданный запрос в БД
  */
-function check_unique_email(mysqli $connect)
+function verify_existence_email_db(mysqli $connect)
 {
-    $check_email = mysqli_real_escape_string($connect, $_POST['email']); //экранирование спец.символов для использования в SQL-выражении
-    $check_sql = "SELECT * FROM users WHERE email = '$check_email'"; // запрос на поиск записи в таблице пользователей по переданному email
-
-    return mysqli_query($connect, $check_sql); // передаем запрос в БД;
+    $check_sql = "SELECT * FROM users WHERE email = ? LIMIT 1"; // запрос на поиск записи в таблице пользователей по переданному email
+    $prepared_sql = db_get_prepare_stmt($connect, $check_sql, [strtolower($_POST['email'])]); //создаем выражение на основе SQL запроса и данных из формы о e-mail
+    mysqli_stmt_execute($prepared_sql);//отправка сформированного SQL-выражения в БД
+    return $result_prepared_sql = mysqli_stmt_get_result($prepared_sql); //полученный результат из подготовленного запроса
 }
 
 /**
@@ -154,7 +154,7 @@ function check_unique_email(mysqli $connect)
  */
 function validate_unique_email(mysqli $connect)
 {
-    $check_result = check_unique_email($connect);
+    $check_result = verify_existence_email_db($connect);
 
     if (mysqli_num_rows($check_result) > 0) {
         return 'Пользователь с этим email уже зарегистрирован';
@@ -174,36 +174,6 @@ function validate_contacts(string $contacts)
     }
     if (strlen($contacts) > 255) {
         return "Контакты должны занимать менее 255 символов";
-    }
-    return NULL;
-}
-
-
-/**
- * Функция проверки наличия зарегистрированного пользователя в БД
- * @param mysqli_result $check_result_sql Переданный запрос в БД о поиске пользователя с email, введенным в форме $form
- * @param array $errors Массив с ошибками валидации формы
- * @param array $form Массив с введенными значениями в форме
- * @return array|string|null Массив с записью о новом пользователе в случае совпадения хеша пароля и введенного пароля пользователем либо строку с описанием ошибки валидации, либо NULL
- */
-function check_user_db (mysqli_result $check_result_sql, array $errors, array $form): ?string
-{
-// Если в результате проверки пользователь есть в результате запроса из БД,
-// тогда эти данные о нем получаем в виде нового ассоциативного массива,
-// иначе данных о пользователе в БД еще нет
-    $user = $check_result_sql ? mysqli_fetch_array($check_result_sql, MYSQLI_ASSOC) : null;
-
-    if (!count($errors) and $user) {
-        //Проверяем, что сохраненный хеш пароля и введенный пароль из формы совпадают.
-        if (password_verify($form['password'], $user['password'])) {
-            //если совпадение есть, значит пользователь указал верный пароль.
-            // Тогда мы можем открыть для него сессию и записать в неё все данные о пользователе
-            return $_SESSION['user'] = $user;
-        } //иначе пароль неверный и мы добавляем сообщение об этом в список ошибок
-            return $errors['password'] = 'Неверный пароль: проверьте введенные символы на корректность';
-
-    } elseif (empty($errors['email'])) { //Если пользователь не найден, то записываем это как ошибку валидации
-        return $errors['email'] = 'Пользователь с указанным e-mail не зарегистрирован на сайте: проверьте правильность набора email';
     }
     return NULL;
 }
