@@ -11,6 +11,10 @@ $categories = get_categories_from_db($connect);
 
 $tpl_data = []; // временный массив для записи данных нового пользователя для вывода данных в случае ошибок
 
+if (!isset($_SESSION['user']['id'])) {
+    http_response_code(403);
+    exit("Вы уже зарегистрированы на нашем сайте.");
+}
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') { //Проверяем, что форма была отправлена
     $errors = []; // массив, где будут храниться ошибки

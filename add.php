@@ -59,6 +59,11 @@ $errors['lot-img'] = validate_file('lot-img');
 
 $errors = array_filter($errors); //фильтруем ошибки из массива - добавляем их в новый в случае присутствия самих ошибок
 
+if (!isset($_SESSION['user']['id'])) {
+    http_response_code(403);
+    exit("Для добавления лота необходимо пройти регистрацию на сайте.");
+}
+
 //при отсутствии ошибок - сохраняем добавленный файл
 if (empty($errors)) {
     $file_url = save_file('lot-img');
