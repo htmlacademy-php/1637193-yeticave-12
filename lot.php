@@ -29,8 +29,8 @@ if (isset($_GET['id'])) {
         'content' => $page_content,
         'categories' => [],
         'title' => 'Страница не найдена',
-        'user_name' => '',
-        'is_auth' => 0
+        'user_name' => $user_name,
+        'is_auth' => $is_auth
     ]);
 
     exit($layout_content);

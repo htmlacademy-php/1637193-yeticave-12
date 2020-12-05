@@ -1,4 +1,8 @@
 <?php
+/**
+ * @var string $user_name
+ * @var string $is_auth
+ */
 session_start();
 require_once './functions/bootstrap.php'; //подключение всех функций и констант в отдельном файле
 
@@ -68,7 +72,8 @@ $layout_content = include_template('/layout.php', [
     'content' => $page_content,
     'categories' => $categories,
     'title' => 'Тут можно залогиниться',
-    'is_auth' => 0
+    'user_name' => $user_name,
+    'is_auth' => $is_auth
 ]);
 
 print($layout_content);
