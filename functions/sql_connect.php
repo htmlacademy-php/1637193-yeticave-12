@@ -12,13 +12,19 @@ function db_connection()
 
     if (!$connect) {
         $error = 'Произошла ошибка подключения: &#129298; ';
+        $error_description = 'У нас произошла техническая ошибка. &#128532; ';
+        $error_link = '/index.php';
+        $error_link_description = 'Возвращайтесь к нам немного позже.';
         $page_content = include_template(
-            'error_page.php',
+            '/error_page.php',
             [
-                'error' => $error
+                'error' => $error,
+                'error_description' => $error_description,
+                'error_link' => $error_link,
+                'error_link_description' => $error_link_description
             ]
         );
-        $layout_content = include_template('layout.php', [
+        $layout_content = include_template('/layout.php', [
             'content' => $page_content,
             'categories' => [],
             'title' => 'Возвращайтесь чуть позже',
@@ -89,7 +95,7 @@ function get_ad_information_from_db($connect)
  * @param $connect - данные о подключении к базе данных
  * @return array|int
  */
-function get_info_about_lot_from_db($id, $connect)
+function get_info_about_lot_from_db($id, $connect, $categories)
 {
     $sql_lot = 'SELECT item.id,
                     item.created_at,
@@ -104,16 +110,33 @@ function get_info_about_lot_from_db($id, $connect)
               FROM item
                     INNER JOIN category ON category.id = item.category_id
                     INNER JOIN bet on bet.item_id = item.id
-              WHERE item.id = ' . $id;
+              WHERE item.id = ' . htmlspecialchars($id);
 
     $info_about_lot = mysqli_query($connect, $sql_lot);
     $lot_info = mysqli_fetch_array($info_about_lot, MYSQLI_ASSOC);
 
     if (!isset($lot_info['id'])) {
         http_response_code(404);
-        header("Location: /404.php");
-        print("Страница с id = " . $id . " не найдена.");
-        die();
+        $error = 'Произошла ошибка: &#129298; ';
+        $error_description = 'Страница с id = ' . htmlspecialchars($id) . ' не найдена. &#128532; ';
+        $error_link = '/index.php';
+        $error_link_description = 'Предлагаем вернуться на главную.';
+        $page_content = include_template(
+            '/error_page.php',
+            [
+                'error' => $error,
+                'error_description' => $error_description,
+                'error_link' => $error_link,
+                'error_link_description' => $error_link_description
+            ]
+        );
+        $layout_content = include_template('/layout.php', [
+            'content' => $page_content,
+            'categories' => $categories,
+            'title' => 'Страница c id = .' . $id . 'не найдена'
+        ]);
+
+        exit($layout_content);
     }
 
     return $lot_info;
@@ -121,7 +144,7 @@ function get_info_about_lot_from_db($id, $connect)
 
 /**
  * Вспомогательная функция для получения значений из POST-запроса
- * @param $name mixed|string поле, из которого будет браться значение POST
+ * @param $name mixed поле, из которого будет браться значение POST
  * @return mixed|string содержимое POST-запроса
  */
 function get_post_value($name)
@@ -159,10 +182,10 @@ function save_file(string $field_name): ?string
 function show_add_lot_page(string $user_name, $categories, $errors = []): void
 {
     $selected_category = $_POST['category'] ?? 0;
-    $page_content = include_template('add_lot.php', compact('categories', 'errors', 'selected_category'));
+    $page_content = include_template('/add_lot.php', compact('categories', 'errors', 'selected_category'));
 
     $layout_content = include_template(
-        'layout.php',
+        '/layout.php',
         [
             'content' => $page_content,
             'categories' => $categories,
