@@ -197,3 +197,38 @@ function show_add_lot_page(string $user_name, $categories, $errors = []): void
 
     print($layout_content);
 }
+
+/**
+ * Функция перенаправляет на главную страницу и заканчивает выполнение скрипта текущей страницы
+ */
+function redirect_to_main() {
+    header("Location: /index.php");
+    return exit();
+}
+
+/**
+ * Функция проверяет, заполнены ли поля в форме авторизации пользователя
+ * @return array Массив, содержащий строки в виде возможных ошибок
+ */
+function validate_if_filled_in ()
+{
+    //массив, где будут храниться ошибки
+    $errors = [];
+    //обязательные для заполнения поля
+    $rules = [
+        'email' => function () {
+            return validate_filled('email', 'e-mail');
+        },
+        'password' => function () {
+            return validate_filled('password', 'пароль');
+        }
+    ];
+    //Проверяем все поля на заполненность
+    foreach ($form = $_POST as $key => $value) {
+        if (isset($rules[$key])) {
+            $rule = $rules[$key];
+            $errors[$key] = $rule();
+        }
+    }
+    return $errors = array_filter($errors);
+}

@@ -3,7 +3,7 @@
 /**
  * Функция проверяет, заполнено ли указанное поле
  * @param $name string Проверяемое поле в форме
- * @param $name_in_russian string Название поля на русском языке
+ * @param $name_in_russian string Название поля на русском языке либо описание поля
  * @return string|null В случае незаполненности возвращает требование о необходимости добавить данные либо NULL
  */
 function validate_filled(string $name, $name_in_russian)
