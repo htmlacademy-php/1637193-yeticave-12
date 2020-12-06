@@ -108,7 +108,7 @@ if (empty($errors)) {
         [
             $_POST['lot-date'],
             $_POST['category'],
-            1,
+            $_SESSION['user']['id'],
             $_POST['lot-name'],
             $_POST['message'],
             $file_url,

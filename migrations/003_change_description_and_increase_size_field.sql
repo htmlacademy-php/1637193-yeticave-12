@@ -23,3 +23,8 @@ ALTER TABLE users
 
 -- Добавление 1го тестового аккаунта для проверки авторизации
 INSERT INTO users (email, name, password, contacts) VALUES ('test@test.ru', 'test account', '$2y$10$SvMpQxMkbOtv3LTN5iQ4M.C62oE0O9Jwr7wkNs5/XsGwrjpyToJI.', 'пароль от аккаунта: Pa$$w0rd!')
+
+-- Обновление хешей пароля и контактных данных у первых трех тестовых аккаунтов:
+UPDATE users SET users.password = '$2y$10$la4wtdluoOwRMcyhj1/VeugC333KXC3e/ZTmNrDQH4FsD.m0noNvS', users.contacts = 'Пароль от аккаунта: 12345qwer' WHERE users.id = 1;
+UPDATE users SET users.password = '$2y$10$CpHYX2mBDOEjDAAKB1.jS.VOM51ZcVq1sdY39BLt1.M0jF32/nDLu', users.contacts = 'Пароль от аккаунта: qwerty123' WHERE users.id = 2;
+UPDATE users SET users.password = '$2y$10$2riOGlP98L6IGj4s4Ag3HeZXIasVTlYAJqQnm1hQzYoWQtaDkrpn6', users.contacts = 'Пароль от аккаунта: vasinpassword123' WHERE users.id = 3;
