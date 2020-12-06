@@ -3,7 +3,7 @@
 /**
  * Функция проверяет, заполнено ли указанное поле
  * @param $name string Проверяемое поле в форме
- * @param $name_in_russian string|null Название поля на русском языке либо NULL
+ * @param $name_in_russian string Название поля на русском языке либо описание поля
  * @return string|null В случае незаполненности возвращает требование о необходимости добавить данные либо NULL
  */
 function validate_filled(string $name, $name_in_russian)
@@ -135,15 +135,26 @@ function validate_email(string $email)
 }
 
 /**
+ * Функция запроса на поиск в БД записи в таблице пользователей по введенному в форме email
+ * @param mysqli $connect Данные о подключении к БД
+ * @return mysqli_result|false Переданный запрос в БД
+ */
+function verify_existence_email_db(mysqli $connect)
+{
+    $check_sql = "SELECT * FROM users WHERE email = ? LIMIT 1"; // запрос на поиск записи в таблице пользователей по переданному email
+    $prepared_sql = db_get_prepare_stmt($connect, $check_sql, [strtolower($_POST['email'])]); //создаем выражение на основе SQL запроса и данных из формы о e-mail
+    mysqli_stmt_execute($prepared_sql);//отправка сформированного SQL-выражения в БД
+    return $result_prepared_sql = mysqli_stmt_get_result($prepared_sql); //полученный результат из подготовленного запроса
+}
+
+/**
  * Функция валидации уникальности адреса электронной почты, в случае успешной валидации возвращает NULL
  * @param mysqli $connect Данные о подключении к БД
  * @return string|null Сообщение о том, что пользователь под данным e-mail уже зарегистрирован или NULL при отсутствии ошибок
  */
 function validate_unique_email(mysqli $connect)
 {
-    $check_email = mysqli_real_escape_string($connect, $_POST['email']); //экранирование спец.символов для использования в SQL-выражении
-    $check_sql = "SELECT id FROM users WHERE email = '$check_email'"; // запрос на поиск записи в таблице пользователей по переданному email
-    $check_result = mysqli_query($connect, $check_sql); // передаем запрос в БД
+    $check_result = verify_existence_email_db($connect);
 
     if (mysqli_num_rows($check_result) > 0) {
         return 'Пользователь с этим email уже зарегистрирован';

@@ -34,11 +34,11 @@
                 <a class="main-header__add-lot button" href="/add.php">Добавить лот</a>
             <?php endif; ?>
             <nav class="user-menu">
-                <?php if ($is_auth == 1): ?>
+                <?php if ($is_auth): ?>
                     <div class="user-menu__logged">
                         <p><?= $user_name ?></p>
                         <a class="user-menu__bets" href="/pages/my-bets.html">Мои ставки</a>
-                        <a class="user-menu__logout" href="#">Выход</a>
+                        <a class="user-menu__logout" href="/logout.php">Выход</a>
                     </div>
                 <?php else: ?>
                     <ul class="user-menu__list">
@@ -53,10 +53,11 @@
             </nav>
         </div>
     </header>
-    <main <?php if (pathinfo($_SERVER['REQUEST_URI'])['basename'] === 'index.php'): ?>class="container"<?php endif; ?>>
+    <main
+        <?php if (pathinfo($_SERVER['REQUEST_URI'])['basename'] === 'index.php' || pathinfo($_SERVER['SCRIPT_NAME'])['basename'] === 'index.php'): ?>class="container"<?php endif; ?>>
         <nav class="nav">
             <ul class="nav__list container">
-                <?php if ($title !== TITLE_MAIN_PAGE): ?>
+                <?php if (pathinfo($_SERVER['SCRIPT_NAME'])['basename'] !== 'index.php'): ?>
                     <?php foreach ($categories as $category_name): ?>
                         <li class="nav__item">
                             <a href="pages/<?= $category_name['id']; ?>"><?= htmlspecialchars($category_name['title'] ?? ""); ?></a>

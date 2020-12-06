@@ -1,7 +1,7 @@
 <?php
-$is_auth = rand(0, 1);
+$is_auth = isset($_SESSION['user']['name']) ?? false;
 
-$user_name = 'Александр'; // указал здесь имя
+$user_name = $_SESSION['user']['name'] ?? "";
 
 //константы для работы с загрузкой файлов
 define('NAME_FOLDER_UPLOADS_FILE', 'uploads');  //Папка для загрузки пользовательских изображений
@@ -19,5 +19,3 @@ const DB_CONNECTION_DATA = [
     'user' => 'root',
     'password' => 'root'
 ];
-
-define('TITLE_MAIN_PAGE', 'Yeticave - Главная страница by Alexander Galkin'); //Заголовок главной страницы

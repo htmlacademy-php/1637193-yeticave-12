@@ -6,8 +6,6 @@
  * @var array $values
  */
 ?>
-
-
 <form class="form container <?= empty($errors) ? "" : "form--invalid" ?>" action="/sign-up.php" method="post"
       autocomplete="off">
     <h2>Регистрация нового аккаунта</h2>
@@ -18,16 +16,14 @@
         <input id="email" type="text" name="email" placeholder="Введите e-mail" class="<?= $classname; ?>"
                maxlength="100"
                value="<?= $values['email'] ?? ''; ?>">
-        <span class="form__error"><?= $classname ? $errors['email'] : "" ?> </span>
+        <span class="form__error"><?= $classname ? $errors['email'] : "" ?></span>
     </div>
     <?php $classname = isset($errors['password']) ? "form__item--invalid" : ""; ?>
     <div class="form__item <?= $classname; ?>">
         <label for="password">Пароль <sup>*</sup></label>
         <input id="password" type="password" name="password" placeholder="Введите пароль" class="<?= $classname; ?>"
                maxlength="45">
-        <?php if ($classname): ?>
-            <span class="form__error"><?= $classname ? $errors['password'] : "" ?></span>
-        <?php endif; ?>
+        <span class="form__error"><?= $classname ? $errors['password'] : "" ?></span>
     </div>
     <?php $classname = isset($errors['name']) ? "form__item--invalid" : ""; ?>
     <div class="form__item <?= $classname; ?>">
@@ -41,14 +37,11 @@
         <label for="message">Контактные данные <sup>*</sup></label>
         <textarea id="message" name="message" placeholder="Напишите как с вами связаться" class="<?= $classname; ?>"
                   maxlength="255"><?= $values['message'] ?? ''; ?></textarea>
-        <?php if ($classname): ?>
-
-            <span class="form__error"><?= $classname ? $errors['message'] : "" ?></span>
-        <?php endif; ?>
+        <span class="form__error"><?= $classname ? $errors['message'] : "" ?></span>
     </div>
     <?php if (!empty($errors)): ?>
         <div class="form--invalid">
-            <span class="form__error <?php if (!empty($errors)): ?>form__error--bottom<?php endif; ?>">Пожалуйста, исправьте следующие ошибки:</span>
+            <span class="form__error form__error--bottom">Пожалуйста, исправьте следующие ошибки:</span>
             <ul>
                 <?php foreach ($errors as $error): ?>
                     <li><?= $error; ?></li>
