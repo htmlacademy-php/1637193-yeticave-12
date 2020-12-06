@@ -5,9 +5,7 @@
  * @var string $user_name
  * @var string $is_auth
  */
-
-session_start();
-require_once './functions/bootstrap.php'; //подключение всех функций и констант в отдельном файле
+require_once './functions/bootstrap.php'; //подключает все пользовательские функции и константы
 
 $connect = db_connection();
 $categories = get_categories_from_db($connect);

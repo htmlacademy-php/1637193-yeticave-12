@@ -1,4 +1,5 @@
 <?php
+require_once './functions/session.php'; //старт сессии для пользователя
 require_once './functions/config.php'; //пользовательские константы и данные по подключению к БД
 require_once './functions/sql_connect.php'; //функции, работающие с подключением к базе данных
 require_once './functions/check.php'; //функции, проверяющие введенные в форму данные на корректность
