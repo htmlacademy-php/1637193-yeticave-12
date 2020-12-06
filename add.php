@@ -4,13 +4,38 @@
  * @var array $categories
  * @var string $is_auth
  */
-session_start();
-require_once './functions/bootstrap.php'; //подключение всех функций и констант в отдельном файле
+require_once './functions/bootstrap.php'; //подключает все пользовательские функции и константы
 
 $connect = db_connection();
 
 $categories = get_categories_from_db($connect);
 
+// показываем ошибку 403, если пользователь не авторизован на сайте
+if (!isset($_SESSION['user']['id'])) {
+    http_response_code(403);
+    $error = 'Ошибка 403';
+    $error_description = 'Для добавления лота необходимо пройти регистрацию на сайте.';
+    $error_link = '/sign-up.php';
+    $error_link_description = 'Зарегистрироваться можно по этой ссылке.';
+    $page_content = include_template(
+        '/error_page.php',
+        [
+            'error' => $error,
+            'error_description' => $error_description,
+            'error_link' => $error_link,
+            'error_link_description' => $error_link_description
+        ]
+    );
+    $layout_content = include_template('/layout.php', [
+        'content' => $page_content,
+        'categories' => $categories,
+        'title' => 'Лот добавить пока нельзя',
+        'user_name' => $user_name,
+        'is_auth' => $is_auth
+    ]);
+
+    exit($layout_content);
+}
 //если не выбрана категория, то показываем пустую форму для заполнения
 if (!isset($_POST['category'])) {
     show_add_lot_page($user_name, $categories);
@@ -54,30 +79,6 @@ foreach ($_POST as $key => $value) {
 $errors['lot-img'] = validate_file('lot-img');
 
 $errors = array_filter($errors); //фильтруем ошибки из массива - добавляем их в новый в случае присутствия самих ошибок
-
-if (!isset($_SESSION['user']['id'])) {
-    http_response_code(403);
-    $error = 'Для добавления лота необходимо пройти регистрацию на сайте.';
-    $error_link = '/sign-up.php';
-    $error_link_description = 'Зарегистрироваться можно по этой ссылке.';
-    $page_content = include_template(
-        '/error_page.php',
-        [
-            'error' => $error,
-            'error_link' => $error_link,
-            'error_link_description' => $error_link_description
-        ]
-    );
-    $layout_content = include_template('/layout.php', [
-        'content' => $page_content,
-        'categories' => $categories,
-        'title' => 'Лот добавить пока нельзя',
-        'user_name' => $user_name,
-        'is_auth' => $is_auth
-    ]);
-
-    exit($layout_content);
-}
 
 //при отсутствии ошибок - сохраняем добавленный файл
 if (empty($errors)) {

@@ -3,23 +3,22 @@
  * @var string $user_name
  * @var string $is_auth
  */
-session_start();
-require_once './functions/bootstrap.php'; //подключение всех функций и констант в отдельном файле
+require_once './functions/bootstrap.php'; //подключает все пользовательские функции и константы
 
 $connect = db_connection();
 $categories = get_categories_from_db($connect);
 
-$tpl_data = []; // временный массив для записи данных нового пользователя для вывода данных в случае ошибок
-
 if (isset($_SESSION['user']['id'])) {
     http_response_code(403);
-    $error = 'Вы уже зарегистрированы на нашем сайте. &#128517;';
+    $error = 'Ошибка 403';
+    $error_description = 'Вы уже зарегистрированы на нашем сайте. &#128517;';
     $error_link = '/index.php';
     $error_link_description = 'Предлагаем вернуться на главную.';
     $page_content = include_template(
         '/error_page.php',
         [
             'error' => $error,
+            'error_description' => $error_description,
             'error_link' => $error_link,
             'error_link_description' => $error_link_description
         ]
@@ -34,6 +33,8 @@ if (isset($_SESSION['user']['id'])) {
 
     exit($layout_content);
 }
+
+$tpl_data = []; // временный массив для записи данных нового пользователя для вывода данных в случае ошибок
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') { //Проверяем, что форма была отправлена
     $errors = []; // массив, где будут храниться ошибки
