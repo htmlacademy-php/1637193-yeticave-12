@@ -22,7 +22,7 @@ ALTER TABLE users
                 COLLATE utf8_general_ci NULL DEFAULT NULL;
 
 -- Добавление 1го тестового аккаунта для проверки авторизации
-INSERT INTO users (email, name, password, contacts) VALUES ('test@test.ru', 'test account', '$2y$10$SvMpQxMkbOtv3LTN5iQ4M.C62oE0O9Jwr7wkNs5/XsGwrjpyToJI.', 'пароль от аккаунта: Pa$$w0rd!')
+INSERT INTO users (email, name, password, contacts) VALUES ('test@test.ru', 'test account', '$2y$10$SvMpQxMkbOtv3LTN5iQ4M.C62oE0O9Jwr7wkNs5/XsGwrjpyToJI.', 'пароль от аккаунта: Pa$$w0rd!');
 
 -- Обновление хешей пароля и контактных данных у первых трех тестовых аккаунтов:
 UPDATE users SET users.password = '$2y$10$la4wtdluoOwRMcyhj1/VeugC333KXC3e/ZTmNrDQH4FsD.m0noNvS', users.contacts = 'Пароль от аккаунта: 12345qwer' WHERE users.id = 1;

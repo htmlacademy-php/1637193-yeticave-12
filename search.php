@@ -9,17 +9,37 @@ $connect = db_connection();
 $categories = get_categories_from_db($connect);
 
 $searсh_items = [];
-
-//Добавим полям "название" и "описание" полнотекстовый индекс, чтобы стало возможным выполнять по ним поиск
-// mysqli_query($connect, 'CREATE FULLTEXT INDEX gif_ft_search ON gifs(title, description)');
+$back_page = '';
 
 //Получим содержимое поискового запроса. Если поисковый запрос не задан, то присвоим пустую строку
 $search = $_GET['search'] ? trim($_GET['search']) : '';
 
-if ($search) { //Будем выполнять поиск лотов, только если был задан поисковый запрос
-//Напишем SQL запрос на поиск с использованием директивы MATCH. На месте искомой строки стоит плейсхолдер
+if (isset($search)) { //Будем выполнять поиск лотов, только если был задан поисковый запрос
+
+//пагинация:
+    $current_page = $_GET['page'] ?? 1; //Получаем текущую страницу.
+    $limit = 9; //Определяем число лотов на 1 странице
+
+    $sql_result_count = mysqli_query($connect, "SELECT COUNT(*) as count
+                                                  FROM item
+                                                  WHERE item.created_at > NOW()"); // AND MATCH(title, description) AGAINST(?)
+                                                 //стоит добавить выражение с MATCH - выдает ошибку о пустом запросе
+
+    $stmt_count = db_get_prepare_stmt($connect, $sql_result_count, [$search]); //Подготовка SQL запроса к выполнению
+    mysqli_stmt_execute($stmt_count); //Выполним подготовленное выражение
+    $result_stmt_count = mysqli_stmt_get_result($stmt_count); //получим его результат
+
+    $items_count = mysqli_fetch_assoc($result_stmt_count)['count']; //Узнаем общее число лотов, подходящих по условиям поиска
+
+    $pages_count = ceil($items_count / $limit); //Считаем кол-во страниц, которые нужны для вывода результата
+    $offset = ($current_page - 1) * $limit; //Считаем смещение
+
+    $pages = range(1, $pages_count); //Заполняем массив номерами всех страниц
+
+//поиск лотов:
+//SQL запрос на поиск с использованием директивы MATCH. На месте искомой строки стоит плейсхолдер
 //В MATCH указываем – где ищем, то есть указываем, поля, а в AGAINST – что ищем, т.е. поисковый запрос.
-    $sql = "SELECT item.id,
+    $sql_search = "SELECT item.id,
                    item.title,
                    item.start_price,
                    item.image_url,
@@ -27,19 +47,28 @@ if ($search) { //Будем выполнять поиск лотов, тольк
                    item.created_at,
                    item.completed_at,
                    category.title AS category_title
-           FROM item "
-        . "INNER JOIN category ON item.category_id = category.id
-           LEFT JOIN bet ON bet.item_id = item.id "
-        . "WHERE item.completed_at > NOW() AND MATCH(item.title, item.description) AGAINST(?)";
+           FROM item
+           INNER JOIN category ON item.category_id = category.id
+           LEFT JOIN bet ON bet.item_id = item.id
+           WHERE item.completed_at > NOW() AND MATCH(item.title, item.description) AGAINST(?)
+           GROUP BY item.id
+           ORDER BY item.created_at DESC LIMIT " . $limit . " OFFSET " . $offset;
 
-    $stmt = db_get_prepare_stmt($connect, $sql, [$search]); //Подготовка SQL запроса к выполнению
-    mysqli_stmt_execute($stmt); //Выполним подготовленное выражение
-    $result = mysqli_stmt_get_result($stmt); //получим его результат
+    $stmt_search = db_get_prepare_stmt($connect, $sql_search, [$search]); //Подготовка SQL запроса к выполнению
+    mysqli_stmt_execute($stmt_search); //Выполним подготовленное выражение
+    $result_stmt_search = mysqli_stmt_get_result($stmt_search); //получим его результат
 
-    $search_items = mysqli_fetch_all($result, MYSQLI_ASSOC); //и преобразуем в двумерный массив
+    $search_items = mysqli_fetch_all($result_stmt_search, MYSQLI_ASSOC); //и преобразуем в двумерный массив
 }
 
-$page_content = include_template('/search.php', ['ad_information' => $search_items]);
+$page_content = include_template('/search_page.php', [
+    'ad_information' => $search_items,
+    'pages_count' => $pages_count,
+    'pages' => $pages,
+    'search' => $search,
+    'current_page' => $current_page,
+    'back_page' => $back_page
+]);
 
 $layout_content = include_template('/layout.php', [
     'content' => $page_content,

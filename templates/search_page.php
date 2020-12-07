@@ -1,13 +1,19 @@
 <?php
 /**
  * @var array $ad_information
+ * @var array $pages
+ * @var string $search
+ * @var string $back_page
+ * @var int $current_page
+ * @var int $pages_count
+ *
  */
 ?>
 <div class="container">
     <section class="lots">
-        <h2>Результаты поиска по запросу «<span>Union</span>»</h2>
+        <h2>Результаты поиска по запросу «<span><?= htmlspecialchars($search) ?></span>»</h2>
         <ul class="lots__list">
-            <?php if (isset($ad_information)): ?>
+            <?php if (!empty($ad_information)): ?>
                 <?php foreach ($ad_information as $ad_value): ?>
                     <?php $remaining_time = get_date_range($ad_value['completed_at']) ?>
                     <li class="lots__item lot">
@@ -65,14 +71,13 @@
     </section>
     <?php if ($pages_count > 1): ?>
         <ul class="pagination-list">
-            <?php foreach ($pages as $page): ?>
-                <li class="pagination-item pagination-item-prev"><a>Назад</a></li>
-                <li class="pagination-item pagination-item-active"><a>1</a></li>
-                <li class="pagination-item"><a href="#">2</a></li>
-                <li class="pagination-item"><a href="#">3</a></li>
-                <li class="pagination-item"><a href="#">4</a></li>
+                <li class="pagination-item pagination-item-prev"><a a href="/search.php?search=<?=$search;?>&find=Найти&page=<?php if($current_page > 1) {echo $back_page = $current_page - 1;} else {echo $back_page = 1;} ?>>Назад</a></li>
+                <?php foreach ($pages as $page): ?>
+                    <li class=" pagination-item <?php if ($page == $current_page): ?> pagination-item-active<?php endif; ?>">
+                      <a href="/search.php?search=<?=$search;?>&find=Найти&page=<?=$page;?>"><?=$page;?></a>
+                    </li>
+                <?php endforeach; ?>
                 <li class="pagination-item pagination-item-next"><a href="#">Вперед</a></li>
-            <?php endforeach; ?>
         </ul>
     <?php endif; ?>
 </div>
