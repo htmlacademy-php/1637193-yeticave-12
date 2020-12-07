@@ -9,8 +9,7 @@
 <form class="form container <?= empty($errors) ? "" : "form--invalid" ?>" action="/sign-up.php" method="post"
       autocomplete="off">
     <h2>Регистрация нового аккаунта</h2>
-    <?php $classname = isset($errors['email']) ? "form__item--invalid" : "";
-    $value = isset($form['email']) ? $form['email'] : ""; ?>
+    <?php $classname = isset($errors['email']) ? "form__item--invalid" : ""; ?>
     <div class="form__item <?= $classname; ?>"> <!-- form__item--invalid -->
         <label for="email">E-mail <sup>*</sup></label>
         <input id="email" type="text" name="email" placeholder="Введите e-mail" class="<?= $classname; ?>"

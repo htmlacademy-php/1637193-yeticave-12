@@ -50,8 +50,7 @@ function get_categories_from_db($connect)
     if (!$result_category) {
         exit('Ошибка запроса: &#129298; ' . mysqli_error($connect));
     }
-    $categories = mysqli_fetch_all($result_category, MYSQLI_ASSOC);
-    return $categories;
+    return mysqli_fetch_all($result_category, MYSQLI_ASSOC);
 
 }
 
@@ -83,8 +82,7 @@ function get_ad_information_from_db($connect)
     if (!$result_items) {
         exit('Ошибка запроса: &#129298; ' . mysqli_error($connect));
     }
-    $ad_information = mysqli_fetch_all($result_items, MYSQLI_ASSOC);
-    return $ad_information;
+    return mysqli_fetch_all($result_items, MYSQLI_ASSOC);
 }
 
 /**
@@ -230,5 +228,5 @@ function validate_if_filled_in ()
             $errors[$key] = $rule();
         }
     }
-    return $errors = array_filter($errors);
+    return array_filter($errors);
 }
