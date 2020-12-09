@@ -5,7 +5,6 @@
  * @var string $search
  * @var int $current_page
  * @var int $pages_count
- *
  */
 ?>
 <div class="container">
@@ -44,28 +43,28 @@
                     </li>
                 <?php endforeach; ?>
             <?php else: ?>
-                <p>Ничего не найдено по вашему запросу</p>
+                <p>По вашему запросу <b>"<?= htmlspecialchars($search); ?>"</b> ничего не найдено.</p>
             <?php endif; ?>
         </ul>
     </section>
-    <?php if ($pages_count > 0): ?>
+    <?php if ($pages_count > 1): ?>
         <ul class="pagination-list">
             <li class="pagination-item pagination-item-prev">
-                <a a href="/search.php?search=<?= $search; ?>&find=Найти&page=<?php if ($current_page > 1) {
-                                                                    echo $back_page = $current_page - 1;
-                                                                } else {
-                                                                    echo $back_page = 1;
-                                                                } ?>>Назад</a></li>
-                <?php foreach ($pages as $page): ?>
-                    <li class=" pagination-item <?php if ($page === $current_page): ?>pagination-item-active<?php endif; ?>">
-                <a href="/search.php?search=<?= $search; ?>&find=Найти&page=<?= $page; ?>"><?= $page; ?></a>
+                <?php if ($current_page > 1): ?>
+                    <?php $back_page = ($current_page > 1) ? ($current_page - 1) : "1"?>
+                        <a href="/search.php?search=<?= htmlspecialchars($search); ?>&page=<?= $back_page; ?>">Назад</a>
+                <?php endif; ?>
             </li>
+            <?php foreach ($pages as $page): ?>
+                <li class="pagination-item <?php if ($page == $current_page): ?>pagination-item-active<?php endif; ?>">
+                    <a href="/search.php?search=<?= htmlspecialchars($search); ?>&page=<?= $page; ?>"><?= $page; ?></a>
+                </li>
             <?php endforeach; ?>
-            <li class="pagination-item pagination-item-next"><a href="/search.php?search=<?= $search; ?>&find=Найти&page=<?php if ($current_page < $pages_count) {
-                        echo $current_page += 1;
-                    } else {
-                        echo $current_page = $pages_count;
-                    } ?>">Вперед</a></li>
+            <li class="pagination-item pagination-item-next">
+                <?php if ($current_page < $pages_count): ?>
+                    <?php $current_page = ($current_page < $pages_count) ? ($current_page + 1) : $pages_count ?>
+                    <a href="/search.php?search=<?= htmlspecialchars($search); ?>&page=<?= $current_page ?>">Вперед</a>
+                <?php endif; ?></li>
         </ul>
     <?php endif; ?>
 </div>

@@ -21,7 +21,7 @@ if (isset($search)) { //Будем выполнять поиск лотов, т�
 //пагинация:
     $sql_result_count = "SELECT COUNT(*) as count
                          FROM item
-                         WHERE item.created_at > NOW() AND MATCH(title, description) AGAINST(?)";
+                         WHERE item.completed_at > NOW() AND MATCH(title, description) AGAINST(?)";
 
     $stmt_count = db_get_prepare_stmt($connect, $sql_result_count, [$search]); //Подготовка SQL запроса к выполнению
     mysqli_stmt_execute($stmt_count); //Выполним подготовленное выражение
@@ -30,10 +30,9 @@ if (isset($search)) { //Будем выполнять поиск лотов, т�
     $items_count = mysqli_fetch_assoc($result_stmt_count)['count']; //Узнаем общее число лотов, подходящих по условиям поиска
 
     $current_page = $_GET['page'] ?? 1; //Получаем текущую страницу.
-    $limit = 9; //Определяем число лотов на 1 странице
 
-    $pages_count = ceil($items_count / $limit); //Считаем кол-во страниц, которые нужны для вывода результата
-    $offset = ($current_page - 1) * $limit; //Считаем смещение
+    $pages_count = ceil($items_count / LIMIT_OF_SEARCH_RESULT); //Считаем кол-во страниц, которые нужны для вывода результата
+    $offset = ($current_page - 1) * LIMIT_OF_SEARCH_RESULT; //Считаем смещение
 
     $pages = range(1, $pages_count); //Заполняем массив номерами всех страниц
 
@@ -52,7 +51,7 @@ if (isset($search)) { //Будем выполнять поиск лотов, т�
            LEFT JOIN bet ON bet.item_id = item.id
            WHERE item.completed_at > NOW() AND MATCH(item.title, item.description) AGAINST(?)
            GROUP BY item.id
-           ORDER BY item.created_at DESC LIMIT " . $limit . " OFFSET " . $offset;
+           ORDER BY item.created_at DESC LIMIT " . LIMIT_OF_SEARCH_RESULT . " OFFSET " . $offset;
 
     $stmt_search = db_get_prepare_stmt($connect, $sql_search, [$search]); //Подготовка SQL запроса к выполнению
     mysqli_stmt_execute($stmt_search); //Выполним подготовленное выражение
@@ -72,9 +71,10 @@ $page_content = include_template('/search_page.php', [
 $layout_content = include_template('/layout.php', [
     'content' => $page_content,
     'categories' => $categories,
-    'title' => 'Результаты поиска',
+    'title' => 'Результаты поиска  по запросу ' . $search,
     'is_auth' => $is_auth,
     'user_name' => $user_name,
+    'search' => $search
 ]);
 
 print($layout_content);
