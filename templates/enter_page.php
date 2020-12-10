@@ -7,7 +7,7 @@
 <form class="form container <?= empty($errors) ? "" : "form--invalid" ?>" action="/enter.php" method="post">
     <h2>Вход</h2>
     <?php $classname = isset($errors['email']) ? "form__item--invalid" : "";
-    $value = isset($form['email']) ? $form['email'] : "";
+    $value = $form['email'] ?? "";
     $verify_user_error = (isset($errors['form']) && !isset($errors['email']) && !isset($errors['password'])) ? $errors['form'] : "" ?>
     <span class="form__error form__error--bottom"><?= $verify_user_error ?></span>
     <div class="form__item <?= $classname ?>">
@@ -18,7 +18,7 @@
         <?php endif; ?>
     </div>
     <?php $classname = isset($errors['password']) ? "form__item--invalid" : "";
-    $value = isset($form['password']) ? $form['password'] : ""; ?>
+    $value = $form['password'] ?? ""; ?>
     <div class="form__item form__item--last <?= $classname ?>">
         <label for="password">Пароль <sup>*</sup></label>
         <input id="password" type="password" name="password" placeholder="Введите пароль"
