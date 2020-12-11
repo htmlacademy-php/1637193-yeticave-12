@@ -36,6 +36,41 @@ if (isset($search)) { //Будем выполнять поиск лотов, т�
 
     $pages = range(1, $pages_count); //Заполняем массив номерами всех страниц
 
+    if (count($pages) > PAGE_LIMIT_AROUND_PAGINATION) { //если число страниц с результатами поиска больше 7, тогда нужен сложный вывод пагинации:
+        //копируем в отдельные массивы значения от края до номера текущей страницы
+        $pages_left_side = array_slice($pages, 0, $current_page - 1);
+        $pages_right_side = array_slice($pages, $current_page);
+
+        //копируем в отдельные массивы по 3 крайних (min и max) значения
+        $pages_left_end = array_splice($pages_left_side, 0, PAGE_LIMIT_PAGINATION);
+        $pages_right_end = array_splice($pages_right_side, -3, PAGE_LIMIT_PAGINATION);
+
+        //вырезаем в отдельные массивы значения без 3х крайних элементов до номера текущей страницы
+        $pages_left_center = array_splice($pages_left_side, -3, PAGE_LIMIT_PAGINATION);
+        $pages_right_center = array_splice($pages_right_side, 0, PAGE_LIMIT_PAGINATION);
+
+        $separator = ['...']; //разделитель
+        $current_page_elem = [$current_page]; //создаем новый массив со значением текущего номера страницы
+
+        //вывод пагинации для левых 7-ми страниц:
+        if (($current_page <= (PAGE_LIMIT_AROUND_PAGINATION))) {
+            $pages = array_merge($pages_left_end, $pages_left_center, $current_page_elem, $pages_right_center, $separator, $pages_right_end);
+        } //вывод пагинации для страниц, расположенных через 7 от начала и за 7 до конца пагинации
+        elseif (($current_page > PAGE_LIMIT_AROUND_PAGINATION) && ($current_page < (count($pages) - PAGE_LIMIT_AROUND_PAGINATION))) {
+            $pages = array_merge($pages_left_end, $separator, $pages_left_center, $current_page_elem, $pages_right_center, $separator, $pages_right_end);
+        } //вывод пагинации для правых 7-ми страниц:
+        elseif (($current_page > PAGE_LIMIT_AROUND_PAGINATION) && ($current_page >= count($pages) - PAGE_LIMIT_AROUND_PAGINATION)) {
+            $pages = array_merge($pages_left_end, $separator, $pages_left_center, $current_page_elem, $pages_right_center, $pages_right_end);
+        }
+    }
+    // выводим на отдельный шаблон пагинации, который подключен к странице поиска.
+    $pagination = include_template('/pagination.php', [
+        'pages_count' => $pages_count,
+        'pages' => $pages,
+        'search' => $search,
+        'current_page' => $current_page
+    ]);
+
 //поиск лотов:
 //SQL запрос на поиск с использованием директивы MATCH(поля,где ищем)..AGAINST(поисковый запрос). На месте искомой строки стоит плейсхолдер
     $sql_search = "SELECT item.id,
@@ -62,10 +97,8 @@ if (isset($search)) { //Будем выполнять поиск лотов, т�
 
 $page_content = include_template('/search_page.php', [
     'ad_information' => $search_items,
-    'pages_count' => $pages_count,
-    'pages' => $pages,
     'search' => $search,
-    'current_page' => $current_page
+    'pagination' => $pagination
 ]);
 
 $layout_content = include_template('/layout.php', [
