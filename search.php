@@ -36,7 +36,7 @@ if (isset($search)) { //Будем выполнять поиск лотов, т�
 
     $pages = range(1, $pages_count); //Заполняем массив номерами всех страниц
 
-    if (count($pages) > PAGE_LIMIT_AROUND_PAGINATION) { //если число страниц с результатами поиска больше 7, тогда нужен сложный вывод пагинации:
+    if (count($pages) > PAGE_LIMIT_SIDE_PAGINATION) { //если число страниц с результатами поиска больше 7, тогда нужен сложный вывод пагинации:
         //копируем в отдельные массивы значения от края до номера текущей страницы
         $pages_left_side = array_slice($pages, 0, $current_page - 1);
         $pages_right_side = array_slice($pages, $current_page);
@@ -53,13 +53,13 @@ if (isset($search)) { //Будем выполнять поиск лотов, т�
         $current_page_elem = [$current_page]; //создаем новый массив со значением текущего номера страницы
 
         //вывод пагинации для левых 7-ми страниц:
-        if (($current_page <= (PAGE_LIMIT_AROUND_PAGINATION))) {
+        if (($current_page <= (PAGE_LIMIT_SIDE_PAGINATION))) {
             $pages = array_merge($pages_left_end, $pages_left_center, $current_page_elem, $pages_right_center, $separator, $pages_right_end);
         } //вывод пагинации для страниц, расположенных через 7 от начала и за 7 до конца пагинации
-        elseif (($current_page > PAGE_LIMIT_AROUND_PAGINATION) && ($current_page < (count($pages) - PAGE_LIMIT_AROUND_PAGINATION))) {
+        elseif (($current_page > PAGE_LIMIT_SIDE_PAGINATION) && ($current_page < (count($pages) - PAGE_LIMIT_SIDE_PAGINATION))) {
             $pages = array_merge($pages_left_end, $separator, $pages_left_center, $current_page_elem, $pages_right_center, $separator, $pages_right_end);
         } //вывод пагинации для правых 7-ми страниц:
-        elseif (($current_page > PAGE_LIMIT_AROUND_PAGINATION) && ($current_page >= count($pages) - PAGE_LIMIT_AROUND_PAGINATION)) {
+        elseif (($current_page > PAGE_LIMIT_SIDE_PAGINATION) && ($current_page >= count($pages) - PAGE_LIMIT_SIDE_PAGINATION)) {
             $pages = array_merge($pages_left_end, $separator, $pages_left_center, $current_page_elem, $pages_right_center, $pages_right_end);
         }
     }

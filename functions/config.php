@@ -52,8 +52,12 @@ define('PAGE_LIMIT_PAGINATION', 3);
 /**
  * Число страниц, которое выводится по краям без разделителя, в пагинации на странице поиска
  */
-define('PAGE_LIMIT_AROUND_PAGINATION', 7);
+define('PAGE_LIMIT_SIDE_PAGINATION', 7);
 
+/**
+ * Число страниц, на которое отступает ссылка при клике на многоточие внутри пагинации
+ */
+define('DISPLAY_STEP_PAGINATION', 4);
 
 /**
  * Данные по подключению к БД
