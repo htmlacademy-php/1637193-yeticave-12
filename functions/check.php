@@ -177,3 +177,22 @@ function validate_contacts(string $contacts)
     }
     return NULL;
 }
+
+/**
+ * Функция валидации добавления ставки лота
+ * @param string $bet_field Имя поля формы добавления ставки
+ * @param int $min_bet Минимальный размер ставки
+ * @return string|null Возвращает ошибку валидации или NULL при отсутствии ошибок
+ **/
+function validate_bet_add(string $bet_field, int $min_bet): ?string
+{
+    if ($empty = validate_filled($bet_field, 'Ваша ставка')) {
+        return $empty;
+    } elseif (!is_numeric($_POST[$bet_field]) || !ctype_digit($_POST[$bet_field])) {
+        return 'Шаг ставки должен быть целым числом больше ноля';
+    } elseif ((int)$_POST[$bet_field]  < $min_bet) {
+        return 'Ваша ставка должна быть не меньше размера минимальной ставки';
+    }
+
+    return null;
+}

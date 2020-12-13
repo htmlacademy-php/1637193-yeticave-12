@@ -3,7 +3,7 @@
 /**
  * Функция db_connection производит подключение к базе данных "yeticave".
  * Если подключение не выполнено, то происходит вывод ошибки подключения и операции приостанавливаются.
- * @return mysqli
+ * @return mysqli Подключение к БД.
  */
 function db_connection()
 {
@@ -58,7 +58,7 @@ function get_categories_from_db($connect)
  * Функция получает массив с самыми новыми, открытыми лотами из базы данных yeticave.
  * Каждый лот включает в себя название, стартовую цену, ссылку на изображение, текущую цену, название категории;
  * @param $connect
- * @return array|int
+ * @return array|int Массив с самыми новыми, открытыми лотами из базы данных yeticave
  */
 function get_ad_information_from_db($connect)
 {
@@ -86,14 +86,14 @@ function get_ad_information_from_db($connect)
 }
 
 /**
- * Функция получает массив с информацией о лотах из базы данных yeticave.
+ * Функция получает массив с информацией о конкретном лоте из базы данных yeticave.
  * Каждый лот включает в себя название, дату создания, описание товара, название категории, ссылку на изображение, дату завершения лота,
  * стартовую цену, шаг ставки, текущую цену, название категории;
- * @param $id - ID Товара
+ * @param $item_id - ID Товара
  * @param $connect - данные о подключении к базе данных
- * @return array|int
+ * @return array|int Массив с данными о лоте с указанным ID
  */
-function get_info_about_lot_from_db($id, $connect, $categories)
+function get_info_about_lot_from_db($item_id, $connect, $categories)
 {
     $sql_lot = 'SELECT item.id,
                     item.created_at,
@@ -108,7 +108,7 @@ function get_info_about_lot_from_db($id, $connect, $categories)
               FROM item
                     INNER JOIN category ON category.id = item.category_id
                     INNER JOIN bet on bet.item_id = item.id
-              WHERE item.id = ' . htmlspecialchars($id);
+              WHERE item.id = ' . htmlspecialchars($item_id);
 
     $info_about_lot = mysqli_query($connect, $sql_lot);
     $lot_info = mysqli_fetch_array($info_about_lot, MYSQLI_ASSOC);
@@ -116,7 +116,7 @@ function get_info_about_lot_from_db($id, $connect, $categories)
     if (!isset($lot_info['id'])) {
         http_response_code(404);
         $error = 'Произошла ошибка: &#129298; ';
-        $error_description = 'Страница с id = ' . htmlspecialchars($id) . ' не найдена. &#128532; ';
+        $error_description = 'Страница с id = ' . htmlspecialchars($item_id) . ' не найдена. &#128532; ';
         $error_link = '/index.php';
         $error_link_description = 'Предлагаем вернуться на главную.';
         $page_content = include_template(
@@ -131,7 +131,7 @@ function get_info_about_lot_from_db($id, $connect, $categories)
         $layout_content = include_template('/layout.php', [
             'content' => $page_content,
             'categories' => $categories,
-            'title' => 'Страница c id = .' . $id . 'не найдена'
+            'title' => 'Страница c id = .' . $item_id . 'не найдена'
         ]);
 
         exit($layout_content);

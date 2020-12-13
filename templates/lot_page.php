@@ -1,6 +1,8 @@
 <?php
 /**
  * @var array $lot
+ * @var int $item_id
+ * @var array $errors
  */
 ?>
 <section class="lot-item container">
@@ -41,11 +43,11 @@
                     </div>
                 </div>
                 <?php if (isset($_SESSION['user']['id'])) : ?>
-                    <form class="lot-item__form" action="https://echo.htmlacademy.ru" method="post" autocomplete="off">
-                        <p class="lot-item__form-item form__item form__item--invalid">
-                            <label for="cost">Ваша ставка</label>
-                            <input id="cost" type="text" name="cost" placeholder="12 000">
-                            <span class="form__error">Введите наименование лота</span>
+                    <form class="lot-item__form" action="lot.php?id=<?= $item_id; ?>" method="post" autocomplete="off">
+                        <p class="lot-item__form-item <?= isset($errors['cost']) ? 'form__item form__item--invalid' : '' ?>">
+                            <label for="cost">Ваша ставка </label>
+                            <input id="cost" type="text" name="cost" placeholder="<?= htmlspecialchars(formatted_sum($lot['current_price'] + $lot['bet_step'])) ?? 0 ?>" value="<?= htmlspecialchars((int)$_POST['cost']) ?>">
+                            <span class="form__error"><?= $errors['cost'] ?? '' ?></span>
                         </p>
                         <button type="submit" class="button">Сделать ставку</button>
                     </form>
