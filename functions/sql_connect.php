@@ -104,7 +104,8 @@ function get_info_about_lot_from_db($item_id, $connect, $categories)
                     item.completed_at,
                     item.start_price,
                     item.bet_step,
-                    IFNULL(MAX(bet.total), item.start_price) AS current_price
+                    IFNULL(MAX(bet.total), item.start_price) AS current_price,
+                    item.author_id
               FROM item
                     INNER JOIN category ON category.id = item.category_id
                     INNER JOIN bet on bet.item_id = item.id
