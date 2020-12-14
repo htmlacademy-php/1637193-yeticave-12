@@ -8,21 +8,13 @@ require_once './functions/bootstrap.php'; //подключает все поль
 $connect = db_connection();
 $categories = get_categories_from_db($connect);
 
-if (isset($_SESSION['user']['id'])) {
+if (!is_user_guest()) {
     http_response_code(403);
     $error = 'Ошибка 403';
     $error_description = 'Вы уже зарегистрированы на нашем сайте. &#128517;';
     $error_link = '/index.php';
     $error_link_description = 'Предлагаем вернуться на главную.';
-    $page_content = include_template(
-        '/error_page.php',
-        [
-            'error' => $error,
-            'error_description' => $error_description,
-            'error_link' => $error_link,
-            'error_link_description' => $error_link_description
-        ]
-    );
+    $page_content = include_template_error($error, $error_description, $error_link, $error_link_description);
     $layout_content = include_template('/layout.php', [
         'content' => $page_content,
         'categories' => $categories,
