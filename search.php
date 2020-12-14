@@ -34,35 +34,10 @@ if (isset($search)) { //Будем выполнять поиск лотов, т�
     $pages_count = ceil($items_count / LIMIT_OF_SEARCH_RESULT); //Считаем кол-во страниц, которые нужны для вывода результата
     $offset = ($current_page - 1) * LIMIT_OF_SEARCH_RESULT; //Считаем смещение
 
-    $pages = range(1, $pages_count); //Заполняем массив номерами всех страниц
+    $fill_pages = range(1, $pages_count); //Заполняем массив номерами всех страниц
 
-    if (count($pages) > PAGE_LIMIT_SIDE_PAGINATION) { //если число страниц с результатами поиска больше 7, тогда нужен сложный вывод пагинации:
-        //копируем в отдельные массивы значения от края до номера текущей страницы
-        $pages_left_side = array_slice($pages, 0, $current_page - 1);
-        $pages_right_side = array_slice($pages, $current_page);
+    $pages = get_pagination($fill_pages, $current_page); //проверяем, нужна ли сложная пагинация
 
-        //копируем в отдельные массивы по 3 крайних (min и max) значения
-        $pages_left_end = array_splice($pages_left_side, 0, PAGE_LIMIT_PAGINATION);
-        $pages_right_end = array_splice($pages_right_side, -3, PAGE_LIMIT_PAGINATION);
-
-        //вырезаем в отдельные массивы значения без 3х крайних элементов до номера текущей страницы
-        $pages_left_center = array_splice($pages_left_side, -3, PAGE_LIMIT_PAGINATION);
-        $pages_right_center = array_splice($pages_right_side, 0, PAGE_LIMIT_PAGINATION);
-
-        $separator = ['...']; //разделитель
-        $current_page_elem = [$current_page]; //создаем новый массив со значением текущего номера страницы
-
-        //вывод пагинации для левых 7-ми страниц:
-        if (($current_page <= (PAGE_LIMIT_SIDE_PAGINATION))) {
-            $pages = array_merge($pages_left_end, $pages_left_center, $current_page_elem, $pages_right_center, $separator, $pages_right_end);
-        } //вывод пагинации для страниц, расположенных через 7 от начала и за 7 до конца пагинации
-        elseif (($current_page > PAGE_LIMIT_SIDE_PAGINATION) && ($current_page <= (count($pages) - PAGE_LIMIT_SIDE_PAGINATION))) {
-            $pages = array_merge($pages_left_end, $separator, $pages_left_center, $current_page_elem, $pages_right_center, $separator, $pages_right_end);
-        } //вывод пагинации для правых 7-ми страниц:
-        elseif (($current_page > PAGE_LIMIT_SIDE_PAGINATION) && ($current_page > count($pages) - PAGE_LIMIT_SIDE_PAGINATION)) {
-            $pages = array_merge($pages_left_end, $separator, $pages_left_center, $current_page_elem, $pages_right_center, $pages_right_end);
-        }
-    }
     // выводим на отдельный шаблон пагинации, который подключен к странице поиска.
     $pagination = include_template('/pagination.php', [
         'pages_count' => $pages_count,
