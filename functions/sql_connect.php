@@ -15,15 +15,9 @@ function db_connection()
         $error_description = 'У нас произошла техническая ошибка. &#128532; ';
         $error_link = '/index.php';
         $error_link_description = 'Возвращайтесь к нам немного позже.';
-        $page_content = include_template(
-            '/error_page.php',
-            [
-                'error' => $error,
-                'error_description' => $error_description,
-                'error_link' => $error_link,
-                'error_link_description' => $error_link_description
-            ]
-        );
+
+        $page_content = include_template_error($error, $error_description, $error_link, $error_link_description);
+
         $layout_content = include_template('/layout.php', [
             'content' => $page_content,
             'categories' => [],
@@ -40,7 +34,7 @@ function db_connection()
 /**
  * Функция получает все категории из базы данных yeticave
  * @param $connect mixed данные о подключении к базе данных yeticave
- * @return array|int  массив с категориями
+ * @return array массив с категориями
  */
 function get_categories_from_db($connect)
 {
@@ -58,7 +52,7 @@ function get_categories_from_db($connect)
  * Функция получает массив с самыми новыми, открытыми лотами из базы данных yeticave.
  * Каждый лот включает в себя название, стартовую цену, ссылку на изображение, текущую цену, название категории;
  * @param $connect
- * @return array|int Массив с самыми новыми, открытыми лотами из базы данных yeticave
+ * @return array Массив с самыми новыми, открытыми лотами из базы данных yeticave
  */
 function get_ad_information_from_db($connect)
 {
@@ -89,9 +83,9 @@ function get_ad_information_from_db($connect)
  * Функция получает массив с информацией о конкретном лоте из базы данных yeticave.
  * Каждый лот включает в себя название, дату создания, описание товара, название категории, ссылку на изображение, дату завершения лота,
  * стартовую цену, шаг ставки, текущую цену, название категории;
- * @param $item_id - ID Товара
- * @param $connect - данные о подключении к базе данных
- * @return array|int Массив с данными о лоте с указанным ID
+ * @param int $item_id - ID Товара
+ * @param mysqli $connect - данные о подключении к базе данных
+ * @return array Массив с данными о лоте с указанным ID
  */
 function get_info_about_lot_from_db($item_id, $connect, $categories)
 {
@@ -109,10 +103,13 @@ function get_info_about_lot_from_db($item_id, $connect, $categories)
               FROM item
                     INNER JOIN category ON category.id = item.category_id
                     INNER JOIN bet on bet.item_id = item.id
-              WHERE item.id = ' . htmlspecialchars($item_id);
+              WHERE item.id = ?';
 
-    $info_about_lot = mysqli_query($connect, $sql_lot);
-    $lot_info = mysqli_fetch_array($info_about_lot, MYSQLI_ASSOC);
+    $sql_lot_prepared = db_get_prepare_stmt($connect, $sql_lot, [$item_id]);
+    mysqli_stmt_execute($sql_lot_prepared);
+    $sql_result = mysqli_stmt_get_result($sql_lot_prepared);
+
+    $lot_info = mysqli_fetch_array($sql_result, MYSQLI_ASSOC);
 
     if (!isset($lot_info['id'])) {
         http_response_code(404);
@@ -120,15 +117,9 @@ function get_info_about_lot_from_db($item_id, $connect, $categories)
         $error_description = 'Страница с id = ' . htmlspecialchars($item_id) . ' не найдена. &#128532; ';
         $error_link = '/index.php';
         $error_link_description = 'Предлагаем вернуться на главную.';
-        $page_content = include_template(
-            '/error_page.php',
-            [
-                'error' => $error,
-                'error_description' => $error_description,
-                'error_link' => $error_link,
-                'error_link_description' => $error_link_description
-            ]
-        );
+
+        $page_content = include_template_error($error, $error_description, $error_link, $error_link_description);
+
         $layout_content = include_template('/layout.php', [
             'content' => $page_content,
             'categories' => $categories,
@@ -137,8 +128,59 @@ function get_info_about_lot_from_db($item_id, $connect, $categories)
 
         exit($layout_content);
     }
-
     return $lot_info;
+}
+
+/**
+ * Фукнция подготавливает запрос в БД о показе последних 10 ставок о конкретном лоте
+ * @param int $item_id - ID Товара
+ * @param mysqli $connect - данные о подключении к базе данных
+ * @return mysqli результат в виде выполненного запроса в БД о показе последних 10 ставок о конкретном лоте
+ */
+function get_bet_history($item_id, $connect)
+{
+//история ставок по данному лоту
+    $sql_bet = 'SELECT bet.item_id, bet.created_at as date, bet.total, bet.user_id, users.name as username
+                FROM bet
+                INNER JOIN users ON users.id = bet.user_id
+                WHERE item_id = ?
+                ORDER BY date DESC
+                LIMIT 10';
+    $sql_bet_stmt = db_get_prepare_stmt($connect, $sql_bet, [$item_id]);
+    mysqli_stmt_execute($sql_bet_stmt);
+
+    return mysqli_stmt_get_result($sql_bet_stmt);
+}
+
+
+/**
+ * Фукнция подготавливает запрос в БД о добавлении новой ставки к конкретному лоту
+ * @param int $item_id - ID Товара
+ * @param mysqli $connect - данные о подключении к базе данных
+ * @return mysqli выполненный запрос в БД
+ */
+function add_bet_in_db($item_id, $connect)
+{
+    // фильтр входящего значения на соответствие числу, введенного в форму
+    $filter_value_bet = filter_input(INPUT_POST, 'cost', FILTER_SANITIZE_NUMBER_INT);
+    // создаем шаблон подготовленного выражения для вставки в БД
+    $sql_add_bet = 'INSERT INTO bet (total,
+                             user_id,
+                             item_id)
+                    VALUES (?, ?, ?)';
+
+    // формируем подготовленное выражение на основе SQL запроса из $sql_add_bet
+    $stmt_add_bet = db_get_prepare_stmt(
+        $connect,
+        $sql_add_bet,
+        [
+            $filter_value_bet,
+            $_SESSION['user']['id'],
+            $item_id
+        ]
+    );
+    //отправка сформированных SQL-выражений в БД
+    return mysqli_stmt_execute($stmt_add_bet);
 }
 
 /**
@@ -168,7 +210,7 @@ function save_file(string $field_name): ?string
             return $file_url;
         }
     }
-    return null;
+    return NULL;
 }
 
 
@@ -200,34 +242,29 @@ function show_add_lot_page(string $user_name, $categories, $errors = []): void
 /**
  * Функция перенаправляет на главную страницу и заканчивает выполнение скрипта текущей страницы
  */
-function redirect_to_main() {
+function redirect_to_main()
+{
     header("Location: /index.php");
     return exit();
 }
 
 /**
- * Функция проверяет, заполнены ли поля в форме авторизации пользователя
- * @return array Массив, содержащий строки в виде возможных ошибок
+ * Функция выводит подготавливает вывод ошибки для функции include_template в шаблон error_page.php
+ * @param string $error Сообщение, что произошла ошибка
+ * @param string $error_description Описание ошибки
+ * @param string $error_link Ссылка на страницу, куда стоит перейти, чтобы избежать ошибки
+ * @param string $error_link_description Описание действия, чтобы избавиться от последствий ошибки
+ * @return string вывод ошибки для функции include_template в шаблон error_page.php
  */
-function validate_if_filled_in ()
+function include_template_error($error, $error_description, $error_link, $error_link_description)
 {
-    //массив, где будут храниться ошибки
-    $errors = [];
-    //обязательные для заполнения поля
-    $rules = [
-        'email' => function () {
-            return validate_filled('email', 'e-mail');
-        },
-        'password' => function () {
-            return validate_filled('password', 'пароль');
-        }
-    ];
-    //Проверяем все поля на заполненность
-    foreach ($form = $_POST as $key => $value) {
-        if (isset($rules[$key])) {
-            $rule = $rules[$key];
-            $errors[$key] = $rule();
-        }
-    }
-    return array_filter($errors);
+   return include_template(
+        '/error_page.php',
+        [
+            'error' => $error,
+            'error_description' => $error_description,
+            'error_link' => $error_link,
+            'error_link_description' => $error_link_description
+        ]
+    );
 }

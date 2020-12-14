@@ -4,7 +4,7 @@
  * Функция проверяет, заполнено ли указанное поле
  * @param $name string Проверяемое поле в форме
  * @param $name_in_russian string Название поля на русском языке либо описание поля
- * @return string|null В случае незаполненности возвращает требование о необходимости добавить данные либо NULL
+ * @return string|NULL В случае незаполненности возвращает требование о необходимости добавить данные либо NULL
  */
 function validate_filled(string $name, $name_in_russian)
 {
@@ -14,27 +14,27 @@ function validate_filled(string $name, $name_in_russian)
         }
         return "Необходимо заполнить поле " . '"' . $name_in_russian . '"';
     }
-    return null;
+    return NULL;
 }
 
 /**
  * Функция проверяет категорию: если категория равна "Выберите категорию", то валидация не пройдена.
  * @param string $field_name Имя поля
- * @return string|null Причина ошибки валидации или NULL при отсутствии ошибок
+ * @return string|NULL Причина ошибки валидации или NULL при отсутствии ошибок
  **/
 function validate_category(string $field_name)
 {
     if (empty($_POST[$field_name])) {
         return "Необходимо выбрать категорию у добавляемого лота";
     }
-    return null;
+    return NULL;
 }
 
 
 /**
  * Функция валидации изображения, в случае успешной валидации возвращает NULL.
  * @param string $field_name Имя поля изображения
- * @return string|null Причина ошибки валидации или NULL при отсутствии ошибок
+ * @return string|NULL Причина ошибки валидации или NULL при отсутствии ошибок
  */
 function validate_file(string $field_name): ?string
 {
@@ -59,7 +59,7 @@ function validate_file(string $field_name): ?string
  * Функция валидации полей с цифровым значением (начальной цены лота и шага ставки),
  * в случае успешной валидации возвращает NULL.
  * @param string $field_name Имя поля
- * @return string|null Причина ошибки валидации или NULL при отсутствии ошибок
+ * @return string|NULL Причина ошибки валидации или NULL при отсутствии ошибок
  **/
 function validate_number_value(string $field_name): ?string
 {
@@ -77,7 +77,7 @@ function validate_number_value(string $field_name): ?string
 /**
  * Функция валидации даты окончания лота, в случае успешной валидации возвращает NULL.
  * @param string $field_name Имя поля
- * @return string|null Причина ошибки валидации или NULL при отсутствии ошибок
+ * @return string|NULL Причина ошибки валидации или NULL при отсутствии ошибок
  **/
 function validate_date_end(string $field_name): ?string
 {
@@ -96,7 +96,7 @@ function validate_date_end(string $field_name): ?string
 /**
  * Функция валидации пароля, в случае успешной валидации возвращает NULL
  * @param string $password Введенный пароль пользователя
- * @return string|null Причина ошибки валидации или NULL при отсутствии ошибок
+ * @return string|NULL Причина ошибки валидации или NULL при отсутствии ошибок
  */
 function validate_password(string $password)
 {
@@ -121,7 +121,7 @@ function validate_password(string $password)
 /**
  * Функция валидации адреса электронной почты, в случае успешной валидации возвращает NULL
  * @param $email string Введенная почта пользователя
- * @return string|null Причина ошибки валидации или NULL при отсутствии ошибок
+ * @return string|NULL Причина ошибки валидации или NULL при отсутствии ошибок
  */
 function validate_email(string $email)
 {
@@ -150,7 +150,7 @@ function verify_existence_email_db(mysqli $connect)
 /**
  * Функция валидации уникальности адреса электронной почты, в случае успешной валидации возвращает NULL
  * @param mysqli $connect Данные о подключении к БД
- * @return string|null Сообщение о том, что пользователь под данным e-mail уже зарегистрирован или NULL при отсутствии ошибок
+ * @return string|NULL Сообщение о том, что пользователь под данным e-mail уже зарегистрирован или NULL при отсутствии ошибок
  */
 function validate_unique_email(mysqli $connect)
 {
@@ -165,7 +165,7 @@ function validate_unique_email(mysqli $connect)
 /**
  * Функция валидации контактных данных пользователя, в случае успешной валидации возвращает NULL
  * @param $contacts string Контактные данные пользователя
- * @return string|null Причина ошибки валидации или NULL при отсутствии ошибок
+ * @return string|NULL Причина ошибки валидации или NULL при отсутствии ошибок
  */
 function validate_contacts(string $contacts)
 {
@@ -182,17 +182,95 @@ function validate_contacts(string $contacts)
  * Функция валидации добавления ставки лота
  * @param string $bet_field Имя поля формы добавления ставки
  * @param int $min_bet Минимальный размер ставки
- * @return string|null Возвращает ошибку валидации или NULL при отсутствии ошибок
+ * @return string|NULL Возвращает ошибку валидации или NULL при отсутствии ошибок
  **/
 function validate_bet_add(string $bet_field, int $min_bet): ?string
 {
     if ($empty = validate_filled($bet_field, 'Ваша ставка')) {
         return $empty;
-    } elseif (!is_numeric($_POST[$bet_field]) || !ctype_digit($_POST[$bet_field])) {
+    } elseif (!filter_var($_POST[$bet_field], FILTER_VALIDATE_INT)) {
         return 'Шаг ставки должен быть целым числом больше ноля';
     } elseif ((int)$_POST[$bet_field]  < $min_bet) {
         return 'Ваша ставка должна быть не меньше размера минимальной ставки';
     }
+    return NULL;
+}
 
-    return null;
+/**
+ * Функция проверяет, заполнены ли поля в форме авторизации пользователя
+ * @return array Массив, содержащий строки в виде возможных ошибок
+ */
+function validate_if_filled_in()
+{
+    //массив, где будут храниться ошибки
+    $errors = [];
+    //обязательные для заполнения поля
+    $rules = [
+        'email' => function () {
+            return validate_filled('email', 'e-mail');
+        },
+        'password' => function () {
+            return validate_filled('password', 'пароль');
+        }
+    ];
+    //Проверяем все поля на заполненность
+    foreach ($form = $_POST as $key => $value) {
+        if (isset($rules[$key])) {
+            $rule = $rules[$key];
+            $errors[$key] = $rule();
+        }
+    }
+    return array_filter($errors);
+}
+
+/**
+ * Фукнция проверяет, является ли текущий пользователь неавторизованным
+ * @return bool Возвращает true при положительном ответе и false при отрицательном
+ */
+function is_user_guest()
+{
+    if (!isset($_SESSION['user']['id'])) {
+        return true;
+    }
+    return false;
+}
+
+/**
+ * Функция сверяет дату и время завершения лота с текущими датой и временем
+ * @param array $lot Массив с информацией о лоте, полученной из БД
+ * @return bool В случае, если дата завершения в прошлом, возвращает true, иначе false
+ */
+function is_lot_completed($lot)
+{
+    if (strtotime($lot['completed_at']) < time()) {
+        return true;
+    }
+    return false;
+}
+
+
+/**
+ * Функция проверяет, является ли текущий пользователь автором выбранного лота
+ * @param array $lot Массив с информацией о лоте, полученной из БД
+ * @return bool Возвращает true, если это один и тот же пользователь, иначе false
+ */
+function is_user_author_of_lot($lot)
+{
+    if ($lot['author_id'] === $_SESSION['user']['id']) {
+        return true;
+    }
+    return false;
+}
+
+/**
+ * Фукнция проверяет, сделал ли данный пользователь последнюю ставку по данному лоту
+ * @param $bets Массив с информацией о последних 10 ставках по лоту
+ * @return bool Возвращает true, если последнюю ставку сделал этот пользователь, иначе false
+ */
+function is_user_made_last_bet($bets)
+{
+    if (isset($bets[0]['user_id']) && $bets[0]['user_id'] === $_SESSION['user']['id']) {
+        return true;
+    }
+    return false;
 }
