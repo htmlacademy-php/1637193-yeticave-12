@@ -258,7 +258,7 @@ function redirect_to_main()
  */
 function include_template_error($error, $error_description, $error_link, $error_link_description)
 {
-   return include_template(
+    return include_template(
         '/error_page.php',
         [
             'error' => $error,
@@ -267,4 +267,30 @@ function include_template_error($error, $error_description, $error_link, $error_
             'error_link_description' => $error_link_description
         ]
     );
+}
+
+/**
+ * Функция проверяет ошибки перед добавлением новой ставки к лоту
+ * @param array $lot Массив с информацией о лоте
+ * @return array Очищенный от пустых значений массив с возможными ошибками
+ */
+function check_errors_before_add_bet($lot)
+{
+    // берем из БД текущий минимальный размер новой возможной ставки
+    $min_bet = $lot['bet_step'] + $lot['current_price'];
+
+    //правило для обязательного поля ввода новой ставки
+    $rules = [
+        'cost' => function () use (&$min_bet) {
+            return validate_bet_add('cost', $min_bet);
+        }
+    ];
+    // сбор возможных ошибок валидации
+    foreach ($_POST as $key => $value) {
+        if (isset($rules[$key])) {
+            $rule = $rules[$key];
+            $errors[$key] = $rule();
+        }
+    }
+    return array_filter($errors);
 }

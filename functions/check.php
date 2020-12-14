@@ -229,10 +229,7 @@ function validate_if_filled_in()
  */
 function is_user_guest()
 {
-    if (!isset($_SESSION['user']['id'])) {
-        return true;
-    }
-    return false;
+    return !isset($_SESSION['user']['id']);
 }
 
 /**
@@ -242,10 +239,7 @@ function is_user_guest()
  */
 function is_lot_completed($lot)
 {
-    if (strtotime($lot['completed_at']) < time()) {
-        return true;
-    }
-    return false;
+    return strtotime($lot['completed_at']) < time();
 }
 
 
@@ -256,10 +250,7 @@ function is_lot_completed($lot)
  */
 function is_user_author_of_lot($lot)
 {
-    if ($lot['author_id'] === $_SESSION['user']['id']) {
-        return true;
-    }
-    return false;
+    return $lot['author_id'] === $_SESSION['user']['id'];
 }
 
 /**
@@ -269,8 +260,5 @@ function is_user_author_of_lot($lot)
  */
 function is_user_made_last_bet($bets)
 {
-    if (isset($bets[0]['user_id']) && $bets[0]['user_id'] === $_SESSION['user']['id']) {
-        return true;
-    }
-    return false;
+    return isset($bets[0]['user_id']) && $bets[0]['user_id'] === $_SESSION['user']['id'];
 }

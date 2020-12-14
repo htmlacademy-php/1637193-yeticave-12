@@ -25,45 +25,26 @@ if (isset($_GET['id'])) {
         'user_name' => $user_name,
         'is_auth' => $is_auth
     ]);
-
     exit($layout_content);
 }
+
 $categories = get_categories_from_db($connect); //получаем список категорий из БД
 $lot = get_info_about_lot_from_db($item_id, $connect, $categories); //получаем информацию о лотах из БД
 
-$show_bet_add = true; //добавлять новую ставку по-умолчанию можно
-
-$sql_bet_history = get_bet_history($item_id, $connect);
+$sql_bet_history = get_bet_history($item_id, $connect); //история о последних 10 ставках по этому лоту
 
 if (mysqli_num_rows($sql_bet_history) > 0) {
+    //соберем информацию о последних 10 ставках в массив
     $bets = mysqli_fetch_all($sql_bet_history, MYSQLI_ASSOC);
-    //количество ставок по данному лоту
+    //определим количество ставок по данному лоту, если их больше 0 и менее 10
     $count_bet = $bets !== null ? count($bets) : 0;
 }
 // отправка нового значения ставки
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // берем из БД текущий минимальный размер новой возможной ставки
-    $min_bet = $lot['bet_step'] + $lot['current_price'];
-
-    //правило для обязательного поля ввода новой ставки
-    $rules = [
-        'cost' => function () use (&$min_bet) {
-            return validate_bet_add('cost', $min_bet);
-        }
-    ];
-    // сбор возможных ошибок валидации
-    foreach ($_POST as $key => $value) {
-        if (isset($rules[$key])) {
-            $rule = $rules[$key];
-            $errors[$key] = $rule();
-        }
-    }
-    $errors = array_filter($errors);
-
+    $errors = check_errors_before_add_bet($lot);
     //если ошибок нет, то добавляем ставку в БД:
     if (empty($errors)) {
         $result_add_bet = add_bet_in_db($item_id, $connect); //отправляем запрос о добавлении новой ставки
-
         //если не прошло, то выводим ошибку
         if (!$result_add_bet) {
             $errors['cost'] = "Произошла ошибка сохранения в базу. Попробуйте еще раз позже";
@@ -72,6 +53,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         header('Location: /lot.php?id=' . $item_id);
     }
 }
+
+$show_bet_add = true; //добавлять новую ставку по-умолчанию можно
+
 //проверка ограничений показа блока добавления ставки
 if (is_user_guest() || is_lot_completed($lot) || is_user_author_of_lot($lot) || is_user_made_last_bet($bets)) {
     $show_bet_add = false;
