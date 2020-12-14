@@ -56,10 +56,10 @@ if (isset($search)) { //Будем выполнять поиск лотов, т�
         if (($current_page <= (PAGE_LIMIT_SIDE_PAGINATION))) {
             $pages = array_merge($pages_left_end, $pages_left_center, $current_page_elem, $pages_right_center, $separator, $pages_right_end);
         } //вывод пагинации для страниц, расположенных через 7 от начала и за 7 до конца пагинации
-        elseif (($current_page > PAGE_LIMIT_SIDE_PAGINATION) && ($current_page < (count($pages) - PAGE_LIMIT_SIDE_PAGINATION))) {
+        elseif (($current_page > PAGE_LIMIT_SIDE_PAGINATION) && ($current_page <= (count($pages) - PAGE_LIMIT_SIDE_PAGINATION))) {
             $pages = array_merge($pages_left_end, $separator, $pages_left_center, $current_page_elem, $pages_right_center, $separator, $pages_right_end);
         } //вывод пагинации для правых 7-ми страниц:
-        elseif (($current_page > PAGE_LIMIT_SIDE_PAGINATION) && ($current_page >= count($pages) - PAGE_LIMIT_SIDE_PAGINATION)) {
+        elseif (($current_page > PAGE_LIMIT_SIDE_PAGINATION) && ($current_page > count($pages) - PAGE_LIMIT_SIDE_PAGINATION)) {
             $pages = array_merge($pages_left_end, $separator, $pages_left_center, $current_page_elem, $pages_right_center, $pages_right_end);
         }
     }
