@@ -85,6 +85,39 @@ function get_ad_information_from_db($connect)
     return mysqli_fetch_all($result_items, MYSQLI_ASSOC);
 }
 
+
+/**
+ * Фукнция получает массив с самыми новыми, открытыми лотами из базы данных yeticave с ограничением числа лотов на 1 странице
+ * @param mysqli $connect Данные о подключении к БД
+ * @param int $offset Смещение выборки количества запросов на 1 странице, т.е. начиная с какой записи будут возвращены ограничения по выборке
+ * @return array Ассоциативный массив с данными о лотах для показа на 1 странице
+ */
+function get_pagination_info_about_items(mysqli $connect, int $offset): array
+{
+    $sql_item = "SELECT item.id,
+                        item.title AS 'title',
+                       item.start_price AS 'start_price',
+                       item.image_url AS 'image_url',
+                       IFNULL(MAX(bet.total), item.start_price) AS 'total',
+                       item.created_at AS 'created_at',
+                       item.completed_at AS 'completed_at',
+                       category.title AS 'category_title'
+                FROM item
+                INNER JOIN category ON item.category_id = category.id
+                LEFT JOIN bet ON item.id = bet.item_id
+                WHERE item.completed_at > NOW()
+                GROUP BY item.id
+                ORDER BY item.created_at DESC
+                LIMIT ?
+                OFFSET ?";
+    $result_items = get_stmt_result($connect, $sql_item, [LIMIT_OF_SEARCH_RESULT, $offset]);
+
+    if (!$result_items) {
+        exit('Ошибка запроса: &#129298; ' . mysqli_error($connect));
+    }
+    return mysqli_fetch_all($result_items, MYSQLI_ASSOC);
+}
+
 /**
  * Функция получает массив с информацией о лотах из базы данных yeticave.
  * Каждый лот включает в себя название, дату создания, описание товара, название категории, ссылку на изображение, дату завершения лота,
@@ -199,7 +232,8 @@ function show_add_lot_page(string $user_name, $categories, $errors = []): void
 /**
  * Функция перенаправляет на главную страницу и заканчивает выполнение скрипта текущей страницы
  */
-function redirect_to_main() {
+function redirect_to_main()
+{
     header("Location: /index.php");
     return exit();
 }
@@ -208,7 +242,7 @@ function redirect_to_main() {
  * Функция проверяет, заполнены ли поля в форме авторизации пользователя
  * @return array Массив, содержащий строки в виде возможных ошибок
  */
-function validate_if_filled_in ()
+function validate_if_filled_in()
 {
     //массив, где будут храниться ошибки
     $errors = [];

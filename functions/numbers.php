@@ -69,6 +69,8 @@ function get_pagination(string $search, int $pages_count, int $current_page): ?s
 {
     $fill_pages = range(1, $pages_count); //Заполняем массив номерами всех страниц
 
+    $search_page = pathinfo($_SERVER['SCRIPT_NAME'])['basename'] ?? 'search.php';
+
     $pages = get_difficult_pagination($fill_pages, $current_page); //проверяем, нужна ли сложная пагинация
 
 // выводим на отдельный шаблон пагинации, который подключен к странице поиска.
@@ -76,17 +78,19 @@ function get_pagination(string $search, int $pages_count, int $current_page): ?s
         'pages_count' => $pages_count,
         'pages' => $pages,
         'search' => $search,
-        'current_page' => $current_page
+        'current_page' => $current_page,
+        'search_page' => $search_page
     ]);
 }
 
 /**
  * Фукнция подготавливает вывод сложной пагинации.
  * Итоговый вариант выглядит следующим образом (нынешняя страница на примере под №11): " 1 2 3 ... 8 9 10 11 12 13 14 ... 37 38 39 "
- * @param $pages_array array Массив, состоящий из номеров страниц для пагинации.
- * @param $current_page int Номер текущей страницы.
+ * @param array $pages_array Массив, состоящий из номеров страниц для пагинации.
+ * @param int $current_page Номер текущей страницы.
+ * @return array Массив, состоящий из элементов сложной пагинации.
  */
-function get_difficult_pagination($pages_array, $current_page)
+function get_difficult_pagination(array $pages_array, int $current_page): array
 {
     if (count($pages_array) > PAGE_LIMIT_SIDE_PAGINATION) { //если число страниц с результатами поиска больше 7, тогда нужен сложный вывод пагинации:
         //копируем в отдельные массивы значения от края до номера текущей страницы

@@ -57,3 +57,4 @@
         <?php endforeach; ?>
     </ul>
 </section>
+<?= $pagination; ?>

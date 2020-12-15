@@ -55,7 +55,7 @@
         </div>
     </header>
     <main
-        <?php if (pathinfo($_SERVER['REQUEST_URI'])['basename'] === 'index.php' || pathinfo($_SERVER['SCRIPT_NAME'])['basename'] === 'index.php'): ?>class="container"<?php endif; ?>>
+        <?php if (pathinfo($_SERVER['REQUEST_URI'])['basename'] === 'index.php'): ?>class="container"<?php endif; ?>>
         <nav class="nav">
             <ul class="nav__list container">
                 <?php if (pathinfo($_SERVER['SCRIPT_NAME'])['basename'] !== 'index.php'): ?>
