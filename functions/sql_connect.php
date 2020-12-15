@@ -5,7 +5,7 @@
  * Если подключение не выполнено, то происходит вывод ошибки подключения и операции приостанавливаются.
  * @return mysqli Подключение к БД.
  */
-function db_connection()
+function db_connection(): mysqli
 {
     $connect = mysqli_connect(DB_CONNECTION_DATA['host'], DB_CONNECTION_DATA['user'], DB_CONNECTION_DATA['password'], DB_CONNECTION_DATA['database']);
     mysqli_set_charset($connect, "utf8");
@@ -32,11 +32,11 @@ function db_connection()
 }
 
 /**
- * Функция получает все категории из базы данных yeticave
- * @param $connect mixed данные о подключении к базе данных yeticave
- * @return array массив с категориями
+ * Функция получает список категорий размещенных лотов из базы данных yeticave
+ * @param mysqli $connect данные о подключении к базе данных yeticave
+ * @return array массив со списком категорий
  */
-function get_categories_from_db($connect)
+function get_categories_from_db(mysqli $connect): array
 {
     $sql_category = "SELECT id, title, symbolic_code FROM category";
     $result_category = mysqli_query($connect, $sql_category);
@@ -51,10 +51,10 @@ function get_categories_from_db($connect)
 /**
  * Функция получает массив с самыми новыми, открытыми лотами из базы данных yeticave.
  * Каждый лот включает в себя название, стартовую цену, ссылку на изображение, текущую цену, название категории;
- * @param $connect
+ * @param mysqli $connect данные о подключении к базе данных
  * @return array Массив с самыми новыми, открытыми лотами из базы данных yeticave
  */
-function get_ad_information_from_db($connect)
+function get_ad_information_from_db($connect): array
 {
     $sql_item = "SELECT item.id,
                         item.title AS 'title',
@@ -85,9 +85,10 @@ function get_ad_information_from_db($connect)
  * стартовую цену, шаг ставки, текущую цену, название категории;
  * @param int $item_id - ID Товара
  * @param mysqli $connect - данные о подключении к базе данных
+ * @param array $categories - массив со списком категорий размещенных лотов
  * @return array Массив с данными о лоте с указанным ID
  */
-function get_info_about_lot_from_db($item_id, $connect, $categories)
+function get_info_about_lot_from_db(int $item_id, mysqli $connect, array $categories): array
 {
     $sql_lot = 'SELECT item.id,
                     item.created_at,
@@ -135,9 +136,9 @@ function get_info_about_lot_from_db($item_id, $connect, $categories)
  * Фукнция подготавливает запрос в БД о показе последних 10 ставок о конкретном лоте
  * @param int $item_id - ID Товара
  * @param mysqli $connect - данные о подключении к базе данных
- * @return mysqli результат в виде выполненного запроса в БД о показе последних 10 ставок о конкретном лоте
+ * @return mysqli_result|false результат в виде выполненного запроса в БД о показе последних 10 ставок о конкретном лоте, иначе false
  */
-function get_bet_history($item_id, $connect)
+function get_bet_history(int $item_id, mysqli $connect): mysqli_result
 {
 //история ставок по данному лоту
     $sql_bet = 'SELECT bet.item_id, bet.created_at as date, bet.total, bet.user_id, users.name as username
@@ -157,9 +158,9 @@ function get_bet_history($item_id, $connect)
  * Фукнция подготавливает запрос в БД о добавлении новой ставки к конкретному лоту
  * @param int $item_id - ID Товара
  * @param mysqli $connect - данные о подключении к базе данных
- * @return mysqli выполненный запрос в БД
+ * @return bool true в случае выполненного запроса в БД, иначе false
  */
-function add_bet_in_db($item_id, $connect)
+function add_bet_in_db(int $item_id, mysqli $connect): bool
 {
     // фильтр входящего значения на соответствие числу, введенного в форму
     $filter_value_bet = filter_input(INPUT_POST, 'cost', FILTER_SANITIZE_NUMBER_INT);
@@ -179,16 +180,16 @@ function add_bet_in_db($item_id, $connect)
             $item_id
         ]
     );
-    //отправка сформированных SQL-выражений в БД
+    //проверка отправки сформированных SQL-выражений в БД
     return mysqli_stmt_execute($stmt_add_bet);
 }
 
 /**
  * Вспомогательная функция для получения значений из POST-запроса
- * @param $name mixed поле, из которого будет браться значение POST
- * @return mixed|string содержимое POST-запроса
+ * @param string $name поле, из которого будет браться значение POST
+ * @return string содержимое POST-запроса
  */
-function get_post_value($name)
+function get_post_value(string $name): ?string
 {
     return $_POST[$name] ?? "";
 }
@@ -220,7 +221,7 @@ function save_file(string $field_name): ?string
  * @param array $categories Массив с значениями категорий лотов
  * @param array $errors Массив для записи возможных ошибок
  */
-function show_add_lot_page(string $user_name, $categories, $errors = []): void
+function show_add_lot_page(string $user_name, array $categories, array $errors = []): void
 {
     $selected_category = $_POST['category'] ?? 0;
     $page_content = include_template('/add_lot.php', compact('categories', 'errors', 'selected_category'));
@@ -256,7 +257,7 @@ function redirect_to_main()
  * @param string $error_link_description Описание действия, чтобы избавиться от последствий ошибки
  * @return string вывод ошибки для функции include_template в шаблон error_page.php
  */
-function include_template_error($error, $error_description, $error_link, $error_link_description)
+function include_template_error($error, $error_description, $error_link, $error_link_description): ?string
 {
     return include_template(
         '/error_page.php',
@@ -274,7 +275,7 @@ function include_template_error($error, $error_description, $error_link, $error_
  * @param array $lot Массив с информацией о лоте
  * @return array Очищенный от пустых значений массив с возможными ошибками
  */
-function check_errors_before_add_bet($lot)
+function check_errors_before_add_bet($lot): array
 {
     // берем из БД текущий минимальный размер новой возможной ставки
     $min_bet = $lot['bet_step'] + $lot['current_price'];
@@ -293,4 +294,40 @@ function check_errors_before_add_bet($lot)
         }
     }
     return array_filter($errors);
+}
+
+/**
+ * Функция осуществляет поиск ставок указанного пользователя в БД
+ * @param mysqli $connect данные о подключении к базе данных
+ * @return array Ассоциативный массив с данными о ставках пользователя
+ */
+function search_users_bet($connect): array
+{
+//поиск ставок данного пользователя
+$sql_user_bet = 'SELECT item.id as item_id,
+                        item.title AS title,
+                        category.title AS category,
+                        item.image_url,
+                        item.completed_at as item_end_time,
+                        IFNULL(MAX(bet.total), item.start_price) AS current_price,
+                        MAX(bet.created_at) as bet_date,
+                        item.winner_id,
+                        users.contacts,
+                        bet.user_id
+                  FROM bet
+                   LEFT JOIN item ON item.id = bet.item_id
+                   LEFT JOIN users on users.id = item.author_id
+                   LEFT JOIN category ON category.id = item.category_id
+                  WHERE bet.user_id = ?
+                  GROUP BY bet.item_id
+                  ORDER BY bet_date DESC';
+
+$sql_user_bet_prepared = db_get_prepare_stmt($connect, $sql_user_bet, [$_SESSION['user']['id']]);
+mysqli_stmt_execute($sql_user_bet_prepared);
+$sql_result = mysqli_stmt_get_result($sql_user_bet_prepared);
+
+if (!$sql_result) {
+    exit('Ошибка запроса: &#129298; ' . mysqli_error($connect));
+}
+return mysqli_fetch_all($sql_result, MYSQLI_ASSOC);
 }

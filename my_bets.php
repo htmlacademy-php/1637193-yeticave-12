@@ -8,7 +8,8 @@ require_once './functions/bootstrap.php'; //подключает все поль
 $connect = db_connection();
 $categories = get_categories_from_db($connect);
 
-if(is_user_guest()) { //проверяем, что пользователь имеет право смотреть ставки
+//проверяем, что пользователь имеет право смотреть ставки
+if(is_user_guest()) {
     http_response_code(403);
     $error = 'Ошибка 403';
     $error_description = 'Для просмотра сделанных ставок необходимо пройти авторизацию на сайте.';
@@ -25,38 +26,13 @@ if(is_user_guest()) { //проверяем, что пользователь им
         'is_auth' => $is_auth
     ]);
     exit($layout_content);
-}
-;
+};
 
 //поиск ставок данного пользователя
-$sql_user_bet = 'SELECT item.id as item_id,
-                        item.title AS title,
-                        category.title AS category,
-                        item.image_url,
-                        item.completed_at as item_end_time,
-                        IFNULL(MAX(bet.total), item.start_price) AS current_price,
-                        MAX(bet.created_at) as bet_date,
-                        item.winner_id,
-                        users.contacts,
-                        bet.user_id
-                  FROM bet
-                   LEFT JOIN item ON item.id = bet.item_id
-                   LEFT JOIN users on users.id = item.author_id
-                   LEFT JOIN category ON category.id = item.category_id
-                  WHERE bet.user_id = ?
-                  GROUP BY bet.item_id
-                  ORDER BY bet_date DESC';
+$user_bets = search_users_bet($connect);
 
-$sql_user_bet_prepared = db_get_prepare_stmt($connect, $sql_user_bet, [$_SESSION['user']['id']]);
-mysqli_stmt_execute($sql_user_bet_prepared);
-$sql_result = mysqli_stmt_get_result($sql_user_bet_prepared);
-
-if (!$sql_result) {
-    exit('Ошибка запроса: &#129298; ' . mysqli_error($connect));
-}
-$user_bets = mysqli_fetch_all($sql_result, MYSQLI_ASSOC);
-
-foreach ($user_bets as $bet) {
+//передаем по ссылке данные о том, является ли юзер победителем и закончился ли уже лот
+foreach ($user_bets as &$bet) {
     if ($bet['winner_id'] == $_SESSION['user']['id']) {
         $bet['winner'] = true;
     }
@@ -66,6 +42,7 @@ foreach ($user_bets as $bet) {
         $bet['lot_ended'] = true;
     }
 }
+unset($bet);
 
 $page_content = include_template('/my_bets_page.php', [
     'bets' => $user_bets
