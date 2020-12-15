@@ -14,14 +14,14 @@
                 <a href="/search.php?search=<?= htmlspecialchars($search); ?>&page=<?= $back_page; ?>">Назад</a>
             <?php endif; ?>
         </li>
-        <?php foreach ($pages as $num_page => $page): ?>
-            <?php $ceparator_link_before = ($current_page > 1) ? ($current_page - 4) : "1";
-            $ceparator_link_after = ($current_page < $pages_count) ? ($current_page + 4) : $pages_count;
-            $ceparator_link = ($page < $current_page) ? $ceparator_link_before : $ceparator_link_after;
-            $page_link = ($page != '...') ? $page : $ceparator_link; ?>
-            <li class="pagination-item <?php if ($page == $current_page): ?>pagination-item-active<?php endif; ?>">
-                <a href="/search.php?search=<?= htmlspecialchars($search); ?>&page=<?= $page_link; ?>"><?= $page; ?></a>
-            </li>
+        <?php foreach ($pages as $page): ?>
+            <?php if ($page !== '...'): ?>
+                <li class="pagination-item <?php if ($page === $current_page): ?>pagination-item-active<?php endif; ?>">
+                    <a href="/search.php?search=<?= htmlspecialchars($search); ?>&page=<?= $page; ?>"><?= $page; ?></a>
+                </li>
+            <?php else: ?>
+                <li class="pagination-item">&#8230;</li>
+            <?php endif; ?></li>
         <?php endforeach; ?>
         <li class="pagination-item pagination-item-next">
             <?php if ($current_page < $pages_count): ?>
