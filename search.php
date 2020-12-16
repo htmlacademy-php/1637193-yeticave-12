@@ -32,7 +32,8 @@ if (isset($search)) { //Будем выполнять поиск лотов, т�
     $pages_count = ceil($items_count / LIMIT_OF_SEARCH_RESULT); //Считаем кол-во страниц, которые нужны для вывода результата
     $offset = ($current_page - 1) * LIMIT_OF_SEARCH_RESULT; //Считаем смещение
 
-    $pagination = get_pagination($search, $pages_count, $current_page);
+    $search_page = pathinfo($_SERVER['SCRIPT_NAME'])['basename'] ?? 'search.php';
+    $pagination = get_pagination($search, $pages_count, $current_page, $search_page);
 
 //поиск лотов:
     //SQL запрос на поиск с использованием директивы MATCH(поля,где ищем)..AGAINST(поисковый запрос). На месте искомой строки стоит плейсхолдер

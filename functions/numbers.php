@@ -63,13 +63,12 @@ function get_stmt_result(mysqli $connect, string $sql_result_count, $array_stmt 
  * @param string $search Текстовое содержимое поискового запроса
  * @param int $pages_count количество страниц, которые нужны для вывода результата
  * @param int $current_page Номер текущей страницы
+ * @param string $search_page Адрес страницы, с которой выполняется поиск
  * @return html Заполненный HTML-шаблон пагинации
  */
-function get_pagination(string $search, int $pages_count, int $current_page): ?string
+function get_pagination(string $search, int $pages_count, int $current_page, string $search_page): ?string
 {
     $fill_pages = range(1, $pages_count); //Заполняем массив номерами всех страниц
-
-    $search_page = pathinfo($_SERVER['SCRIPT_NAME'])['basename'] ?? 'search.php';
 
     $pages = get_difficult_pagination($fill_pages, $current_page); //проверяем, нужна ли сложная пагинация
 

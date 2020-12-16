@@ -2,6 +2,7 @@
 /**
  * @var array $categories
  * @var array $ad_information
+ * @var string $pagination
  */
 ?>
 <section class="promo">
@@ -57,4 +58,6 @@
         <?php endforeach; ?>
     </ul>
 </section>
-<?= $pagination; ?>
+<?php if (isset($pagination) && !($pagination === '')): ?>
+    <?= $pagination; ?>
+<?php endif; ?>
