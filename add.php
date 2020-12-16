@@ -10,8 +10,9 @@ $connect = db_connection();
 
 $categories = get_categories_from_db($connect);
 
+$user_id = $_SESSION['user']['id'];
 // показываем ошибку 403, если пользователь не авторизован на сайте
-if (is_user_guest()) {
+if (is_user_guest($user_id)) {
     http_response_code(403);
     $error = 'Ошибка 403';
     $error_description = 'Для добавления лота необходимо пройти регистрацию на сайте.';
@@ -96,6 +97,7 @@ if (empty($errors)) {
                                       bet_step)
                     VALUES (?, ?, ?, ?, ?, ?, ?, ?)';
 
+    $user_id = $_SESSION['user']['id'];
     // формируем подготовленное выражение на основе SQL запроса из $sql_add_lot
     $stmt = db_get_prepare_stmt(
         $connect,
@@ -103,7 +105,7 @@ if (empty($errors)) {
         [
             $_POST['lot-date'],
             $_POST['category'],
-            $_SESSION['user']['id'],
+            $user_id,
             $_POST['lot-name'],
             $_POST['message'],
             $file_url,

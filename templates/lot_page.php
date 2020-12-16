@@ -4,6 +4,7 @@
  * @var array $errors
  * @var array $bets
  * @var int $item_id
+ * @var int $cost
  * @var int $count_bet
  * @var bool $show_bet_add
  */
@@ -51,7 +52,7 @@
                             <label for="cost">Ваша ставка </label>
                             <input id="cost" type="text" name="cost"
                                    placeholder="<?= htmlspecialchars(formatted_sum($lot['current_price'] + $lot['bet_step'])) ?? 0 ?>"
-                                   value="<?= htmlspecialchars((int)$_POST['cost']) ?? '' ?>">
+                                   value="<?= htmlspecialchars($cost); ?>">
                             <span class="form__error"><?= $errors['cost'] ?? '' ?></span>
                         </p>
                         <button type="submit" class="button">Сделать ставку</button>

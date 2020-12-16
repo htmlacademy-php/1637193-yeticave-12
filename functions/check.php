@@ -225,11 +225,12 @@ function validate_if_filled_in()
 
 /**
  * Фукнция проверяет, является ли текущий пользователь неавторизованным
+ * @param int $user_id ID текущего пользователя
  * @return bool Возвращает true при положительном ответе и false при отрицательном
  */
-function is_user_guest()
+function is_user_guest(int $user_id): bool
 {
-    return !isset($_SESSION['user']['id']);
+    return !isset($user_id);
 }
 
 /**
@@ -237,7 +238,7 @@ function is_user_guest()
  * @param array $lot Массив с информацией о лоте, полученной из БД
  * @return bool В случае, если дата завершения в прошлом, возвращает true, иначе false
  */
-function is_lot_completed($lot)
+function is_lot_completed($lot): bool
 {
     return strtotime($lot['completed_at']) < time();
 }
@@ -246,19 +247,21 @@ function is_lot_completed($lot)
 /**
  * Функция проверяет, является ли текущий пользователь автором выбранного лота
  * @param array $lot Массив с информацией о лоте, полученной из БД
+ * @param int $user_id ID текущего пользователя
  * @return bool Возвращает true, если это один и тот же пользователь, иначе false
  */
-function is_user_author_of_lot($lot)
+function is_user_author_of_lot($lot, int $user_id): bool
 {
-    return $lot['author_id'] === $_SESSION['user']['id'];
+    return $lot['author_id'] === $user_id;
 }
 
 /**
  * Фукнция проверяет, сделал ли данный пользователь последнюю ставку по данному лоту
  * @param $bets Массив с информацией о последних 10 ставках по лоту
+ * @param int $user_id ID текущего пользователя
  * @return bool Возвращает true, если последнюю ставку сделал этот пользователь, иначе false
  */
-function is_user_made_last_bet($bets)
+function is_user_made_last_bet($bets, int $user_id): bool
 {
-    return isset($bets[0]['user_id']) && $bets[0]['user_id'] === $_SESSION['user']['id'];
+    return isset($bets[0]['user_id']) && $bets[0]['user_id'] === $user_id;
 }

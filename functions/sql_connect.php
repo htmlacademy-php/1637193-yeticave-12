@@ -158,9 +158,10 @@ function get_bet_history(int $item_id, mysqli $connect): mysqli_result
  * Фукнция подготавливает запрос в БД о добавлении новой ставки к конкретному лоту
  * @param int $item_id - ID Товара
  * @param mysqli $connect - данные о подключении к базе данных
+ * @param int $user_id - ID пользователя, который добавляет ставку
  * @return bool true в случае выполненного запроса в БД, иначе false
  */
-function add_bet_in_db(int $item_id, mysqli $connect): bool
+function add_bet_in_db(int $item_id, mysqli $connect, int $user_id): bool
 {
     // фильтр входящего значения на соответствие числу, введенного в форму
     $filter_value_bet = filter_input(INPUT_POST, 'cost', FILTER_SANITIZE_NUMBER_INT);
@@ -176,7 +177,7 @@ function add_bet_in_db(int $item_id, mysqli $connect): bool
         $sql_add_bet,
         [
             $filter_value_bet,
-            $_SESSION['user']['id'],
+            $user_id,
             $item_id
         ]
     );
@@ -282,7 +283,7 @@ function check_errors_before_add_bet($lot): array
 
     //правило для обязательного поля ввода новой ставки
     $rules = [
-        'cost' => function () use (&$min_bet) {
+        'cost' => function () use ($min_bet) {
             return validate_bet_add('cost', $min_bet);
         }
     ];
@@ -299,9 +300,10 @@ function check_errors_before_add_bet($lot): array
 /**
  * Функция осуществляет поиск ставок указанного пользователя в БД
  * @param mysqli $connect данные о подключении к базе данных
+ * @param int $user_id ID текущего пользователя
  * @return array Ассоциативный массив с данными о ставках пользователя
  */
-function search_users_bet($connect): array
+function search_users_bet($connect, int $user_id): array
 {
 //поиск ставок данного пользователя
 $sql_user_bet = 'SELECT item.id as item_id,
@@ -322,7 +324,7 @@ $sql_user_bet = 'SELECT item.id as item_id,
                   GROUP BY bet.item_id
                   ORDER BY bet_date DESC';
 
-$sql_user_bet_prepared = db_get_prepare_stmt($connect, $sql_user_bet, [$_SESSION['user']['id']]);
+$sql_user_bet_prepared = db_get_prepare_stmt($connect, $sql_user_bet, [$user_id]);
 mysqli_stmt_execute($sql_user_bet_prepared);
 $sql_result = mysqli_stmt_get_result($sql_user_bet_prepared);
 
