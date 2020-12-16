@@ -13,7 +13,7 @@
         <?php foreach ($categories as $category_name): ?>
             <li class="promo__item promo__item--<?= htmlspecialchars($category_name['symbolic_code']) ?>">
                 <a class="promo__link"
-                   href="/pages/all-lots.html"><?= htmlspecialchars($category_name['title']); ?></a>
+                   href="/categories.php?id=<?= $category_name['id'] ?? 0 ?>"><?= htmlspecialchars($category_name['title'] ?? "Название категории"); ?></a>
             </li>
         <?php endforeach; ?>
     </ul>

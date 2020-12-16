@@ -60,26 +60,32 @@
         <?php if (!isset($is_index_page)): ?>
             <nav class="nav">
                 <ul class="nav__list container">
-                    <?php foreach ($categories as $category_name): ?>
-                        <li class="nav__item">
-                            <a href="pages/<?= $category_name['id']; ?>"><?= htmlspecialchars($category_name['title'] ?? ""); ?></a>
-                        </li>
-                    <?php endforeach; ?>
+                    <?php if (isset($categories)): ?>
+                        <?php foreach ($categories as $category_name): ?>
+                            <li class="nav__item">
+                                <a href="/categories.php?id=<?= $category_name['id'] ?? 0 ?>"><?= htmlspecialchars($category_name['title'] ?? "Название категории"); ?></a>
+                            </li>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
                 </ul>
             </nav>
         <?php endif; ?>
-        <?= $content; ?>
+        <?php if (isset($content)): ?>
+            <?= $content; ?>
+        <?php endif; ?>
     </main>
 </div>
 
 <footer class="main-footer">
     <nav class="nav">
         <ul class="nav__list container">
-            <?php foreach ($categories as $category_name): ?>
-                <li class="nav__item">
-                    <a href="pages/<?= $category_name['id']; ?>"><?= htmlspecialchars($category_name['title']); ?></a>
-                </li>
-            <?php endforeach; ?>
+            <?php if (isset($categories)): ?>
+                <?php foreach ($categories as $category_name): ?>
+                    <li class="nav__item">
+                        <a href="/categories.php?id=<?= $category_name['id'] ?? 0 ?>"><?= htmlspecialchars($category_name['title'] ?? "Название категории"); ?></a>
+                    </li>
+                <?php endforeach; ?>
+            <?php endif; ?>
         </ul>
     </nav>
     <div class="main-footer__bottom container">

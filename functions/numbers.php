@@ -58,15 +58,17 @@ function get_stmt_result(mysqli $connect, string $sql_result_count, $array_stmt 
     return $result_stmt;
 }
 
+
 /**
  * Функция заполняет данными шаблон пагинации
- * @param string $search Текстовое содержимое поискового запроса
  * @param int $pages_count количество страниц, которые нужны для вывода результата
  * @param int $current_page Номер текущей страницы
  * @param string $search_page Адрес страницы, с которой выполняется поиск
+ * @param string $search Текстовое содержимое поискового запроса [необязательный параметр]
+ * @param string $category_id ID категории лотов [необязательный параметр]
  * @return html Заполненный HTML-шаблон пагинации
  */
-function get_pagination(string $search, int $pages_count, int $current_page, string $search_page): ?string
+function get_pagination(int $pages_count, int $current_page, string $search_page, string $search = '', string $category_id = ''): ?string
 {
     $fill_pages = range(1, $pages_count); //Заполняем массив номерами всех страниц
 
@@ -78,7 +80,8 @@ function get_pagination(string $search, int $pages_count, int $current_page, str
         'pages' => $pages,
         'search' => $search,
         'current_page' => $current_page,
-        'search_page' => $search_page
+        'search_page' => $search_page,
+        'category_id' => $category_id
     ]);
 }
 

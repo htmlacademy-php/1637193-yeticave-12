@@ -55,6 +55,66 @@ function get_categories_from_db($connect)
 }
 
 /**
+ * Фукнция считает количество лотов, принадлежащих выбранной категории, для пагинации
+ * @param mysqli $connect Данные о подключении к БД
+ * @param int $category_id номер данной категории из БД
+ * @return array|null Возвращает массив с количеством элементов, равных количеству лотов из выбранной категории, либо NULL, если лоты из категории не найдены
+ */
+function get_category_count(mysqli $connect, int $category_id)
+{
+    $sql_lots_count = 'SELECT COUNT(*) as count
+                       FROM item
+                       WHERE completed_at > NOW() AND category_id = ?';
+
+    $sql_result_lots_count = get_stmt_result($connect, $sql_lots_count, [$category_id]);
+
+    $fetch_array = mysqli_fetch_array($sql_result_lots_count, MYSQLI_ASSOC);
+
+    if ($fetch_array === []) {
+        $fetch_array = NULL;
+    }
+    return $fetch_array;
+}
+
+/**
+ * Функция получает список лотов, принадлежащих выбранной категории, в виде массива с элементами, содержащими информацию о лотах из выбранной категории
+ * @param mysqli $connect Данные о подключении к БД
+ * @param int $category_id номер данной категории из БД
+ * @param int $offset Смещение выборки количества запросов на 1 странице, т.е. начиная с какой записи будут возвращены ограничения по выборке
+ * @return array|null Возвращает массив с элементами, содержащими информацию о лотах из выбранной категории, либо NULL, если лоты из категории не найдены
+ */
+function get_lot_category_count($connect, int $category_id, int $offset)
+{
+    $sql_lots = 'SELECT item.id,
+                        completed_at,
+                        category.title AS category,
+                        item.category_id AS category_id,
+                        item.title AS item_title,
+                        image_url,
+                        IFNULL(MAX(bet.total), item.start_price) AS total,
+                        (SELECT COUNT(*)
+                         FROM bet
+                         WHERE bet.item_id = item.id) AS count_bet
+                FROM item
+                JOIN category ON item.category_id = category.id
+                LEFT JOIN bet on item.id = bet.item_id
+                WHERE completed_at > NOW() AND category.id = ?
+                GROUP BY item.id
+                ORDER BY item.created_at DESC
+                LIMIT ?
+                OFFSET ?';
+
+    $result_lots = get_stmt_result($connect, $sql_lots, [$category_id, LIMIT_OF_SEARCH_RESULT, $offset]);
+
+    $fetch_lots = mysqli_fetch_all($result_lots, MYSQLI_ASSOC);
+
+    if ($fetch_lots === []) {
+        $fetch_lots = null;
+    }
+    return $fetch_lots;
+}
+
+/**
  * Функция получает массив с самыми новыми, открытыми лотами из базы данных yeticave.
  * Каждый лот включает в себя название, стартовую цену, ссылку на изображение, текущую цену, название категории;
  * @param $connect
@@ -112,9 +172,6 @@ function get_pagination_info_about_items(mysqli $connect, int $offset): array
                 OFFSET ?";
     $result_items = get_stmt_result($connect, $sql_item, [LIMIT_OF_SEARCH_RESULT, $offset]);
 
-    if (!$result_items) {
-        exit('Ошибка запроса: &#129298; ' . mysqli_error($connect));
-    }
     return mysqli_fetch_all($result_items, MYSQLI_ASSOC);
 }
 
