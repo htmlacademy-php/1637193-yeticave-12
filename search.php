@@ -14,7 +14,12 @@ $current_page = 1; //номер текущей страницы
 $pages = []; //массив с номерами страниц
 
 //Получим содержимое поискового запроса. Если поисковый запрос не задан, то присвоим пустую строку
-$search = $_GET['search'] ? trim($_GET['search']) : '';
+$search = filter_input(INPUT_GET, 'search', FILTER_SANITIZE_STRING);
+if (!$search || !isset($search)) {
+    $search = '';
+} else {
+    $search = trim($search);
+}
 
 if (isset($search)) { //Будем выполнять поиск лотов, только если был задан поисковый запрос
 
@@ -27,13 +32,16 @@ if (isset($search)) { //Будем выполнять поиск лотов, т�
 
     $items_count = mysqli_fetch_assoc($result_stmt_count)['count']; //Узнаем общее число лотов, подходящих по условиям поиска
 
-    $current_page = $_GET['page'] ?? 1; //Получаем текущую страницу.
+    $current_page = (int)filter_input(INPUT_GET, 'page', FILTER_SANITIZE_NUMBER_INT); //Получаем номер текущей страницы.
+    if (!$current_page || !isset($current_page)) {
+        $current_page = 1;
+    }
 
     $pages_count = ceil($items_count / LIMIT_OF_SEARCH_RESULT); //Считаем кол-во страниц, которые нужны для вывода результата
     $offset = ($current_page - 1) * LIMIT_OF_SEARCH_RESULT; //Считаем смещение
 
     $search_page = pathinfo($_SERVER['SCRIPT_NAME'])['basename'] ?? 'search.php';
-    $pagination = get_pagination($search, $pages_count, $current_page, $search_page);
+    $pagination = get_pagination($pages_count, $current_page, $search_page, $search);
 
 //поиск лотов:
     //SQL запрос на поиск с использованием директивы MATCH(поля,где ищем)..AGAINST(поисковый запрос). На месте искомой строки стоит плейсхолдер
