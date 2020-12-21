@@ -22,7 +22,7 @@
                                     <?= htmlspecialchars($bet['title']) ?></a>
                             </h3>
                             <?php if (isset($bet['winner']) && $bet['winner']): ?>
-                                <p><?= htmlspecialchars($bid['contacts'] ?? 'Контактов не оставили.') ?></p>
+                                <p><?= htmlspecialchars($bet['contacts'] ?? 'Контактов не оставили.') ?></p>
                             <?php endif; ?>
                         </div>
                     </td>

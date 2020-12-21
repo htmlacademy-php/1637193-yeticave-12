@@ -14,7 +14,7 @@
         <li class="pagination-item pagination-item-prev">
             <?php if ($current_page > 1): ?>
                 <?php $back_page = ($current_page > 1) ? ($current_page - 1) : "1" ?>
-                <a href="/<?= $this_page; ?>?<?php if (isset($search) && $search !== ''): ?>&search=<?= htmlspecialchars($search); ?><?php endif; ?><?php if (isset($category_id) && $category_id !== ''): ?>&id=<?= $category_id; ?><?php endif; ?>&page=<?= $back_page; ?>">Назад</a>
+                <a href="/<?= $this_page; ?>?<?php if (isset($search) && $search !== ''): ?>search=<?= htmlspecialchars($search); ?><?php endif; ?><?php if (isset($category_id) && $category_id !== ''): ?>&id=<?= $category_id; ?><?php endif; ?>&page=<?= $back_page; ?>">Назад</a>
             <?php endif; ?>
         </li>
         <?php foreach ($pages as $page): ?>
