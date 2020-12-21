@@ -6,6 +6,7 @@
  * @var string $is_auth
  */
 require_once './functions/bootstrap.php'; //подключает все пользовательские функции и константы
+require_once '/getwinner.php'; //подключает сценарий "отправка письма победителю аукциона"
 
 $connect = db_connection(); //подлкючение к БД
 $categories = get_categories_from_db($connect); //вывод категорий лотов
