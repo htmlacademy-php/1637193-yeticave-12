@@ -9,7 +9,7 @@ $connect = db_connection();
 $bets = []; //информация о ставках
 $errors = []; //массив с возможными ошибками
 $count_bet = 0; //количество ставок по данному лоту
-$cost = 0; //введенное значение ставки
+$cost = ''; //введенное значение ставки
 if (isset($_POST['cost']) && $_POST['cost'] !=='') {
     $cost = (int)$_POST['cost'];
 }
@@ -47,7 +47,7 @@ if (mysqli_num_rows($sql_bet_history) > 0) {
     $count_bet = $bets !== null ? count($bets) : 0;
 }
 
-$user_id = $_SESSION['user']['id'];
+$user_id = $_SESSION['user']['id'] ?? null; //проверяем, авторизован ли пользователь
 
 // отправка нового значения ставки
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {

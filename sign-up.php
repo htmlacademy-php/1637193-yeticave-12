@@ -8,7 +8,7 @@ require_once './functions/bootstrap.php'; //подключает все поль
 $connect = db_connection();
 $categories = get_categories_from_db($connect);
 
-$user_id = $_SESSION['user']['id'];
+$user_id = $_SESSION['user']['id'] ?? null; //проверяем, авторизован ли пользователь
 //выводим ошибку, если пользователь уже авторизован
 if (!is_user_guest($user_id)) {
     http_response_code(403);

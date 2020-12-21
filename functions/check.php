@@ -186,12 +186,15 @@ function validate_contacts(string $contacts)
  **/
 function validate_bet_add(string $bet_field, int $min_bet): ?string
 {
-    if ($empty = validate_filled($bet_field, 'Ваша ставка')) {
+    $empty = validate_filled($bet_field, 'Ваша ставка');
+    if ($_POST[$bet_field] !== "0" && $empty) {
         return $empty;
     } elseif (!filter_var($_POST[$bet_field], FILTER_VALIDATE_INT)) {
         return 'Шаг ставки должен быть целым числом больше ноля';
-    } elseif ((int)$_POST[$bet_field]  < $min_bet) {
+    } elseif ((int)$_POST[$bet_field] < $min_bet) {
         return 'Ваша ставка должна быть не меньше размера минимальной ставки';
+    } elseif ((int)$_POST[$bet_field] > 100000000) {
+        return 'Ваша ставка должна быть меньше 100 млн. рублей';
     }
     return NULL;
 }
@@ -228,8 +231,11 @@ function validate_if_filled_in()
  * @param int $user_id ID текущего пользователя
  * @return bool Возвращает true при положительном ответе и false при отрицательном
  */
-function is_user_guest(int $user_id): bool
+function is_user_guest(?int $user_id): bool
 {
+    if ($user_id === null) {
+        return true;
+    }
     return !isset($user_id);
 }
 

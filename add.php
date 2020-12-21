@@ -10,7 +10,7 @@ $connect = db_connection();
 
 $categories = get_categories_from_db($connect);
 
-$user_id = $_SESSION['user']['id'];
+$user_id = $_SESSION['user']['id'] ?? null; //проверяем, авторизован ли пользователь
 // показываем ошибку 403, если пользователь не авторизован на сайте
 if (is_user_guest($user_id)) {
     http_response_code(403);
@@ -97,7 +97,6 @@ if (empty($errors)) {
                                       bet_step)
                     VALUES (?, ?, ?, ?, ?, ?, ?, ?)';
 
-    $user_id = $_SESSION['user']['id'];
     // формируем подготовленное выражение на основе SQL запроса из $sql_add_lot
     $stmt = db_get_prepare_stmt(
         $connect,
