@@ -6,6 +6,7 @@
  * @var string $user_name
  * @var string $search
  * @var int $is_auth
+ * @var bool $is_index_page
  */
 ?>
 
@@ -28,8 +29,9 @@
                 <img src="/img/logo.svg" width="160" height="39" alt="Логотип компании YetiCave">
             </a>
             <form class="main-header__search" method="get" action="/search.php" autocomplete="off">
-                <input type="search" name="search" placeholder="Поиск лота" value="<?= isset($search) ? htmlspecialchars($search) : "" ?>">
-                <input class="main-header__search-btn" type="submit" name="find" value="Найти"  id="search">
+                <input type="search" name="search" placeholder="Поиск лота"
+                       value="<?= isset($search) ? htmlspecialchars($search) : "" ?>">
+                <input class="main-header__search-btn" type="submit" name="find" value="Найти" id="search">
             </form>
             <?php if ($is_auth): ?>
                 <a class="main-header__add-lot button" href="/add.php">Добавить лот</a>
@@ -54,31 +56,36 @@
             </nav>
         </div>
     </header>
-    <main
-        <?php if (pathinfo($_SERVER['REQUEST_URI'])['basename'] === 'index.php' || pathinfo($_SERVER['SCRIPT_NAME'])['basename'] === 'index.php'): ?>class="container"<?php endif; ?>>
-        <nav class="nav">
-            <ul class="nav__list container">
-                <?php if (pathinfo($_SERVER['SCRIPT_NAME'])['basename'] !== 'index.php'): ?>
-                    <?php foreach ($categories as $category_name): ?>
-                        <li class="nav__item">
-                            <a href="pages/<?= $category_name['id']; ?>"><?= htmlspecialchars($category_name['title'] ?? ""); ?></a>
-                        </li>
-                    <?php endforeach; ?>
-                <?php endif; ?>
-            </ul>
-        </nav>
-        <?= $content; ?>
+    <main <?php if (isset($is_index_page)): ?>class="container"<?php endif; ?>>
+        <?php if (!isset($is_index_page)): ?>
+            <nav class="nav">
+                <ul class="nav__list container">
+                    <?php if (isset($categories)): ?>
+                        <?php foreach ($categories as $category_name): ?>
+                            <li class="nav__item">
+                                <a href="/categories.php?id=<?= $category_name['id'] ?? 0 ?>"><?= htmlspecialchars($category_name['title'] ?? "Название категории"); ?></a>
+                            </li>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
+                </ul>
+            </nav>
+        <?php endif; ?>
+        <?php if (isset($content)): ?>
+            <?= $content; ?>
+        <?php endif; ?>
     </main>
 </div>
 
 <footer class="main-footer">
     <nav class="nav">
         <ul class="nav__list container">
-            <?php foreach ($categories as $category_name): ?>
-                <li class="nav__item">
-                    <a href="pages/<?= $category_name['id']; ?>"><?= htmlspecialchars($category_name['title']); ?></a>
-                </li>
-            <?php endforeach; ?>
+            <?php if (isset($categories)): ?>
+                <?php foreach ($categories as $category_name): ?>
+                    <li class="nav__item">
+                        <a href="/categories.php?id=<?= $category_name['id'] ?? 0 ?>"><?= htmlspecialchars($category_name['title'] ?? "Название категории"); ?></a>
+                    </li>
+                <?php endforeach; ?>
+            <?php endif; ?>
         </ul>
     </nav>
     <div class="main-footer__bottom container">
