@@ -1,6 +1,12 @@
 <?php
 /**
  * @var array $lot
+ * @var array $errors
+ * @var array $bets
+ * @var int $item_id
+ * @var int $cost
+ * @var int $count_bet
+ * @var bool $show_bet_add
  */
 ?>
 <section class="lot-item container">
@@ -40,36 +46,31 @@
                         <span><?= htmlspecialchars(formatted_sum($lot['current_price'] + $lot['bet_step'])) ?? 0 ?></span>
                     </div>
                 </div>
-                <?php if (isset($_SESSION['user']['id'])) : ?>
-                    <form class="lot-item__form" action="https://echo.htmlacademy.ru" method="post" autocomplete="off">
-                        <p class="lot-item__form-item form__item form__item--invalid">
-                            <label for="cost">Ваша ставка</label>
-                            <input id="cost" type="text" name="cost" placeholder="12 000">
-                            <span class="form__error">Введите наименование лота</span>
+                <?php if ($show_bet_add) : ?>
+                    <form class="lot-item__form" action="/lot.php?id=<?= $item_id; ?>" method="post" autocomplete="off">
+                        <p class="lot-item__form-item <?= isset($errors['cost']) ? 'form__item form__item--invalid' : '' ?>">
+                            <label for="cost">Ваша ставка </label>
+                            <input id="cost" type="text" name="cost"
+                                   placeholder="<?= htmlspecialchars(formatted_sum($lot['current_price'] + $lot['bet_step'])) ?? 0 ?>"
+                                   value="<?= htmlspecialchars($cost); ?>">
+                            <span class="form__error"><?= $errors['cost'] ?? '' ?></span>
                         </p>
                         <button type="submit" class="button">Сделать ставку</button>
                     </form>
                 <?php endif; ?>
             </div>
             <div class="history">
-                <h3>История ставок (<span>10</span>)</h3>
+                <h3>История ставок <span><?= isset($bets) ? ('(' . $count_bet . ')') : 'пуста'?></span></h3>
                 <table class="history__list">
-                    <tr class="history__item">
-                        <td class="history__name">Test</td>
-                        <td class="history__price">10 999 р</td>
-                        <td class="history__time">XXX минут назад</td>
-                    </tr>
-                    <tr class="history__item">
-                        <td class="history__name">Test</td>
-                        <td class="history__price">10 999 р</td>
-                        <td class="history__time">XXX минут назад</td>
-                    </tr>
-                    <tr class="history__item">
-                        <td class="history__name">Test</td>
-                        <td class="history__price">10 999 р</td>
-                        <td class="history__time">XXX минут назад</td>
-                    </tr>
-
+                    <?php if(isset($bets)): ?>
+                        <?php foreach ($bets as $bet): ?>
+                            <tr class="history__item">
+                                <td class="history__name"><?= htmlspecialchars($bet['username']); ?></td>
+                                <td class="history__price"><?= htmlspecialchars(formatted_sum($bet['total'])); ?></td>
+                                <td class="history__time"><?= get_correct_bet_time($bet['date']); ?></td>
+                            </tr>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
                 </table>
             </div>
         </div>

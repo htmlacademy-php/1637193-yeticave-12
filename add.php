@@ -10,22 +10,17 @@ $connect = db_connection();
 
 $categories = get_categories_from_db($connect);
 
+$user_id = $_SESSION['user']['id'] ?? null; //проверяем, авторизован ли пользователь
 // показываем ошибку 403, если пользователь не авторизован на сайте
-if (!isset($_SESSION['user']['id'])) {
+if (is_user_guest($user_id)) {
     http_response_code(403);
     $error = 'Ошибка 403';
     $error_description = 'Для добавления лота необходимо пройти регистрацию на сайте.';
     $error_link = '/sign-up.php';
     $error_link_description = 'Зарегистрироваться можно по этой ссылке.';
-    $page_content = include_template(
-        '/error_page.php',
-        [
-            'error' => $error,
-            'error_description' => $error_description,
-            'error_link' => $error_link,
-            'error_link_description' => $error_link_description
-        ]
-    );
+
+    $page_content = include_template_error($error, $error_description, $error_link, $error_link_description);
+
     $layout_content = include_template('/layout.php', [
         'content' => $page_content,
         'categories' => $categories,
@@ -109,7 +104,7 @@ if (empty($errors)) {
         [
             $_POST['lot-date'],
             $_POST['category'],
-            $_SESSION['user']['id'],
+            $user_id,
             $_POST['lot-name'],
             $_POST['message'],
             $file_url,

@@ -22,15 +22,9 @@ if (!($_SERVER['REQUEST_METHOD'] == 'POST')) {
         $error_description = 'Вы уже авторизованы на нашем сайте. &#128517;';
         $error_link = '/index.php';
         $error_link_description = 'Предлагаем вернуться на главную.';
-        $page_content = include_template(
-            '/error_page.php',
-            [
-                'error' => $error,
-                'error_description' => $error_description,
-                'error_link' => $error_link,
-                'error_link_description' => $error_link_description
-            ]
-        );
+
+        $page_content = include_template_error($error, $error_description, $error_link, $error_link_description);
+
         $layout_content = include_template('/layout.php', [
             'content' => $page_content,
             'categories' => $categories,
