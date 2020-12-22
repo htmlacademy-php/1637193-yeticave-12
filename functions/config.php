@@ -14,7 +14,7 @@ $user_name = $_SESSION['user']['name'] ?? "";
 /**
  * Папка для загрузки пользовательских изображений
  */
- define('NAME_FOLDER_UPLOADS_FILE', 'uploads');
+define('NAME_FOLDER_UPLOADS_FILE', 'uploads');
 
 /**
  * Универсальный разделитель каталогов
@@ -67,4 +67,15 @@ const DB_CONNECTION_DATA = [
     'database' => 'yeticave',
     'user' => 'root',
     'password' => 'root'
+];
+
+/**
+ * Данные для доступа к SMTP-серверу
+ */
+const SMTP_CONFIG = [
+    'host' => 'smtp.mailtrap.io',
+    'username' => 'bd2f8a93ea7c17',
+    'password' => '9882134b53e1fc',
+    'port' => '2525',
+    'encryption' => 'tls'
 ];

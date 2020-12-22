@@ -7,7 +7,8 @@
  */
 function db_connection(): mysqli
 {
-    $connect = mysqli_connect(DB_CONNECTION_DATA['host'], DB_CONNECTION_DATA['user'], DB_CONNECTION_DATA['password'], DB_CONNECTION_DATA['database']);
+    $connect = mysqli_connect(DB_CONNECTION_DATA['host'], DB_CONNECTION_DATA['user'], DB_CONNECTION_DATA['password'],
+        DB_CONNECTION_DATA['database']);
     mysqli_set_charset($connect, "utf8");
 
     if (!$connect) {
@@ -65,7 +66,7 @@ function get_category_count(mysqli $connect, int $category_id)
     $fetch_array = mysqli_fetch_array($sql_result_lots_count, MYSQLI_ASSOC);
 
     if ($fetch_array === []) {
-        $fetch_array = NULL;
+        $fetch_array = null;
     }
     return $fetch_array;
 }
@@ -397,7 +398,7 @@ function check_errors_before_add_bet($lot): array
 function search_users_bet($connect, int $user_id): array
 {
 //поиск ставок данного пользователя
-$sql_user_bet = 'SELECT item.id as item_id,
+    $sql_user_bet = 'SELECT item.id as item_id,
                         item.title AS title,
                         category.title AS category,
                         item.image_url,
@@ -415,12 +416,104 @@ $sql_user_bet = 'SELECT item.id as item_id,
                   GROUP BY bet.item_id
                   ORDER BY bet_date DESC';
 
-$sql_user_bet_prepared = db_get_prepare_stmt($connect, $sql_user_bet, [$user_id]);
-mysqli_stmt_execute($sql_user_bet_prepared);
-$sql_result = mysqli_stmt_get_result($sql_user_bet_prepared);
+    $sql_user_bet_prepared = db_get_prepare_stmt($connect, $sql_user_bet, [$user_id]);
+    mysqli_stmt_execute($sql_user_bet_prepared);
+    $sql_result = mysqli_stmt_get_result($sql_user_bet_prepared);
 
-if (!$sql_result) {
-    exit('Ошибка запроса: &#129298; ' . mysqli_error($connect));
+    if (!$sql_result) {
+        exit('Ошибка запроса: &#129298; ' . mysqli_error($connect));
+    }
+    return mysqli_fetch_all($sql_result, MYSQLI_ASSOC);
 }
-return mysqli_fetch_all($sql_result, MYSQLI_ASSOC);
+
+
+/**
+ * Функция выдает список последних ставок по лотам без победителей,
+ * дата истечения которых меньше или равна текущей
+ * @param mysqli $connect данные о подключении к базе данных
+ * @return mysqli_result Результат запроса в БД
+ */
+function get_finished_lots(mysqli $connect): mysqli_result
+{
+    $sql_finished_lots = 'SELECT bet.id AS bet_id, total, bet.user_id AS user_id, item_id, bet.created_at AS created_at, i.winner_id AS winner_id,
+               i.title AS item_title, i.completed_at AS completed_at, u.name AS user_name, u.email AS user_email
+            FROM bet
+            INNER JOIN item i on bet.item_id = i.id
+            INNER JOIN users u on bet.user_id = u.id
+            INNER JOIN (
+                    SELECT item_id AS item_id_bet, MAX(total) AS max_bet
+                    FROM bet
+                    GROUP BY item_id
+            ) bet_new ON bet.item_id = bet_new.item_id_bet AND bet.total = bet_new.max_bet
+            WHERE i.winner_id IS NULL AND i.completed_at <= CURDATE()
+            ORDER BY bet_id';
+
+
+    $result_finished_lots = mysqli_query($connect, $sql_finished_lots);
+
+    if (!$result_finished_lots) {
+        exit('Ошибка запроса: &#129298; ' . mysqli_error($connect));
+    }
+    return $result_finished_lots;
+}
+
+
+/**
+ * Функция отправляет сообщение о выигрыше ставки победителю лота
+ * @param array $winner Массив с данными победителя лота
+ * @return string Отправленное сообщение
+ */
+function send_email_to_winner(array $winner)
+{
+    // конфигурация транспорта для доступа к SMTP-серверу
+    $transport = (new Swift_SmtpTransport(SMTP_CONFIG['host'], SMTP_CONFIG['port'], SMTP_CONFIG['encryption']))
+        ->setUsername(SMTP_CONFIG['username'])
+        ->setPassword(SMTP_CONFIG['password']);
+
+    //данные для вставки в шаблон:
+    $user_name = $winner['user_name'];
+    $item_title = $winner['item_title'];
+    $item_id = (int)$winner['item_id'];
+    $host_url = $_SERVER['SERVER_NAME'];
+
+    //Передадим список победителей в шаблон, используемый для отправки email
+    $message_content = include_template(
+        '/email.php',
+        [
+            'user_name' => $user_name,
+            'item_title' => $item_title,
+            'item_link' => '/lot.php?id=' . $item_id,
+            'host_url' => 'http://' . $host_url
+        ]
+    );
+
+    //Установим параметры сообщения: тема, отправитель и список его получателей
+    $message = (new Swift_Message())
+        ->setSubject("Ваша ставка победила")
+        ->setFrom(['keks@phpdemo.ru' => 'yeticave'])
+        ->setTo([$winner['user_email'] => $winner['user_name']])
+        ->setBody($message_content, 'text/html');
+
+    //Передадим в главный объект библиотеки SwiftMailer, ответственный за отправку сообщений, созданный объект с SMTP-сервером.
+    // и отправим сообщение
+    return (new Swift_Mailer($transport))->send($message);
+}
+
+/**
+ * Функция добавляет в БД победителя лота
+ * @param mysqli $connect данные о подключении к базе данных
+ * @param int $user ID пользователя, выигравшего лот
+ * @param int $item ID лота, который выиграл пользователь
+ * @return mysqli_result Результат запроса в БД
+ */
+function identify_winner_lot(mysqli $connect,int $user, int $item)
+{
+    $sql_winner = "UPDATE item SET winner_id = $user WHERE id = $item";
+
+    $result_winner = mysqli_query($connect, $sql_winner);
+
+    if (!$result_winner) {
+        exit('Ошибка запроса: &#129298; ' . mysqli_error($connect));
+    }
+    return $result_winner;
 }
