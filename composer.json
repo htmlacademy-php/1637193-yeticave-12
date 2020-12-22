@@ -1,0 +1,15 @@
+{
+    "name": "al-galkin/yeticave",
+    "description": "Website for auction",
+    "type": "project",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Aleksandr Galkin",
+            "email": "xgalkin@gmail.com"
+        }
+    ],
+    "require": {
+        "swiftmailer/swiftmailer": "^6.2"
+    }
+}
