@@ -18,48 +18,6 @@ function formatted_sum($lot_price)
 }
 
 /**
- * Функция выполняет выражение на основе подготовленного SQL-запроса и возвращает его результат
- * @param mysqli $connect Данные о подключении к БД
- * @param string $sql_result_count SQL-запрос в БД
- * @param array $array_stmt Данные для вставки на место плейсхолдеров
- * @return mysqli_result Результат подготовленного выражения
- */
-function get_stmt_result(mysqli $connect, string $sql_result_count, $array_stmt = []): mysqli_result
-{
-    $stmt = db_get_prepare_stmt($connect, $sql_result_count, $array_stmt); //Подготовка SQL запроса к выполнению
-    mysqli_stmt_execute($stmt); //Выполним подготовленное выражение
-    $result_stmt = mysqli_stmt_get_result($stmt); //получим его результат
-
-    if (!$result_stmt) {
-        http_response_code(500);
-        $error = 'Произошла ошибка: 500 &#129298; ';
-        $error_description = 'Не удалось связать подготовленное выражение. &#128532; ';
-        $error_link = '/index.php';
-        $error_link_description = 'Предлагаем вернуться на главную.';
-        $page_content = include_template(
-            '/error_page.php',
-            [
-                'error' => $error,
-                'error_description' => $error_description,
-                'error_link' => $error_link,
-                'error_link_description' => $error_link_description
-            ]
-        );
-        $layout_content = include_template('/layout.php', [
-            'content' => $page_content,
-            'categories' => [],
-            'title' => 'Ошибка 500',
-            'user_name' => $user_name,
-            'is_auth' => $is_auth
-        ]);
-
-        exit($layout_content);
-    }
-    return $result_stmt;
-}
-
-
-/**
  * Функция заполняет данными шаблон пагинации
  * @param int $pages_count количество страниц, которые нужны для вывода результата
  * @param int $current_page Номер текущей страницы

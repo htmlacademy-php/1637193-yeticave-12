@@ -426,6 +426,95 @@ function search_users_bet($connect, int $user_id): array
     return mysqli_fetch_all($sql_result, MYSQLI_ASSOC);
 }
 
+/**
+ * Функция выполняет выражение на основе подготовленного SQL-запроса и возвращает его результат
+ * @param mysqli $connect Данные о подключении к БД
+ * @param string $sql_result_count SQL-запрос в БД
+ * @param array $array_stmt Данные для вставки на место плейсхолдеров
+ * @return mysqli_result Результат подготовленного выражения
+ */
+function get_stmt_result(mysqli $connect, string $sql_result_count, $array_stmt = []): mysqli_result
+{
+    $stmt = db_get_prepare_stmt($connect, $sql_result_count, $array_stmt); //Подготовка SQL запроса к выполнению
+    mysqli_stmt_execute($stmt); //Выполним подготовленное выражение
+    $result_stmt = mysqli_stmt_get_result($stmt); //получим его результат
+
+    if (!$result_stmt) {
+        http_response_code(500);
+        $error = 'Произошла ошибка: 500 &#129298; ';
+        $error_description = 'Не удалось связать подготовленное выражение. &#128532; ';
+        $error_link = '/index.php';
+        $error_link_description = 'Предлагаем вернуться на главную.';
+        $page_content = include_template(
+            '/error_page.php',
+            [
+                'error' => $error,
+                'error_description' => $error_description,
+                'error_link' => $error_link,
+                'error_link_description' => $error_link_description
+            ]
+        );
+        $layout_content = include_template('/layout.php', [
+            'content' => $page_content,
+            'categories' => [],
+            'title' => 'Ошибка 500',
+            'user_name' => $user_name,
+            'is_auth' => $is_auth
+        ]);
+
+        exit($layout_content);
+    }
+    return $result_stmt;
+}
+
+/**
+ * Функция считает число лотов, подходящих под результаты поискового запроса
+ * @param mysqli $connect Данные о подключении к БД
+ * @param string $search Содержимое поискового запрос от пользователя
+ * @return int Число лотов, подходящих по условиям поиска
+ */
+function get_search_items_count(mysqli $connect, string $search): int
+{
+    $sql_result_count = "SELECT COUNT(*) as count
+                         FROM item
+                         WHERE item.completed_at > NOW() AND MATCH(title, description) AGAINST(?)";
+
+    $result_stmt_count = get_stmt_result($connect, $sql_result_count, [$search]);
+
+    return mysqli_fetch_assoc($result_stmt_count)['count'];
+}
+
+/**
+ * Функция возвращает массив с результатами поискового запроса
+ * @param mysqli $connect Данные о подключении к БД
+ * @param string $search Содержимое поискового запрос от пользователя
+ * @param int $offset Смещение выдачи результатов поиска для пагинации
+ * @return array Массив с элементами в виде результатов поискового запроса
+ */
+function get_search_items(mysqli $connect, string $search, int $offset): array
+{
+    //SQL запрос на поиск с использованием директивы MATCH(поля,где ищем)..AGAINST(поисковый запрос). На месте искомой строки стоит плейсхолдер
+    $sql_search = "SELECT item.id,
+                   item.title,
+                   item.start_price,
+                   item.image_url,
+                   IFNULL(MAX(bet.total), item.start_price) AS total,
+                   item.created_at,
+                   item.completed_at,
+                   category.title AS category_title
+           FROM item
+           INNER JOIN category ON item.category_id = category.id
+           LEFT JOIN bet ON bet.item_id = item.id
+           WHERE item.completed_at > NOW() AND MATCH(item.title, item.description) AGAINST(?)
+           GROUP BY item.id
+           ORDER BY item.created_at DESC
+           LIMIT ?
+           OFFSET ?";
+
+    $result_stmt_search = get_stmt_result($connect, $sql_search, [$search, LIMIT_OF_SEARCH_RESULT, $offset]);
+    // преобразуем результаты поиска в массив
+    return mysqli_fetch_all($result_stmt_search, MYSQLI_ASSOC);
+}
 
 /**
  * Функция выдает список последних ставок по лотам без победителей,
@@ -506,7 +595,7 @@ function send_email_to_winner(array $winner)
  * @param int $item ID лота, который выиграл пользователь
  * @return mysqli_result Результат запроса в БД
  */
-function identify_winner_lot(mysqli $connect,int $user, int $item)
+function identify_winner_lot(mysqli $connect, int $user, int $item)
 {
     $sql_winner = "UPDATE item SET winner_id = $user WHERE id = $item";
 
