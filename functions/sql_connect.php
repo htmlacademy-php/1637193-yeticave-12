@@ -501,11 +501,12 @@ function send_email_to_winner(array $winner)
 
 /**
  * Функция добавляет в БД победителя лота
+ * @param mysqli $connect данные о подключении к базе данных
  * @param int $user ID пользователя, выигравшего лот
  * @param int $item ID лота, который выиграл пользователь
  * @return mysqli_result Результат запроса в БД
  */
-function identify_winner_lot(int $user, int $item): mysqli_result
+function identify_winner_lot(mysqli $connect,int $user, int $item)
 {
     $sql_winner = "UPDATE item SET winner_id = $user WHERE id = $item";
 

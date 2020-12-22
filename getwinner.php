@@ -18,7 +18,7 @@ if ($result_finished_lots && mysqli_num_rows($result_finished_lots)) {
             $user = (int)$winner['user_id'];
             $item = (int)$winner['item_id'];
 
-            identify_winner_lot($user, $item);
+            identify_winner_lot($connect, $user, $item);
         }
     }
     if (!empty($winners)) {
