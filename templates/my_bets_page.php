@@ -59,4 +59,9 @@
     <?php else: ?>
         <p>Ставок еще не было.</p>
     <?php endif; ?>
+    <br>
+    <?php if (isset($pagination) && !($pagination === '')): ?>
+        <?= $pagination; ?>
+    <?php endif; ?>
 </section>
+

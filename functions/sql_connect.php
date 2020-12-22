@@ -427,6 +427,39 @@ function search_users_bet($connect, int $user_id): array
 }
 
 /**
+ * Функция осуществляет поиск ставок указанного пользователя в БД с ограничением числа лотов на 1 странице
+ * @param mysqli $connect Данные о подключении к БД
+ * @param int $user_id ID текущего пользователя
+ * @param int $offset Смещение выборки количества запросов на 1 странице, т.е. начиная с какой записи будут возвращены ограничения по выборке
+ * @return array Ассоциативный массив с данными о ставках пользователя для показа на 1 странице
+ */
+function search_users_bet_about_items(mysqli $connect, int $user_id, int $offset): array
+{
+    $sql_bet = "SELECT item.id as item_id,
+                        item.title AS title,
+                        category.title AS category,
+                        item.image_url,
+                        item.completed_at as item_end_time,
+                        IFNULL(MAX(bet.total), item.start_price) AS current_price,
+                        MAX(bet.created_at) as bet_date,
+                        item.winner_id,
+                        users.contacts,
+                        bet.user_id
+                  FROM bet
+                   LEFT JOIN item ON item.id = bet.item_id
+                   LEFT JOIN users on users.id = item.author_id
+                   LEFT JOIN category ON category.id = item.category_id
+                  WHERE bet.user_id = ?
+                  GROUP BY bet.item_id
+                  ORDER BY bet_date DESC
+                   LIMIT ?
+                   OFFSET ?";
+    $result_bet = get_stmt_result($connect, $sql_bet, [$user_id, LIMIT_OF_SEARCH_RESULT, $offset]);
+
+    return mysqli_fetch_all($result_bet, MYSQLI_ASSOC);
+}
+
+/**
  * Функция выполняет выражение на основе подготовленного SQL-запроса и возвращает его результат
  * @param mysqli $connect Данные о подключении к БД
  * @param string $sql_result_count SQL-запрос в БД

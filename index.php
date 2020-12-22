@@ -13,6 +13,7 @@ $categories = get_categories_from_db($connect); //вывод категорий 
 $ad_information = get_ad_information_from_db($connect); //массив с информацией о всех открытых лотах
 
 $items_count = count($ad_information); //Узнаем общее число лотов, подходящих по условиям поиска
+$pagination = null; //пагинация
 
 //если число открытых лотов больше 9, то нужно подключение пагинации:
 if ($items_count > LIMIT_OF_SEARCH_RESULT) {

@@ -43,5 +43,7 @@
             <?php endif; ?>
         </ul>
     </section>
-    <?= $pagination; ?>
+    <?php if (isset($pagination) && !($pagination === '')): ?>
+        <?= $pagination; ?>
+    <?php endif; ?>
 </div>
