@@ -22,7 +22,7 @@
                 <?php foreach ($categories as $category_name): ?>
                     <option
                         value="<?= $category_name['id']; ?>"
-                        <?= ($selected_category == $category_name['id']) ? "selected" : "" ?>
+                        <?= ($selected_category === $category_name['id']) ? "selected" : "" ?>
                     ><?= htmlspecialchars($category_name['title'] ?? ""); ?></option>
                 <?php endforeach; ?>
             </select>

@@ -8,7 +8,7 @@ require_once './functions/bootstrap.php'; //подключает все поль
 $connect = db_connection();
 $categories = get_categories_from_db($connect);
 
-if (!($_SERVER['REQUEST_METHOD'] == 'POST')) {
+if (!($_SERVER['REQUEST_METHOD'] === 'POST')) {
     //если форма не отправлена, то проверяем наличие сессии у пользователя:
     //сессия есть: пользователь залогинен и ему нужно показать главную
     //сессии нет: показываем форму для захода на сайт

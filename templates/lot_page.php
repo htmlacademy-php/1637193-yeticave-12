@@ -23,17 +23,11 @@
         </div>
         <div class="lot-item__right">
             <div class="lot-item__state">
-                <?php $remaining_time = get_date_range($lot['completed_at']) ?>
-                <div class="lot-item__timer timer
-                            <?php if ($remaining_time[0] == '00'): ?>
-                                timer--finishing
-                            <?php endif; ?>
-                            ">
-                    <?php if ($remaining_time[0] == '00' && $remaining_time[1] == '00'): ?>
-                        Время лота истекло
-                    <?php else: ?>
-                        <?= $remaining_time[0] . ':' . $remaining_time[1] ?>
-                    <?php endif; ?>
+                <?php $timer_finished = get_date_range($lot['completed_at']) ?? '' ?>
+                <?php $remaining_time = get_remaining_time($lot['completed_at']) ?? '' ?>
+                <div
+                    class="lot-item__timer timer <?php if ($timer_finished[0] === '00'): ?>timer--finishing<?php endif; ?>">
+                    <?= $remaining_time ?? '' ?>
                 </div>
                 <div class="lot-item__cost-state">
                     <div class="lot-item__rate">
