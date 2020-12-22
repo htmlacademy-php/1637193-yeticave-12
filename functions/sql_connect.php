@@ -483,7 +483,7 @@ function send_email_to_winner(array $winner)
             'user_name' => $user_name,
             'item_title' => $item_title,
             'item_link' => '/lot.php?id=' . $item_id,
-            'host_url' => $host_url
+            'host_url' => 'http://' . $host_url
         ]
     );
 
