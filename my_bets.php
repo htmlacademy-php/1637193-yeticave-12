@@ -11,7 +11,7 @@ $categories = get_categories_from_db($connect);
 $user_id = $_SESSION['user']['id'] ?? null; //проверяем, авторизован ли пользователь
 
 //проверяем, что пользователь имеет право смотреть ставки
-if(is_user_guest($user_id)) {
+if (is_user_guest($user_id)) {
     http_response_code(403);
     $error = 'Ошибка 403';
     $error_description = 'Для просмотра сделанных ставок необходимо пройти авторизацию на сайте.';
@@ -32,15 +32,10 @@ if(is_user_guest($user_id)) {
 //поиск ставок данного пользователя
 $user_bets = search_users_bet($connect, $user_id);
 
-//передаем по ссылке данные о том, является ли юзер победителем и закончился ли уже лот
+//передаем по ссылке данные о том, является ли юзер победителем
 foreach ($user_bets as &$bet) {
-    if ($bet['winner_id'] == $user_id) {
+    if ($bet['winner_id'] === $user_id) {
         $bet['winner'] = true;
-    }
-    $remaining_time = get_date_range($bet['item_end_time']);
-    $bet['remaining_time'] = $remaining_time;
-    if ($remaining_time[0] == '00' && $remaining_time[1] == '00') {
-        $bet['lot_ended'] = true;
     }
 }
 

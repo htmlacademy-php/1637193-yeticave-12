@@ -51,11 +51,27 @@ function get_correct_bet_time($bet_time)
         return 'Только что';
     } elseif ((int)$bet_time_hours === 0 && ((int)$bet_time_minutes >= 1 || ((int)$bet_time_minutes < 60))) {
         return $bet_time_minutes . ' ' . get_noun_plural_form($bet_time_minutes, 'минута', 'минуты', 'минут') . $ago;
-    } else if ((int)$bet_time_hours === 1) {
+    } elseif ((int)$bet_time_hours === 1) {
         return 'час' . $ago;
-    } else if ((int)$bet_time_hours > 1 && (int)$bet_time_hours < 12) {
+    } elseif ((int)$bet_time_hours > 1 && (int)$bet_time_hours < 12) {
         return $bet_time_hours . ' ' . get_noun_plural_form($bet_time_hours, 'час', 'часа', 'часов') . $ago;
     } else {
         return date_format(date_create($bet_time), 'd.m.y в H:i');
     }
+}
+
+/**
+ * Функция возвращает оставшееся время лота в формате ЧЧ:ММ.
+ * В случае, если время истекло, возвращает строку "Время лота истекло".
+ * @param string $completed_at Дата и время завершения лота
+ * @return string оставшееся время лота в формате ЧЧ:ММ или строку с указанием, что лот истек.
+ */
+function get_remaining_time(string $completed_at)
+{
+    $remaining_time = get_date_range($completed_at);
+
+    if ($remaining_time[0] === '00' && $remaining_time[1] === '00') {
+        return 'Время лота истекло';
+    }
+    return $remaining_time[0] . ':' . $remaining_time[1];
 }

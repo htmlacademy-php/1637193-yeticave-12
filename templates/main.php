@@ -24,7 +24,6 @@
     </div>
     <ul class="lots__list">
         <?php foreach ($ad_information as $ad_value): ?>
-            <?php $remaining_time = get_date_range($ad_value['completed_at']) ?>
             <li class="lots__item lot">
                 <div class="lot__image">
                     <img src="<?= htmlspecialchars($ad_value['image_url']) ?>" width="350" height="260"
@@ -41,16 +40,11 @@
                             <span
                                 class="lot__cost"><?= htmlspecialchars(formatted_sum($ad_value['total'])) ?></span>
                         </div>
-                        <div class="lot__timer timer
-                                    <?php if ($remaining_time[0] == '00'): ?>
-                                    timer--finishing
-                                    <?php endif; ?>
-                                    ">
-                            <?php if ($remaining_time[0] == '00' && $remaining_time[1] == '00'): ?>
-                                Время лота истекло
-                            <?php else: ?>
-                                <?= $remaining_time[0] . ':' . $remaining_time[1] ?>
-                            <?php endif; ?>
+                        <?php $timer_finished = get_date_range($ad_value['completed_at']) ?? '' ?>
+                        <?php $remaining_time = get_remaining_time($ad_value['completed_at']) ?? '' ?>
+                        <div
+                            class="lot__timer timer <?php if ($timer_finished[0] === '00'): ?>timer--finishing<?php endif; ?>">
+                            <?= $remaining_time ?? '' ?>
                         </div>
                     </div>
                 </div>
