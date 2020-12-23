@@ -1,6 +1,6 @@
 <?php
 require_once './functions/bootstrap.php'; //подключает все пользовательские функции и константы
-require_once 'vendor/autoload.php'; //подключает файл автозагрузки composer
+require_once './vendor/autoload.php'; //подключает файл автозагрузки composer
 
 $connect = db_connection();
 

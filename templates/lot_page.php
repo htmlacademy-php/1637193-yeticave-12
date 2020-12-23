@@ -54,9 +54,9 @@
                 <?php endif; ?>
             </div>
             <div class="history">
-                <h3>История ставок <span><?= isset($bets) ? ('(' . $count_bet . ')') : 'пуста'?></span></h3>
+                <h3>История ставок <span><?= isset($bets) ? ('(' . $count_bet . ')') : 'пуста' ?></span></h3>
                 <table class="history__list">
-                    <?php if(isset($bets)): ?>
+                    <?php if (isset($bets)): ?>
                         <?php foreach ($bets as $bet): ?>
                             <tr class="history__item">
                                 <td class="history__name"><?= htmlspecialchars($bet['username']); ?></td>

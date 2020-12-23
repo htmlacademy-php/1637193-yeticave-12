@@ -26,8 +26,13 @@ function formatted_sum($lot_price)
  * @param string $category_id ID категории лотов [необязательный параметр]
  * @return html Заполненный HTML-шаблон пагинации
  */
-function get_pagination(int $pages_count, int $current_page, string $search_page, string $search = '', string $category_id = ''): ?string
-{
+function get_pagination(
+    int $pages_count,
+    int $current_page,
+    string $search_page,
+    string $search = '',
+    string $category_id = ''
+): ?string {
     $fill_pages = range(1, $pages_count); //Заполняем массив номерами всех страниц
 
     $pages = get_difficult_pagination($fill_pages, $current_page); //проверяем, нужна ли сложная пагинация
@@ -70,13 +75,16 @@ function get_difficult_pagination(array $pages_array, int $current_page): array
 
         //вывод пагинации для левых 7-ми страниц:
         if (($current_page <= (PAGE_LIMIT_SIDE_PAGINATION))) {
-            $new_pages_array = array_merge($pages_left_end, $pages_left_center, $current_page_elem, $pages_right_center, $separator, $pages_right_end);
+            $new_pages_array = array_merge($pages_left_end, $pages_left_center, $current_page_elem, $pages_right_center,
+                $separator, $pages_right_end);
         } //вывод пагинации для страниц, расположенных через 7 от начала и за 7 до конца пагинации
         elseif (($current_page > PAGE_LIMIT_SIDE_PAGINATION) && ($current_page <= (count($pages_array) - PAGE_LIMIT_SIDE_PAGINATION))) {
-            $new_pages_array = array_merge($pages_left_end, $separator, $pages_left_center, $current_page_elem, $pages_right_center, $separator, $pages_right_end);
+            $new_pages_array = array_merge($pages_left_end, $separator, $pages_left_center, $current_page_elem,
+                $pages_right_center, $separator, $pages_right_end);
         } //вывод пагинации для правых 7-ми страниц:
         elseif (($current_page > PAGE_LIMIT_SIDE_PAGINATION) && ($current_page > count($pages_array) - PAGE_LIMIT_SIDE_PAGINATION)) {
-            $new_pages_array = array_merge($pages_left_end, $separator, $pages_left_center, $current_page_elem, $pages_right_center, $pages_right_end);
+            $new_pages_array = array_merge($pages_left_end, $separator, $pages_left_center, $current_page_elem,
+                $pages_right_center, $pages_right_end);
         }
         return $new_pages_array;
     }
