@@ -11,17 +11,17 @@ $errors = []; //массив с возможными ошибками
 $count_bet = 0; //количество ставок по данному лоту
 $cost = ''; //введенное значение ставки
 
+//если лот с текущим ID не существует, выводим ошибку
+if (!(isset($_GET['id']))) {
+    error_output(400);
+}
+
 //получаем значение ставки из формы
 if (isset($_POST['cost']) && $_POST['cost'] !== '') {
     $cost = (int)$_POST['cost'];
 }
 
-if (isset($_GET['id'])) {
-    $item_id = (int)$_GET['id']; //получаем ID текущего лота
-} else {
-    error_output(400);
-}
-
+$item_id = (int)$_GET['id']; //получаем ID текущего лота
 $categories = get_categories_from_db($connect); //получаем список категорий из БД
 $lot = get_info_about_lot_from_db($item_id, $connect, $categories); //получаем информацию о лотах из БД
 
@@ -42,7 +42,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     //если ошибок нет, то добавляем ставку в БД:
     if (empty($errors)) {
         $result_add_bet = add_bet_in_db($item_id, $connect, $user_id); //отправляем запрос о добавлении новой ставки
-
+        //если не прошло, то выводим ошибку
+        if (!$result_add_bet) {
+            $errors['cost'] = "Произошла ошибка сохранения в базу. Попробуйте еще раз позже";
+        }
         // если удачно добавили ставку, переадресовываем снова на страницу этого лота
         header('Location: /lot.php?id=' . $item_id);
     }

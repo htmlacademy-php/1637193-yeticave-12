@@ -230,7 +230,8 @@ function add_bet_in_db(int $item_id, mysqli $connect, int $user_id): bool
                              item_id)
                     VALUES (?, ?, ?)';
 
-    return $stmt_add_bet = get_stmt_result(
+    // формируем подготовленное выражение на основе SQL запроса из $sql_add_bet
+    $stmt_add_bet = db_get_prepare_stmt(
         $connect,
         $sql_add_bet,
         [
@@ -239,6 +240,8 @@ function add_bet_in_db(int $item_id, mysqli $connect, int $user_id): bool
             $item_id
         ]
     );
+    //проверка отправки сформированных SQL-выражений в БД
+    return mysqli_stmt_execute($stmt_add_bet);
 }
 
 /**
