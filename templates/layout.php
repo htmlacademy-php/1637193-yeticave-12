@@ -14,14 +14,13 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title><?= $title ?? "YetiCave" ?></title>
+    <title><?= htmlspecialchars($title ?? "YetiCave") ?></title>
     <link href="/css/normalize.min.css" rel="stylesheet">
     <link href="/css/style.css" rel="stylesheet">
     <link href="/css/flatpickr.min.css" rel="stylesheet">
 </head>
 <body>
 <div class="page-wrapper">
-
     <header class="main-header">
         <div class="main-header__container container">
             <h1 class="visually-hidden">YetiCave</h1>
@@ -40,7 +39,7 @@
                 <nav class="user-menu">
                     <?php if ($is_auth): ?>
                         <div class="user-menu__logged">
-                            <p><?= $user_name ?? '' ?></p>
+                            <p><?= htmlspecialchars($user_name ?? '') ?></p>
                             <a class="user-menu__bets" href="/my_bets.php">Мои ставки</a>
                             <a class="user-menu__logout" href="/logout.php">Выход</a>
                         </div>
@@ -65,7 +64,7 @@
                     <?php if (isset($categories)): ?>
                         <?php foreach ($categories as $category_name): ?>
                             <li class="nav__item">
-                                <a href="/categories.php?id=<?= $category_name['id'] ?? 0 ?>"><?= htmlspecialchars($category_name['title'] ?? "Название категории"); ?></a>
+                                <a href="/categories.php?id=<?= $category_name['id'] ?? 0 ?>"><?= htmlspecialchars($category_name['title'] ?? 'Название категории'); ?></a>
                             </li>
                         <?php endforeach; ?>
                     <?php endif; ?>
@@ -77,14 +76,13 @@
         <?php endif; ?>
     </main>
 </div>
-
 <footer class="main-footer">
     <nav class="nav">
         <ul class="nav__list container">
             <?php if (isset($categories)): ?>
                 <?php foreach ($categories as $category_name): ?>
                     <li class="nav__item">
-                        <a href="/categories.php?id=<?= $category_name['id'] ?? 0 ?>"><?= htmlspecialchars($category_name['title'] ?? "Название категории"); ?></a>
+                        <a href="/categories.php?id=<?= $category_name['id'] ?? 0 ?>"><?= htmlspecialchars($category_name['title'] ?? 'Название категории'); ?></a>
                     </li>
                 <?php endforeach; ?>
             <?php endif; ?>

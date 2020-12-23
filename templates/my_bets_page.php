@@ -7,15 +7,15 @@
             <?php foreach ($bets as $bet): ?>
                 <?php $timer_finished = get_date_range($bet['item_end_time']) ?? '' ?>
                 <tr class="rates__item
-                <?php if (isset($bet['winner'])) : ?>
+                <?php if (isset($bet['winner'])): ?>
                     rates__item--win
                 <?php elseif (isset($timer_finished) && ($timer_finished[0] === '00' && $timer_finished[1] === '00')): ?>
                     rates__item--end
                 <?php endif; ?>">
                     <td class="rates__info">
                         <div class="rates__img">
-                            <img src="../<?= htmlspecialchars($bet['image_url']) ?>" width="54" height="40"
-                                 alt="<?= htmlspecialchars($bet['title']) ?>">
+                            <img src="../<?= htmlspecialchars($bet['image_url'] ?? '#') ?>" width="54" height="40"
+                                 alt="<?= htmlspecialchars($bet['title'] ?? 'Без названия') ?>">
                         </div>
                         <div>
                             <h3 class="rates__title"><a
@@ -51,7 +51,7 @@
                         <?= htmlspecialchars(formatted_sum($bet['current_price'])); ?>
                     </td>
                     <td class="rates__time">
-                        <?= get_correct_bet_time($bet['bet_date']); ?>
+                        <?= get_correct_bet_time($bet['bet_date']) ?? ''; ?>
                     </td>
                 </tr>
             <?php endforeach; ?>

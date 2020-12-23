@@ -28,7 +28,8 @@ if (!$current_page || !isset($current_page)) {
     $current_page = 1;
 }
 
-$items_count = get_category_count($connect, $category_id)['count']; //Узнаем общее число лотов, подходящих по условиям запроса в категорию
+$items_count = get_category_count($connect,
+    $category_id)['count']; //Узнаем общее число лотов, подходящих по условиям запроса в категорию
 
 $pages_count = ceil($items_count / LIMIT_OF_SEARCH_RESULT); //Считаем кол-во страниц, которые нужны для вывода результата
 $offset = ($current_page - 1) * LIMIT_OF_SEARCH_RESULT; //Считаем смещение

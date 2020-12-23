@@ -14,7 +14,7 @@
         <label for="email">E-mail <sup>*</sup></label>
         <input id="email" type="text" name="email" placeholder="Введите e-mail" value="<?= htmlspecialchars($value) ?>">
         <?php if ($classname): ?>
-            <span class="form__error"><?= $errors['email'] ?></span>
+            <span class="form__error"><?= $errors['email'] ?? '' ?></span>
         <?php endif; ?>
     </div>
     <?php $classname = isset($errors['password']) ? "form__item--invalid" : "";
@@ -24,7 +24,7 @@
         <input id="password" type="password" name="password" placeholder="Введите пароль"
                value="<?= htmlspecialchars($value) ?>">
         <?php if ($classname): ?>
-            <span class="form__error"><?= $errors['password']; ?></span>
+            <span class="form__error"><?= $errors['password'] ?? '' ?></span>
         <?php endif; ?>
     </div>
     <button type="submit" class="button">Войти</button>
