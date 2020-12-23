@@ -12,22 +12,7 @@ $user_id = $_SESSION['user']['id'] ?? null; //проверяем, авториз
 
 //проверяем, что пользователь имеет право смотреть ставки
 if (is_user_guest($user_id)) {
-    http_response_code(403);
-    $error = 'Ошибка 403';
-    $error_description = 'Для просмотра сделанных ставок необходимо пройти авторизацию на сайте.';
-    $error_link = '/enter.php';
-    $error_link_description = 'Авторизоваться можно по этой ссылке.';
-
-    $page_content = include_template_error($error, $error_description, $error_link, $error_link_description);
-
-    $layout_content = include_template('/layout.php', [
-        'content' => $page_content,
-        'categories' => $categories,
-        'title' => 'Лот добавить пока нельзя',
-        'user_name' => $user_name,
-        'is_auth' => $is_auth
-    ]);
-    exit($layout_content);
+    error_output(403, 'my_bets');
 };
 //поиск ставок данного пользователя
 $user_bets = search_users_bet($connect, $user_id);
