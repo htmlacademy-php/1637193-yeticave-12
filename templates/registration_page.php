@@ -10,7 +10,7 @@
       autocomplete="off">
     <h2>Регистрация нового аккаунта</h2>
     <?php $classname = isset($errors['email']) ? "form__item--invalid" : ""; ?>
-    <div class="form__item <?= $classname; ?>"> <!-- form__item--invalid -->
+    <div class="form__item <?= $classname; ?>">
         <label for="email">E-mail <sup>*</sup></label>
         <input id="email" type="text" name="email" placeholder="Введите e-mail" class="<?= $classname; ?>"
                maxlength="100"

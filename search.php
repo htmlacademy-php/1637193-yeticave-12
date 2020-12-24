@@ -9,9 +9,7 @@ $connect = db_connection();
 $categories = get_categories_from_db($connect);
 
 $search_items = []; //массив с результатами поиска
-$pages_count = 1; //число страниц для вывода результатов поиска
-$current_page = 1; //номер текущей страницы
-$pages = []; //массив с номерами страниц
+$pagination = null; //пагинация
 
 //Получим содержимое поискового запроса. Если поисковый запрос не задан, то присвоим пустую строку
 $search = filter_input(INPUT_GET, 'search', FILTER_SANITIZE_STRING);
@@ -21,16 +19,9 @@ if (!$search || !isset($search)) {
     $search = trim($search);
 }
 
-if (isset($search)) { //Будем выполнять поиск лотов, только если был задан поисковый запрос
-
-//пагинация:
-    $sql_result_count = "SELECT COUNT(*) as count
-                         FROM item
-                         WHERE item.completed_at > NOW() AND MATCH(title, description) AGAINST(?)";
-
-    $result_stmt_count = get_stmt_result($connect, $sql_result_count, [$search]);
-
-    $items_count = mysqli_fetch_assoc($result_stmt_count)['count']; //Узнаем общее число лотов, подходящих по условиям поиска
+if (isset($search) && $search !== '') { //Будем выполнять поиск лотов, только если был задан поисковый запрос
+    //пагинация:
+    $items_count = get_search_items_count($connect, $search);  //Узнаем общее число лотов, подходящих по условиям поиска
 
     $current_page = (int)filter_input(INPUT_GET, 'page', FILTER_SANITIZE_NUMBER_INT); //Получаем номер текущей страницы.
     if (!$current_page || !isset($current_page)) {
@@ -43,28 +34,8 @@ if (isset($search)) { //Будем выполнять поиск лотов, т�
     $search_page = pathinfo($_SERVER['SCRIPT_NAME'])['basename'] ?? 'search.php';
     $pagination = get_pagination($pages_count, $current_page, $search_page, $search);
 
-//поиск лотов:
-    //SQL запрос на поиск с использованием директивы MATCH(поля,где ищем)..AGAINST(поисковый запрос). На месте искомой строки стоит плейсхолдер
-    $sql_search = "SELECT item.id,
-                   item.title,
-                   item.start_price,
-                   item.image_url,
-                   IFNULL(MAX(bet.total), item.start_price) AS total,
-                   item.created_at,
-                   item.completed_at,
-                   category.title AS category_title
-           FROM item
-           INNER JOIN category ON item.category_id = category.id
-           LEFT JOIN bet ON bet.item_id = item.id
-           WHERE item.completed_at > NOW() AND MATCH(item.title, item.description) AGAINST(?)
-           GROUP BY item.id
-           ORDER BY item.created_at DESC
-           LIMIT ?
-           OFFSET ?";
-
-    $result_stmt_search = get_stmt_result($connect, $sql_search, [$search, LIMIT_OF_SEARCH_RESULT, $offset]);
-
-    $search_items = mysqli_fetch_all($result_stmt_search, MYSQLI_ASSOC); //и преобразуем в двумерный массив
+    //поиск лотов:
+    $search_items = get_search_items($connect, $search, $offset);
 }
 
 $page_content = include_template('/search_page.php', [

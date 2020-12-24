@@ -11,9 +11,9 @@
         снаряжение.</p>
     <ul class="promo__list">
         <?php foreach ($categories as $category_name): ?>
-            <li class="promo__item promo__item--<?= htmlspecialchars($category_name['symbolic_code']) ?>">
+            <li class="promo__item promo__item--<?= htmlspecialchars($category_name['symbolic_code'] ?? '') ?>">
                 <a class="promo__link"
-                   href="/categories.php?id=<?= $category_name['id'] ?? 0 ?>"><?= htmlspecialchars($category_name['title'] ?? "Название категории"); ?></a>
+                   href="/categories.php?id=<?= $category_name['id'] ?? 0 ?>"><?= htmlspecialchars($category_name['title'] ?? 'Название категории'); ?></a>
             </li>
         <?php endforeach; ?>
     </ul>
@@ -24,14 +24,14 @@
     </div>
     <ul class="lots__list">
         <?php foreach ($ad_information as $ad_value): ?>
-            <?php $remaining_time = get_date_range($ad_value['completed_at']) ?>
             <li class="lots__item lot">
                 <div class="lot__image">
-                    <img src="<?= htmlspecialchars($ad_value['image_url']) ?>" width="350" height="260"
-                         alt="<?= htmlspecialchars($ad_value['title']) ?>">
+                    <img src="../<?= htmlspecialchars($ad_value['image_url'] ?? '#') ?>" width="350" height="260"
+                         alt="<?= htmlspecialchars($ad_value['title'] ?? 'Без названия') ?>">
                 </div>
                 <div class="lot__info">
-                    <span class="lot__category"><?= htmlspecialchars($ad_value['category_title']); ?></span>
+                    <span
+                        class="lot__category"><?= htmlspecialchars($ad_value['category_title'] ?? 'Без категории'); ?></span>
                     <h3 class="lot__title"><a class="text-link"
                                               href="/lot.php?id=<?= htmlspecialchars($ad_value['id']) ?>"><?= htmlspecialchars($ad_value['title']) ?></a>
                     </h3>
@@ -41,16 +41,11 @@
                             <span
                                 class="lot__cost"><?= htmlspecialchars(formatted_sum($ad_value['total'])) ?></span>
                         </div>
-                        <div class="lot__timer timer
-                                    <?php if ($remaining_time[0] == '00'): ?>
-                                    timer--finishing
-                                    <?php endif; ?>
-                                    ">
-                            <?php if ($remaining_time[0] == '00' && $remaining_time[1] == '00'): ?>
-                                Время лота истекло
-                            <?php else: ?>
-                                <?= $remaining_time[0] . ':' . $remaining_time[1] ?>
-                            <?php endif; ?>
+                        <?php $timer_finished = get_date_range($ad_value['completed_at']) ?? '' ?>
+                        <?php $remaining_time = get_remaining_time($ad_value['completed_at']) ?? '' ?>
+                        <div
+                            class="lot__timer timer <?php if ($timer_finished[0] === '00'): ?>timer--finishing<?php endif; ?>">
+                            <?= $remaining_time ?? '' ?>
                         </div>
                     </div>
                 </div>

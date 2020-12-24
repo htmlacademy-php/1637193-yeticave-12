@@ -3,32 +3,17 @@
 /**
  * Функция db_connection производит подключение к базе данных "yeticave".
  * Если подключение не выполнено, то происходит вывод ошибки подключения и операции приостанавливаются.
- * @return mysqli Подключение к БД.
+ * @return mysqli Подключение к БД либо вывод ошибки подключения.
  */
 function db_connection(): mysqli
 {
     $connect = mysqli_connect(DB_CONNECTION_DATA['host'], DB_CONNECTION_DATA['user'], DB_CONNECTION_DATA['password'],
         DB_CONNECTION_DATA['database']);
+    if (!$connect) {
+        exit(error_output(500));
+    }
     mysqli_set_charset($connect, "utf8");
 
-    if (!$connect) {
-        $error = 'Произошла ошибка подключения: &#129298; ';
-        $error_description = 'У нас произошла техническая ошибка. &#128532; ';
-        $error_link = '/index.php';
-        $error_link_description = 'Возвращайтесь к нам немного позже.';
-
-        $page_content = include_template_error($error, $error_description, $error_link, $error_link_description);
-
-        $layout_content = include_template('/layout.php', [
-            'content' => $page_content,
-            'categories' => [],
-            'title' => 'Возвращайтесь чуть позже',
-            'user_name' => '',
-            'is_auth' => 0
-        ]);
-
-        exit($layout_content);
-    }
     return $connect;
 }
 
@@ -43,7 +28,7 @@ function get_categories_from_db(mysqli $connect): array
     $result_category = mysqli_query($connect, $sql_category);
 
     if (!$result_category) {
-        exit('Ошибка запроса: &#129298; ' . mysqli_error($connect));
+        exit(error_output(500));
     }
     return mysqli_fetch_all($result_category, MYSQLI_ASSOC);
 
@@ -55,7 +40,7 @@ function get_categories_from_db(mysqli $connect): array
  * @param int $category_id номер данной категории из БД
  * @return array|null Возвращает массив с количеством элементов, равных количеству лотов из выбранной категории, либо NULL, если лоты из категории не найдены
  */
-function get_category_count(mysqli $connect, int $category_id)
+function get_category_count(mysqli $connect, int $category_id): ?array
 {
     $sql_lots_count = 'SELECT COUNT(*) as count
                        FROM item
@@ -78,7 +63,7 @@ function get_category_count(mysqli $connect, int $category_id)
  * @param int $offset Смещение выборки количества запросов на 1 странице, т.е. начиная с какой записи будут возвращены ограничения по выборке
  * @return array|null Возвращает массив с элементами, содержащими информацию о лотах из выбранной категории, либо NULL, если лоты из категории не найдены
  */
-function get_lot_category_count($connect, int $category_id, int $offset)
+function get_lot_category_count(mysqli $connect, int $category_id, int $offset): ?array
 {
     $sql_lots = 'SELECT item.id,
                         completed_at,
@@ -115,7 +100,7 @@ function get_lot_category_count($connect, int $category_id, int $offset)
  * @param mysqli $connect данные о подключении к базе данных
  * @return array Массив с самыми новыми, открытыми лотами из базы данных yeticave
  */
-function get_ad_information_from_db($connect): array
+function get_ad_information_from_db(mysqli $connect): array
 {
     $sql_item = "SELECT item.id,
                         item.title AS 'title',
@@ -135,7 +120,7 @@ function get_ad_information_from_db($connect): array
     $result_items = mysqli_query($connect, $sql_item);
 
     if (!$result_items) {
-        exit('Ошибка запроса: &#129298; ' . mysqli_error($connect));
+        exit(error_output(500));
     }
     return mysqli_fetch_all($result_items, MYSQLI_ASSOC);
 }
@@ -197,28 +182,12 @@ function get_info_about_lot_from_db(int $item_id, mysqli $connect, array $catego
                     INNER JOIN bet on bet.item_id = item.id
               WHERE item.id = ?';
 
-    $sql_lot_prepared = db_get_prepare_stmt($connect, $sql_lot, [$item_id]);
-    mysqli_stmt_execute($sql_lot_prepared);
-    $sql_result = mysqli_stmt_get_result($sql_lot_prepared);
+    $sql_lot_prepared = get_stmt_result($connect, $sql_lot, [$item_id]);
 
-    $lot_info = mysqli_fetch_array($sql_result, MYSQLI_ASSOC);
+    $lot_info = mysqli_fetch_array($sql_lot_prepared, MYSQLI_ASSOC);
 
     if (!isset($lot_info['id'])) {
-        http_response_code(404);
-        $error = 'Произошла ошибка: &#129298; ';
-        $error_description = 'Страница с id = ' . htmlspecialchars($item_id) . ' не найдена. &#128532; ';
-        $error_link = '/index.php';
-        $error_link_description = 'Предлагаем вернуться на главную.';
-
-        $page_content = include_template_error($error, $error_description, $error_link, $error_link_description);
-
-        $layout_content = include_template('/layout.php', [
-            'content' => $page_content,
-            'categories' => $categories,
-            'title' => 'Страница c id = .' . $item_id . 'не найдена'
-        ]);
-
-        exit($layout_content);
+        exit(error_output(404));
     }
 
     return $lot_info;
@@ -239,10 +208,8 @@ function get_bet_history(int $item_id, mysqli $connect): mysqli_result
                 WHERE item_id = ?
                 ORDER BY date DESC
                 LIMIT 10';
-    $sql_bet_stmt = db_get_prepare_stmt($connect, $sql_bet, [$item_id]);
-    mysqli_stmt_execute($sql_bet_stmt);
 
-    return mysqli_stmt_get_result($sql_bet_stmt);
+    return get_stmt_result($connect, $sql_bet, [$item_id]);
 }
 
 
@@ -288,19 +255,19 @@ function get_post_value(string $name): ?string
 }
 
 /**
- * Сохраняет файл в папку /uploads/, не изменяя имени файла.
- * @param string $field_name Имя поля файла
+ * Сохраняет файл в папку /uploads/, добавляя префикс к началу имени файла.
+ * @param string $file Поле в форме для выбора и загрузки файла с ПК пользователя
  * @return string|null Возвращает url сохраненного файла или возвращает NULL в случае ошибки
  **/
-function save_file(string $field_name): ?string
+function save_file(string $file): ?string
 {
-    if (isset($_FILES[$field_name])) {
+    if (isset($_FILES[$file])) {
         $prefix = uniqid();
-        $file_name = $prefix . '_' . $_FILES[$field_name]['name'];
+        $file_name = $prefix . '_' . $_FILES[$file]['name'];
         $file_path = $_SERVER['DOCUMENT_ROOT'] . _DS . NAME_FOLDER_UPLOADS_FILE . _DS;
         $file_url = _DS . NAME_FOLDER_UPLOADS_FILE . _DS . $file_name;
 
-        if (move_uploaded_file($_FILES[$field_name]['tmp_name'], $file_path . $file_name)) {
+        if (move_uploaded_file($_FILES[$file]['tmp_name'], $file_path . $file_name)) {
             return $file_url;
         }
     }
@@ -348,11 +315,17 @@ function redirect_to_main()
  * @param string $error_description Описание ошибки
  * @param string $error_link Ссылка на страницу, куда стоит перейти, чтобы избежать ошибки
  * @param string $error_link_description Описание действия, чтобы избавиться от последствий ошибки
+ * @param int $http_code Код состояния HTTP
  * @return string вывод ошибки для функции include_template в шаблон error_page.php
  */
-function include_template_error($error, $error_description, $error_link, $error_link_description): ?string
-{
-    return include_template(
+function include_template_error(
+    string $error,
+    string $error_description,
+    string $error_link,
+    string $error_link_description,
+    int $http_code = 0
+): ?string {
+    $page_content = include_template(
         '/error_page.php',
         [
             'error' => $error,
@@ -361,6 +334,13 @@ function include_template_error($error, $error_description, $error_link, $error_
             'error_link_description' => $error_link_description
         ]
     );
+    $layout_content = include_template('/layout.php', [
+        'content' => $page_content,
+        'categories' => [],
+        'title' => 'Ошибка ' . $http_code
+    ]);
+
+    exit($layout_content);
 }
 
 /**
@@ -368,7 +348,7 @@ function include_template_error($error, $error_description, $error_link, $error_
  * @param array $lot Массив с информацией о лоте
  * @return array Очищенный от пустых значений массив с возможными ошибками
  */
-function check_errors_before_add_bet($lot): array
+function check_errors_before_add_bet(array $lot): array
 {
     // берем из БД текущий минимальный размер новой возможной ставки
     $min_bet = $lot['bet_step'] + $lot['current_price'];
@@ -395,7 +375,7 @@ function check_errors_before_add_bet($lot): array
  * @param int $user_id ID текущего пользователя
  * @return array Ассоциативный массив с данными о ставках пользователя
  */
-function search_users_bet($connect, int $user_id): array
+function search_users_bet(mysqli $connect, int $user_id): array
 {
 //поиск ставок данного пользователя
     $sql_user_bet = 'SELECT item.id as item_id,
@@ -416,16 +396,111 @@ function search_users_bet($connect, int $user_id): array
                   GROUP BY bet.item_id
                   ORDER BY bet_date DESC';
 
-    $sql_user_bet_prepared = db_get_prepare_stmt($connect, $sql_user_bet, [$user_id]);
-    mysqli_stmt_execute($sql_user_bet_prepared);
-    $sql_result = mysqli_stmt_get_result($sql_user_bet_prepared);
+    $sql_result = get_stmt_result($connect, $sql_user_bet, [$user_id]);
 
-    if (!$sql_result) {
-        exit('Ошибка запроса: &#129298; ' . mysqli_error($connect));
-    }
     return mysqli_fetch_all($sql_result, MYSQLI_ASSOC);
 }
 
+/**
+ * Функция осуществляет поиск ставок указанного пользователя в БД с ограничением числа лотов на 1 странице
+ * @param mysqli $connect Данные о подключении к БД
+ * @param int $user_id ID текущего пользователя
+ * @param int $offset Смещение выборки количества запросов на 1 странице, т.е. начиная с какой записи будут возвращены ограничения по выборке
+ * @return array Ассоциативный массив с данными о ставках пользователя для показа на 1 странице
+ */
+function search_users_bet_about_items(mysqli $connect, int $user_id, int $offset): array
+{
+    $sql_bet = "SELECT item.id as item_id,
+                        item.title AS title,
+                        category.title AS category,
+                        item.image_url,
+                        item.completed_at as item_end_time,
+                        IFNULL(MAX(bet.total), item.start_price) AS current_price,
+                        MAX(bet.created_at) as bet_date,
+                        item.winner_id,
+                        users.contacts,
+                        bet.user_id
+                  FROM bet
+                   LEFT JOIN item ON item.id = bet.item_id
+                   LEFT JOIN users on users.id = item.author_id
+                   LEFT JOIN category ON category.id = item.category_id
+                  WHERE bet.user_id = ?
+                  GROUP BY bet.item_id
+                  ORDER BY bet_date DESC
+                   LIMIT ?
+                   OFFSET ?";
+    $result_bet = get_stmt_result($connect, $sql_bet, [$user_id, LIMIT_OF_SEARCH_RESULT, $offset]);
+
+    return mysqli_fetch_all($result_bet, MYSQLI_ASSOC);
+}
+
+/**
+ * Функция выполняет выражение на основе подготовленного SQL-запроса и возвращает его результат
+ * @param mysqli $connect Данные о подключении к БД
+ * @param string $sql_result_count SQL-запрос в БД
+ * @param array $array_stmt Данные для вставки на место плейсхолдеров
+ * @return mysqli_result Результат подготовленного выражения
+ */
+function get_stmt_result(mysqli $connect, string $sql_result_count, $array_stmt = []): mysqli_result
+{
+    $stmt = db_get_prepare_stmt($connect, $sql_result_count, $array_stmt); //Подготовка SQL запроса к выполнению
+    mysqli_stmt_execute($stmt); //Выполним подготовленное выражение
+    $result_stmt = mysqli_stmt_get_result($stmt); //получим его результат
+
+    if (!$result_stmt) {
+        exit(error_output(500));
+    }
+    return $result_stmt;
+}
+
+/**
+ * Функция считает число лотов, подходящих под результаты поискового запроса
+ * @param mysqli $connect Данные о подключении к БД
+ * @param string $search Содержимое поискового запрос от пользователя
+ * @return int Число лотов, подходящих по условиям поиска
+ */
+function get_search_items_count(mysqli $connect, string $search): int
+{
+    $sql_result_count = "SELECT COUNT(*) as count
+                         FROM item
+                         WHERE item.completed_at > NOW() AND MATCH(title, description) AGAINST(?)";
+
+    $result_stmt_count = get_stmt_result($connect, $sql_result_count, [$search]);
+
+    return mysqli_fetch_assoc($result_stmt_count)['count'];
+}
+
+/**
+ * Функция возвращает массив с результатами поискового запроса
+ * @param mysqli $connect Данные о подключении к БД
+ * @param string $search Содержимое поискового запрос от пользователя
+ * @param int $offset Смещение выдачи результатов поиска для пагинации
+ * @return array Массив с элементами в виде результатов поискового запроса
+ */
+function get_search_items(mysqli $connect, string $search, int $offset): array
+{
+    //SQL запрос на поиск с использованием директивы MATCH(поля,где ищем)..AGAINST(поисковый запрос). На месте искомой строки стоит плейсхолдер
+    $sql_search = "SELECT item.id,
+                   item.title,
+                   item.start_price,
+                   item.image_url,
+                   IFNULL(MAX(bet.total), item.start_price) AS total,
+                   item.created_at,
+                   item.completed_at,
+                   category.title AS category_title
+           FROM item
+           INNER JOIN category ON item.category_id = category.id
+           LEFT JOIN bet ON bet.item_id = item.id
+           WHERE item.completed_at > NOW() AND MATCH(item.title, item.description) AGAINST(?)
+           GROUP BY item.id
+           ORDER BY item.created_at DESC
+           LIMIT ?
+           OFFSET ?";
+
+    $result_stmt_search = get_stmt_result($connect, $sql_search, [$search, LIMIT_OF_SEARCH_RESULT, $offset]);
+    // преобразуем результаты поиска в массив
+    return mysqli_fetch_all($result_stmt_search, MYSQLI_ASSOC);
+}
 
 /**
  * Функция выдает список последних ставок по лотам без победителей,
@@ -452,7 +527,7 @@ function get_finished_lots(mysqli $connect): mysqli_result
     $result_finished_lots = mysqli_query($connect, $sql_finished_lots);
 
     if (!$result_finished_lots) {
-        exit('Ошибка запроса: &#129298; ' . mysqli_error($connect));
+        exit(error_output(500));
     }
     return $result_finished_lots;
 }
@@ -506,14 +581,26 @@ function send_email_to_winner(array $winner)
  * @param int $item ID лота, который выиграл пользователь
  * @return mysqli_result Результат запроса в БД
  */
-function identify_winner_lot(mysqli $connect,int $user, int $item)
+function identify_winner_lot(mysqli $connect, int $user, int $item): ?mysqli_result
 {
     $sql_winner = "UPDATE item SET winner_id = $user WHERE id = $item";
 
     $result_winner = mysqli_query($connect, $sql_winner);
 
     if (!$result_winner) {
-        exit('Ошибка запроса: &#129298; ' . mysqli_error($connect));
+        exit(error_output(500));
     }
     return $result_winner;
+}
+
+/**
+ * Функция запроса на поиск в БД записи в таблице пользователей по введенному в форме email
+ * @param mysqli $connect Данные о подключении к БД
+ * @param string $check_email Введенный в форму e-mail пользователя
+ * @return mysqli_result|false Переданный запрос в БД
+ */
+function verify_existence_email_db(mysqli $connect, string $check_email): ?mysqli_result
+{
+    $check_sql = "SELECT * FROM users WHERE email = ? LIMIT 1"; // запрос на поиск записи в таблице пользователей по переданному email
+    return get_stmt_result($connect, $check_sql, [$check_email]);
 }

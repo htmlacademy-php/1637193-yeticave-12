@@ -14,7 +14,7 @@
     <div class="lot-item__content">
         <div class="lot-item__left">
             <div class="lot-item__image">
-                <img src="<?= htmlspecialchars($lot['image_url'] ?? '#') ?>" width="730" height="548"
+                <img src="../<?= htmlspecialchars($lot['image_url'] ?? '#') ?>" width="730" height="548"
                      alt="<?= htmlspecialchars($lot['title'] ?? 'Без названия') ?>">
             </div>
             <p class="lot-item__category">Категория:
@@ -23,17 +23,11 @@
         </div>
         <div class="lot-item__right">
             <div class="lot-item__state">
-                <?php $remaining_time = get_date_range($lot['completed_at']) ?>
-                <div class="lot-item__timer timer
-                            <?php if ($remaining_time[0] == '00'): ?>
-                                timer--finishing
-                            <?php endif; ?>
-                            ">
-                    <?php if ($remaining_time[0] == '00' && $remaining_time[1] == '00'): ?>
-                        Время лота истекло
-                    <?php else: ?>
-                        <?= $remaining_time[0] . ':' . $remaining_time[1] ?>
-                    <?php endif; ?>
+                <?php $timer_finished = get_date_range($lot['completed_at']) ?? '' ?>
+                <?php $remaining_time = get_remaining_time($lot['completed_at']) ?? '' ?>
+                <div
+                    class="lot-item__timer timer <?php if ($timer_finished[0] === '00'): ?>timer--finishing<?php endif; ?>">
+                    <?= $remaining_time ?? '' ?>
                 </div>
                 <div class="lot-item__cost-state">
                     <div class="lot-item__rate">
@@ -47,7 +41,8 @@
                     </div>
                 </div>
                 <?php if ($show_bet_add) : ?>
-                    <form class="lot-item__form" action="/lot.php?id=<?= $item_id; ?>" method="post" autocomplete="off">
+                    <form class="lot-item__form" action="/lot.php?id=<?= htmlspecialchars($item_id ?? 0) ?>"
+                          method="post" autocomplete="off">
                         <p class="lot-item__form-item <?= isset($errors['cost']) ? 'form__item form__item--invalid' : '' ?>">
                             <label for="cost">Ваша ставка </label>
                             <input id="cost" type="text" name="cost"
@@ -60,14 +55,14 @@
                 <?php endif; ?>
             </div>
             <div class="history">
-                <h3>История ставок <span><?= isset($bets) ? ('(' . $count_bet . ')') : 'пуста'?></span></h3>
+                <h3>История ставок <span><?= isset($bets) ? ('(' . $count_bet . ')') : 'пуста' ?></span></h3>
                 <table class="history__list">
-                    <?php if(isset($bets)): ?>
+                    <?php if (isset($bets)): ?>
                         <?php foreach ($bets as $bet): ?>
                             <tr class="history__item">
-                                <td class="history__name"><?= htmlspecialchars($bet['username']); ?></td>
-                                <td class="history__price"><?= htmlspecialchars(formatted_sum($bet['total'])); ?></td>
-                                <td class="history__time"><?= get_correct_bet_time($bet['date']); ?></td>
+                                <td class="history__name"><?= htmlspecialchars($bet['username'] ?? 'User'); ?></td>
+                                <td class="history__price"><?= htmlspecialchars(formatted_sum($bet['total']) ?? 0); ?></td>
+                                <td class="history__time"><?= get_correct_bet_time($bet['date'] ?? 0); ?></td>
                             </tr>
                         <?php endforeach; ?>
                     <?php endif; ?>

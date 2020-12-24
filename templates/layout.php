@@ -14,14 +14,13 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title><?= $title ?? "YetiCave" ?></title>
+    <title><?= htmlspecialchars($title ?? "YetiCave") ?></title>
     <link href="/css/normalize.min.css" rel="stylesheet">
     <link href="/css/style.css" rel="stylesheet">
     <link href="/css/flatpickr.min.css" rel="stylesheet">
 </head>
 <body>
 <div class="page-wrapper">
-
     <header class="main-header">
         <div class="main-header__container container">
             <h1 class="visually-hidden">YetiCave</h1>
@@ -33,27 +32,29 @@
                        value="<?= isset($search) ? htmlspecialchars($search) : "" ?>">
                 <input class="main-header__search-btn" type="submit" name="find" value="Найти" id="search">
             </form>
-            <?php if ($is_auth): ?>
-                <a class="main-header__add-lot button" href="/add.php">Добавить лот</a>
-            <?php endif; ?>
-            <nav class="user-menu">
+            <?php if (isset($is_auth)): ?>
                 <?php if ($is_auth): ?>
-                    <div class="user-menu__logged">
-                        <p><?= $user_name ?></p>
-                        <a class="user-menu__bets" href="/my_bets.php">Мои ставки</a>
-                        <a class="user-menu__logout" href="/logout.php">Выход</a>
-                    </div>
-                <?php else: ?>
-                    <ul class="user-menu__list">
-                        <li class="user-menu__item">
-                            <a href="/sign-up.php">Регистрация</a>
-                        </li>
-                        <li class="user-menu__item">
-                            <a href="/enter.php">Вход</a>
-                        </li>
-                    </ul>
+                    <a class="main-header__add-lot button" href="/add.php">Добавить лот</a>
                 <?php endif; ?>
-            </nav>
+                <nav class="user-menu">
+                    <?php if ($is_auth): ?>
+                        <div class="user-menu__logged">
+                            <p><?= htmlspecialchars($user_name ?? '') ?></p>
+                            <a class="user-menu__bets" href="/my_bets.php">Мои ставки</a>
+                            <a class="user-menu__logout" href="/logout.php">Выход</a>
+                        </div>
+                    <?php else: ?>
+                        <ul class="user-menu__list">
+                            <li class="user-menu__item">
+                                <a href="/sign-up.php">Регистрация</a>
+                            </li>
+                            <li class="user-menu__item">
+                                <a href="/enter.php">Вход</a>
+                            </li>
+                        </ul>
+                    <?php endif; ?>
+                </nav>
+            <?php endif; ?>
         </div>
     </header>
     <main <?php if (isset($is_index_page)): ?>class="container"<?php endif; ?>>
@@ -63,7 +64,7 @@
                     <?php if (isset($categories)): ?>
                         <?php foreach ($categories as $category_name): ?>
                             <li class="nav__item">
-                                <a href="/categories.php?id=<?= $category_name['id'] ?? 0 ?>"><?= htmlspecialchars($category_name['title'] ?? "Название категории"); ?></a>
+                                <a href="/categories.php?id=<?= $category_name['id'] ?? 0 ?>"><?= htmlspecialchars($category_name['title'] ?? 'Название категории'); ?></a>
                             </li>
                         <?php endforeach; ?>
                     <?php endif; ?>
@@ -75,14 +76,13 @@
         <?php endif; ?>
     </main>
 </div>
-
 <footer class="main-footer">
     <nav class="nav">
         <ul class="nav__list container">
             <?php if (isset($categories)): ?>
                 <?php foreach ($categories as $category_name): ?>
                     <li class="nav__item">
-                        <a href="/categories.php?id=<?= $category_name['id'] ?? 0 ?>"><?= htmlspecialchars($category_name['title'] ?? "Название категории"); ?></a>
+                        <a href="/categories.php?id=<?= $category_name['id'] ?? 0 ?>"><?= htmlspecialchars($category_name['title'] ?? 'Название категории'); ?></a>
                     </li>
                 <?php endforeach; ?>
             <?php endif; ?>
@@ -131,7 +131,7 @@
                 </svg>
             </a>
         </div>
-        <?php if ($is_auth): ?>
+        <?php if (isset($is_auth) && $is_auth): ?>
             <a class="main-footer__add-lot button" href="/add.php">Добавить лот</a>
         <?php endif; ?>
         <div class="main-footer__developed-by">

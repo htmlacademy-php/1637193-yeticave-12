@@ -11,37 +11,34 @@
         <h2><span><?= htmlspecialchars($category_name) ?? '' ?></span></h2>
         <ul class="lots__list">
             <?php foreach ($category_items as $item): ?>
-                <?php $remaining_time = get_date_range($item['completed_at']) ?>
                 <li class="lots__item lot">
                     <div class="lot__image">
-                        <img src="<?= htmlspecialchars($item['image_url']) ?>" width="350" height="260"
-                             alt="<?= htmlspecialchars($item['item_title']) ?>">
+                        <img src="../<?= htmlspecialchars($item['image_url'] ?? '#') ?>" width="350" height="260"
+                             alt="<?= htmlspecialchars($item['item_title'] ?? 'Без названия') ?>">
                     </div>
                     <div class="lot__info">
-                        <span class="lot__category"><?= htmlspecialchars($item['category']); ?></span>
+                        <span class="lot__category"><?= htmlspecialchars($item['category'] ?? 'Без категории') ?></span>
                         <h3 class="lot__title"><a class="text-link"
-                                                  href="/lot.php?id=<?= htmlspecialchars($item['id']) ?>"><?= htmlspecialchars($item['item_title']) ?></a>
+                                                  href="/lot.php?id=<?= htmlspecialchars($item['id'] ?? 0) ?>"><?= htmlspecialchars($item['item_title'] ?? 'Без названия') ?></a>
                         </h3>
                         <div class="lot__state">
                             <div class="lot__rate">
                                 <span class="lot__amount">Стартовая цена</span>
                                 <span
-                                    class="lot__cost"><?= htmlspecialchars(formatted_sum($item['total'])) ?></span>
+                                    class="lot__cost"><?= htmlspecialchars(formatted_sum($item['total'] ?? 0)) ?></span>
                             </div>
+                            <?php $timer_finished = get_date_range($item['completed_at']) ?? '' ?>
+                            <?php $remaining_time = get_remaining_time($item['completed_at']) ?? '' ?>
                             <div
-                                class="lot__timer timer<?php if ($remaining_time[0] == '00'): ?>timer--finishing<?php endif; ?>">
-                                <?php if ($remaining_time[0] == '00' && $remaining_time[1] == '00'): ?>
-                                    Время лота истекло
-                                <?php else: ?>
-                                    <?= $remaining_time[0] . ':' . $remaining_time[1] ?>
-                                <?php endif; ?>
+                                class="lot__timer timer <?php if ($timer_finished[0] === '00'): ?>timer--finishing<?php endif; ?>">
+                                <?= $remaining_time ?? '' ?>
                             </div>
                         </div>
                     </div>
                 </li>
             <?php endforeach; ?>
             <?php else: ?>
-                <p>Категории еще нет на сайте.</p>
+                <p>Лотов из данной категории еще нет на сайте.</p>
             <?php endif; ?>
         </ul>
     </section>

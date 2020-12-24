@@ -11,29 +11,13 @@ $categories = get_categories_from_db($connect);
 $user_id = $_SESSION['user']['id'] ?? null; //проверяем, авторизован ли пользователь
 //выводим ошибку, если пользователь уже авторизован
 if (!is_user_guest($user_id)) {
-    http_response_code(403);
-    $error = 'Ошибка 403';
-    $error_description = 'Вы уже зарегистрированы на нашем сайте. &#128517;';
-    $error_link = '/index.php';
-    $error_link_description = 'Предлагаем вернуться на главную.';
-    $page_content = include_template_error($error, $error_description, $error_link, $error_link_description);
-    $layout_content = include_template('/layout.php', [
-        'content' => $page_content,
-        'categories' => $categories,
-        'title' => 'Вы же уже зарегистрированы',
-        'user_name' => $user_name,
-        'is_auth' => $is_auth
-    ]);
-
-    exit($layout_content);
+    error_output(403);
 }
 
 $tpl_data = []; // временный массив для записи данных нового пользователя для вывода данных в случае ошибок
 
-if ($_SERVER['REQUEST_METHOD'] == 'POST') { //Проверяем, что форма была отправлена
+if ($_SERVER['REQUEST_METHOD'] === 'POST') { //Проверяем, что форма была отправлена
     $errors = []; // массив, где будут храниться ошибки
-
-    $required = ['email', 'password', 'name', 'message']; //обязательные для заполнения поля
 
     $rules = [
         'email' => function () {
@@ -59,7 +43,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') { //Проверяем, что фор�
     }
     //проверка существования пользователя с email из формы
     if (empty($errors['email'])) {
-        $errors['email'] = validate_unique_email($connect);
+        $check_email = $_POST['email'];
+        $errors['email'] = validate_unique_email($connect, $check_email);
     }
     $errors = array_filter($errors);
 
@@ -70,7 +55,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') { //Проверяем, что фор�
         $password_hash = password_hash($form['password'], PASSWORD_DEFAULT);
 
         $sql_new_user = 'INSERT INTO users (email, name, password, contacts) VALUES (?, ?, ?, ?)';
-        $prepared_sql = db_get_prepare_stmt($connect, $sql_new_user, [strtolower($form['email']), $form['name'], $password_hash, $form['message']]); //подготовка SQL-запроса к выполнению
+        $prepared_sql = db_get_prepare_stmt($connect, $sql_new_user, [
+            strtolower($form['email']),
+            $form['name'],
+            $password_hash,
+            $form['message']
+        ]); //подготовка SQL-запроса к выполнению
         $result_sql = mysqli_stmt_execute($prepared_sql); //выполняет подготовленный запрос
 
         //Редирект на страницу входа, если пользователь был успешно добавлен в БД.
@@ -90,7 +80,7 @@ $layout_content = include_template('/layout.php', [
     'content' => $page_content,
     'categories' => $categories,
     'title' => 'Регистрация в Yeticave',
-    'is_auth' => 0
+    'is_auth' => $is_auth
 ]);
 
 print($layout_content);

@@ -13,23 +13,7 @@ $categories = get_categories_from_db($connect);
 $user_id = $_SESSION['user']['id'] ?? null; //проверяем, авторизован ли пользователь
 // показываем ошибку 403, если пользователь не авторизован на сайте
 if (is_user_guest($user_id)) {
-    http_response_code(403);
-    $error = 'Ошибка 403';
-    $error_description = 'Для добавления лота необходимо пройти регистрацию на сайте.';
-    $error_link = '/sign-up.php';
-    $error_link_description = 'Зарегистрироваться можно по этой ссылке.';
-
-    $page_content = include_template_error($error, $error_description, $error_link, $error_link_description);
-
-    $layout_content = include_template('/layout.php', [
-        'content' => $page_content,
-        'categories' => $categories,
-        'title' => 'Лот добавить пока нельзя',
-        'user_name' => $user_name,
-        'is_auth' => $is_auth
-    ]);
-
-    exit($layout_content);
+    error_output(403, 'add');
 }
 //если не выбрана категория, то показываем пустую форму для заполнения
 if (!isset($_POST['category'])) {
@@ -37,8 +21,6 @@ if (!isset($_POST['category'])) {
     exit(0);
 }
 
-//массив со списком обязательных полей в форме
-$required_fields = ['lot-name', 'category', 'message', 'lot-image', 'lot-price', 'lot-step', 'lot-date'];
 // применение функций для проверки полей формы к каждому элементу формы внутри цикла
 $rules = [
     'lot-name' => function () {
@@ -71,7 +53,7 @@ foreach ($_POST as $key => $value) {
 }
 
 //валидация файла изображения из массива $_FILES
-$errors['lot-img'] = validate_file('lot-img');
+$errors['lot-img'] = validate_file_before_saving('lot-img');
 
 $errors = array_filter($errors); //фильтруем ошибки из массива - добавляем их в новый в случае присутствия самих ошибок
 

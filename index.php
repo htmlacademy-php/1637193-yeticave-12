@@ -13,8 +13,9 @@ $categories = get_categories_from_db($connect); //вывод категорий 
 $ad_information = get_ad_information_from_db($connect); //массив с информацией о всех открытых лотах
 
 $items_count = count($ad_information); //Узнаем общее число лотов, подходящих по условиям поиска
+$pagination = null; //пагинация по умолчанию отсутствует
 
-//если число открытых лотов больше 9, то нужно подключение пагинации:
+//но если число открытых лотов больше 9, то подключим пагинацию:
 if ($items_count > LIMIT_OF_SEARCH_RESULT) {
     $current_page = (int)filter_input(INPUT_GET, 'page', FILTER_SANITIZE_NUMBER_INT); //Получаем номер текущей страницы.
     if (!$current_page || !isset($current_page)) {
@@ -28,7 +29,8 @@ if ($items_count > LIMIT_OF_SEARCH_RESULT) {
 
     $pagination = get_pagination($pages_count, $current_page, $search_page); //подключаем пагинацию
 
-    $ad_information = get_pagination_info_about_items($connect, $offset); //массив с информацией о лотах с ограничением  вывода на 1 страницу
+    $ad_information = get_pagination_info_about_items($connect,
+        $offset); //массив с информацией о лотах с ограничением  вывода на 1 страницу
 }
 $page_content = include_template('/main.php', compact('categories', 'ad_information', 'pagination'));
 
