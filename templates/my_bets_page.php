@@ -48,7 +48,7 @@
                         </td>
                     <?php endif; ?>
                     <td class="rates__price">
-                        <?= htmlspecialchars(formatted_sum($bet['current_price'])); ?>
+                        <?= htmlspecialchars(formatted_sum($bet['current_price'] ?? 0)); ?>
                     </td>
                     <td class="rates__time">
                         <?= get_correct_bet_time($bet['bet_date']) ?? ''; ?>

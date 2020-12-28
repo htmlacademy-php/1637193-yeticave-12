@@ -1,4 +1,4 @@
-<?php
+<?php /** @noinspection ALL */
 /**
  * @var array $pages
  * @var string $search
@@ -24,7 +24,7 @@
                 </li>
             <?php else: ?>
                 <li class="pagination-item">&#8230;</li>
-            <?php endif; ?></li>
+            <?php endif; ?>
         <?php endforeach; ?>
         <li class="pagination-item pagination-item-next">
             <?php if ($current_page < $pages_count): ?>

@@ -437,13 +437,13 @@ function search_users_bet_about_items(mysqli $connect, int $user_id, int $offset
 /**
  * Функция выполняет выражение на основе подготовленного SQL-запроса и возвращает его результат
  * @param mysqli $connect Данные о подключении к БД
- * @param string $sql_result_count SQL-запрос в БД
- * @param array $array_stmt Данные для вставки на место плейсхолдеров
+ * @param string $sql_result SQL-запрос в БД
+ * @param array $array_stmt Массив с данными для вставки на место плейсхолдеров
  * @return mysqli_result Результат подготовленного выражения
  */
-function get_stmt_result(mysqli $connect, string $sql_result_count, $array_stmt = []): mysqli_result
+function get_stmt_result(mysqli $connect, string $sql_result, array $array_stmt = []): mysqli_result
 {
-    $stmt = db_get_prepare_stmt($connect, $sql_result_count, $array_stmt); //Подготовка SQL запроса к выполнению
+    $stmt = db_get_prepare_stmt($connect, $sql_result, $array_stmt); //Подготовка SQL запроса к выполнению
     mysqli_stmt_execute($stmt); //Выполним подготовленное выражение
     $result_stmt = mysqli_stmt_get_result($stmt); //получим его результат
 

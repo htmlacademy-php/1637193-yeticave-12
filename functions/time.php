@@ -41,7 +41,7 @@ function get_date_range(string $get_end_date): array
  * @param string $bet_time дата и время добавления ставки
  * @return string возвращает описание времени, прошедшего с момента последнего добавления ставки, в удобном для чтения формате
  */
-function get_correct_bet_time($bet_time): string
+function get_correct_bet_time(string $bet_time): string
 {
     $bet_time_strtotime = strtotime('now') - strtotime($bet_time);
     $bet_time_minutes = ceil($bet_time_strtotime / 60);
