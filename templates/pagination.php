@@ -1,4 +1,4 @@
-<?php /** @noinspection ALL */
+<?php
 /**
  * @var array $pages
  * @var string $search
