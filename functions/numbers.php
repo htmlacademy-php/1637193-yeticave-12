@@ -71,19 +71,18 @@ function get_difficult_pagination(array $pages_array, int $current_page): array
         $pages_right_center = array_splice($pages_right_side, 0, PAGE_LIMIT_PAGINATION);
 
         $separator = ['...']; //разделитель
-        $current_page_elem = [$current_page]; //создаем новый массив со значением текущего номера страницы
 
         //вывод пагинации для левых 7-ми страниц:
         if (($current_page <= (PAGE_LIMIT_SIDE_PAGINATION))) {
-            $new_pages_array = array_merge($pages_left_end, $pages_left_center, $current_page_elem, $pages_right_center,
+            $new_pages_array = array_merge($pages_left_end, $pages_left_center, [$current_page], $pages_right_center,
                 $separator, $pages_right_end);
         } //вывод пагинации для страниц, расположенных через 7 от начала и за 7 до конца пагинации
         elseif (($current_page > PAGE_LIMIT_SIDE_PAGINATION) && ($current_page <= (count($pages_array) - PAGE_LIMIT_SIDE_PAGINATION))) {
-            $new_pages_array = array_merge($pages_left_end, $separator, $pages_left_center, $current_page_elem,
+            $new_pages_array = array_merge($pages_left_end, $separator, $pages_left_center, [$current_page],
                 $pages_right_center, $separator, $pages_right_end);
         } //вывод пагинации для правых 7-ми страниц:
         elseif (($current_page > PAGE_LIMIT_SIDE_PAGINATION) && ($current_page > count($pages_array) - PAGE_LIMIT_SIDE_PAGINATION)) {
-            $new_pages_array = array_merge($pages_left_end, $separator, $pages_left_center, $current_page_elem,
+            $new_pages_array = array_merge($pages_left_end, $separator, $pages_left_center, [$current_page],
                 $pages_right_center, $pages_right_end);
         }
         return $new_pages_array;

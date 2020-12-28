@@ -2,12 +2,12 @@
 /**
  * Функция для подсчёта оставшегося времени действия лота в аукционе
  * Возвращает оставшееся до переданной в функцию даты время в виде массива [ЧЧ, ММ].
- * @param string $get_end_date Конечная дата в формате 'ГГГГ-ММ-ДД'.
+ * @param string $get_end_date Конечная дата в формате 'ГГГГ-ММ-ДД ЧЧ:ММ:СС'.
  * @return array Возвращает массив строк в формате [ЧЧ, ММ]. В случае некорректного формата введенной даты или истекшей на данный момент даты возвращает [00, 00].
  */
 function get_date_range(string $get_end_date): array
 {
-    //проверка корректности ввода даты на соответствие формату 'ГГГГ-ММ-ДД'
+    //проверка корректности ввода даты на соответствие формату 'ГГГГ-ММ-ДД ЧЧ:ММ:СС'
     if (!is_date_valid($get_end_date, CORRECT_DATE_TIME_FORMAT)) {
         return ['00', '00'];
     }
@@ -41,7 +41,7 @@ function get_date_range(string $get_end_date): array
  * @param string $bet_time дата и время добавления ставки
  * @return string возвращает описание времени, прошедшего с момента последнего добавления ставки, в удобном для чтения формате
  */
-function get_correct_bet_time($bet_time): string
+function get_correct_bet_time(string $bet_time): string
 {
     $bet_time_strtotime = strtotime('now') - strtotime($bet_time);
     $bet_time_minutes = ceil($bet_time_strtotime / 60);
