@@ -1,10 +1,11 @@
 <?php
 /**
- * Функция по выводу форматированной суммы товара
- * @param integer $lot_price Вводится число от суммы товара
- * @return string Возвращается строка в виде отформатированного числа, с пробелами каждые 3 порядка и знаком ₽ в конце
+ * Функция форматирует стоимость лота (до формата с пробелами каждые 3 порядка цифр) и добавляет к ней значок ₽.
+ * Пример: 1 000 000 ₽, 1 000 ₽, 100 ₽
+ * @param int $lot_price Число с стоимостью лота
+ * @return string Cтрока в виде отформатированного числа, с пробелами каждые 3 порядка и знаком ₽ в конце
  */
-function formatted_sum($lot_price)
+function formatted_sum(int $lot_price): string
 {
     $round_number = ceil($lot_price);
     if ($round_number < 1000) {
@@ -24,7 +25,7 @@ function formatted_sum($lot_price)
  * @param string $search_page Адрес страницы, с которой выполняется поиск
  * @param string $search Текстовое содержимое поискового запроса [необязательный параметр]
  * @param string $category_id ID категории лотов [необязательный параметр]
- * @return html Заполненный HTML-шаблон пагинации
+ * @return string Заполненный HTML-шаблон пагинации
  */
 function get_pagination(
     int $pages_count,
@@ -57,7 +58,8 @@ function get_pagination(
  */
 function get_difficult_pagination(array $pages_array, int $current_page): array
 {
-    if (count($pages_array) > PAGE_LIMIT_SIDE_PAGINATION) { //если число страниц с результатами поиска больше 7, тогда нужен сложный вывод пагинации:
+    $new_pages_array = $pages_array;
+    if (count($new_pages_array) > PAGE_LIMIT_SIDE_PAGINATION) { //если число страниц с результатами поиска больше 7, тогда нужен сложный вывод пагинации:
         //копируем в отдельные массивы значения от края до номера текущей страницы
         $pages_left_side = array_slice($pages_array, 0, $current_page - 1);
         $pages_right_side = array_slice($pages_array, $current_page);
@@ -81,11 +83,10 @@ function get_difficult_pagination(array $pages_array, int $current_page): array
             $new_pages_array = array_merge($pages_left_end, $separator, $pages_left_center, [$current_page],
                 $pages_right_center, $separator, $pages_right_end);
         } //вывод пагинации для правых 7-ми страниц:
-        elseif (($current_page > PAGE_LIMIT_SIDE_PAGINATION) && ($current_page > count($pages_array) - PAGE_LIMIT_SIDE_PAGINATION)) {
+        elseif (($current_page > PAGE_LIMIT_SIDE_PAGINATION) && ($current_page > (count($pages_array) - PAGE_LIMIT_SIDE_PAGINATION))) {
             $new_pages_array = array_merge($pages_left_end, $separator, $pages_left_center, [$current_page],
                 $pages_right_center, $pages_right_end);
         }
-        return $new_pages_array;
     }
-    return $pages_array;
+    return $new_pages_array;
 }

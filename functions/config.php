@@ -38,7 +38,7 @@ define('CORRECT_DATE_TIME_FORMAT', 'Y-m-d H:i:s');
  */
 define('CORRECT_DATE_TIME', 'Y-m-d');
 
-//константы для работы с поиском на сайте и котенаци
+//константы для работы с поиском на сайте и пагинацией
 /**
  * Число лотов, которые выходят на одной странице поиска после запроса пользователя
  */
@@ -55,7 +55,7 @@ define('PAGE_LIMIT_PAGINATION', 3);
 define('PAGE_LIMIT_SIDE_PAGINATION', 7);
 
 /**
- * Данные по подключению к БД
+ * Данные для подключения к БД
  */
 const DB_CONNECTION_DATA = [
     'host' => 'localhost',

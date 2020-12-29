@@ -38,7 +38,7 @@ $user_id = $_SESSION['user']['id'] ?? null; //проверяем, авториз
 
 // отправка нового значения ставки
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $errors = check_errors_before_add_bet($lot);
+    $errors = check_errors_before_add_bet($lot, $errors);
     //если ошибок нет, то добавляем ставку в БД:
     if (empty($errors)) {
         $result_add_bet = add_bet_in_db($item_id, $connect, $user_id); //отправляем запрос о добавлении новой ставки
@@ -54,8 +54,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 $show_bet_add = true; //добавлять новую ставку по-умолчанию можно
 
 //проверка ограничений показа блока добавления ставки
-if (is_user_guest($user_id) || is_lot_completed($lot) || is_user_author_of_lot($lot,
-        $user_id) || is_user_made_last_bet($bets, $user_id)) {
+if (
+    is_user_guest($user_id) ||
+    is_lot_completed($lot) ||
+    is_user_author_of_lot($lot, $user_id)||
+    is_user_made_last_bet($bets, $user_id)
+) {
     $show_bet_add = false;
 }
 

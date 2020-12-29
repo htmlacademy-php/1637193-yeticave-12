@@ -38,7 +38,7 @@ function get_categories_from_db(mysqli $connect): array
  * Фукнция считает количество лотов, принадлежащих выбранной категории, для пагинации
  * @param mysqli $connect Данные о подключении к БД
  * @param int $category_id номер данной категории из БД
- * @return array|null Возвращает массив с количеством элементов, равных количеству лотов из выбранной категории, либо NULL, если лоты из категории не найдены
+ * @return array|null Возвращает массив с количеством элементов, равных количеству лотов из выбранной категории, либо null, если лоты из категории не найдены
  */
 function get_category_count(mysqli $connect, int $category_id): ?array
 {
@@ -61,7 +61,7 @@ function get_category_count(mysqli $connect, int $category_id): ?array
  * @param mysqli $connect Данные о подключении к БД
  * @param int $category_id номер данной категории из БД
  * @param int $offset Смещение выборки количества запросов на 1 странице, т.е. начиная с какой записи будут возвращены ограничения по выборке
- * @return array|null Возвращает массив с элементами, содержащими информацию о лотах из выбранной категории, либо NULL, если лоты из категории не найдены
+ * @return array|null Возвращает массив с элементами, содержащими информацию о лотах из выбранной категории, либо null, если лоты из категории не найдены
  */
 function get_lot_category_count(mysqli $connect, int $category_id, int $offset): ?array
 {
@@ -98,7 +98,7 @@ function get_lot_category_count(mysqli $connect, int $category_id, int $offset):
  * Функция получает массив с самыми новыми, открытыми лотами из базы данных yeticave.
  * Каждый лот включает в себя название, стартовую цену, ссылку на изображение, текущую цену, название категории;
  * @param mysqli $connect данные о подключении к базе данных
- * @return array Массив с самыми новыми, открытыми лотами из базы данных yeticave
+ * @return array Массив с самыми новыми, открытыми лотами из базы данных yeticave либо вывод ошибки 500 при неудачном запросе в БД
  */
 function get_ad_information_from_db(mysqli $connect): array
 {
@@ -157,12 +157,12 @@ function get_pagination_info_about_items(mysqli $connect, int $offset): array
 
 /**
  * Функция получает массив с информацией о конкретном лоте из базы данных yeticave.
- * Каждый лот включает в себя название, дату создания, описание товара, название категории, ссылку на изображение, дату завершения лота,
- * стартовую цену, шаг ставки, текущую цену, название категории;
+ * Каждый лот включает в себя название, дату создания, описание товара, название категории, ссылку на изображение,
+ * дату завершения лота, стартовую цену, шаг ставки, текущую цену, название категории;
  * @param int $item_id - ID Товара
  * @param mysqli $connect - данные о подключении к базе данных
  * @param array $categories - массив со списком категорий размещенных лотов
- * @return array Массив с данными о лоте с указанным ID
+ * @return array Массив с данными о лоте с указанным ID либо вывод ошибки 404 при отсутствии лота с таким ID
  */
 function get_info_about_lot_from_db(int $item_id, mysqli $connect, array $categories): array
 {
@@ -197,7 +197,7 @@ function get_info_about_lot_from_db(int $item_id, mysqli $connect, array $catego
  * Фукнция подготавливает запрос в БД о показе последних 10 ставок о конкретном лоте
  * @param int $item_id - ID Товара
  * @param mysqli $connect - данные о подключении к базе данных
- * @return mysqli_result|false результат в виде выполненного запроса в БД о показе последних 10 ставок о конкретном лоте, иначе false
+ * @return mysqli_result результат в виде выполненного запроса в БД о показе последних 10 ставок о конкретном лоте
  */
 function get_bet_history(int $item_id, mysqli $connect): mysqli_result
 {
@@ -214,11 +214,11 @@ function get_bet_history(int $item_id, mysqli $connect): mysqli_result
 
 
 /**
- * Фукнция подготавливает запрос в БД о добавлении новой ставки к конкретному лоту
+ * Фукнция проверяет отправку запроса в БД о добавлении новой ставки к конкретному лоту
  * @param int $item_id - ID Товара
  * @param mysqli $connect - данные о подключении к базе данных
  * @param int $user_id - ID пользователя, который добавляет ставку
- * @return bool true в случае выполненного запроса в БД, иначе false
+ * @return bool - true в случае выполненного запроса в БД, иначе false
  */
 function add_bet_in_db(int $item_id, mysqli $connect, int $user_id): bool
 {
@@ -247,9 +247,9 @@ function add_bet_in_db(int $item_id, mysqli $connect, int $user_id): bool
 /**
  * Вспомогательная функция для получения значений из POST-запроса
  * @param string $name поле, из которого будет браться значение POST
- * @return string содержимое POST-запроса
+ * @return string содержимое POST-запроса или пустая строка, если запрос не существует
  */
-function get_post_value(string $name): ?string
+function get_post_value(string $name): string
 {
     return $_POST[$name] ?? "";
 }
@@ -257,7 +257,7 @@ function get_post_value(string $name): ?string
 /**
  * Сохраняет файл в папку /uploads/, добавляя префикс к началу имени файла.
  * @param string $file Поле в форме для выбора и загрузки файла с ПК пользователя
- * @return string|null Возвращает url сохраненного файла или возвращает NULL в случае ошибки
+ * @return string|null Возвращает url сохраненного файла или возвращает null в случае ошибки
  **/
 function save_file(string $file): ?string
 {
@@ -310,7 +310,7 @@ function redirect_to_main()
 }
 
 /**
- * Функция выводит подготавливает вывод ошибки для функции include_template в шаблон error_page.php
+ * Функция подготавливает вывод ошибки для функции include_template в шаблон error_page.php
  * @param string $error Сообщение, что произошла ошибка
  * @param string $error_description Описание ошибки
  * @param string $error_link Ссылка на страницу, куда стоит перейти, чтобы избежать ошибки
@@ -324,7 +324,7 @@ function include_template_error(
     string $error_link,
     string $error_link_description,
     int $http_code = 0
-): ?string {
+): string {
     $page_content = include_template(
         '/error_page.php',
         [
@@ -346,9 +346,10 @@ function include_template_error(
 /**
  * Функция проверяет ошибки перед добавлением новой ставки к лоту
  * @param array $lot Массив с информацией о лоте
+ * @param array $errors Массив с информацией о ошибках
  * @return array Очищенный от пустых значений массив с возможными ошибками
  */
-function check_errors_before_add_bet(array $lot): array
+function check_errors_before_add_bet(array $lot, array $errors): array
 {
     // берем из БД текущий минимальный размер новой возможной ставки
     $min_bet = $lot['bet_step'] + $lot['current_price'];
@@ -373,7 +374,7 @@ function check_errors_before_add_bet(array $lot): array
  * Функция осуществляет поиск ставок указанного пользователя в БД
  * @param mysqli $connect данные о подключении к базе данных
  * @param int $user_id ID текущего пользователя
- * @return array Ассоциативный массив с данными о ставках пользователя
+ * @return array Массив с элементами в виде данных о ставках пользователя
  */
 function search_users_bet(mysqli $connect, int $user_id): array
 {
@@ -406,7 +407,7 @@ function search_users_bet(mysqli $connect, int $user_id): array
  * @param mysqli $connect Данные о подключении к БД
  * @param int $user_id ID текущего пользователя
  * @param int $offset Смещение выборки количества запросов на 1 странице, т.е. начиная с какой записи будут возвращены ограничения по выборке
- * @return array Ассоциативный массив с данными о ставках пользователя для показа на 1 странице
+ * @return array Массив с элементами в виде данных о ставках пользователя для показа на 1 странице
  */
 function search_users_bet_about_items(mysqli $connect, int $user_id, int $offset): array
 {
@@ -439,7 +440,7 @@ function search_users_bet_about_items(mysqli $connect, int $user_id, int $offset
  * @param mysqli $connect Данные о подключении к БД
  * @param string $sql_result SQL-запрос в БД
  * @param array $array_stmt Массив с данными для вставки на место плейсхолдеров
- * @return mysqli_result Результат подготовленного выражения
+ * @return mysqli_result Результат подготовленного выражения либо вывод ошибки 500 в случае ошибки
  */
 function get_stmt_result(mysqli $connect, string $sql_result, array $array_stmt = []): mysqli_result
 {
@@ -503,10 +504,9 @@ function get_search_items(mysqli $connect, string $search, int $offset): array
 }
 
 /**
- * Функция выдает список последних ставок по лотам без победителей,
- * дата истечения которых меньше или равна текущей
+ * Функция выдает список последних ставок по лотам без победителей, дата истечения которых меньше или равна текущей
  * @param mysqli $connect данные о подключении к базе данных
- * @return mysqli_result Результат запроса в БД
+ * @return mysqli_result Результат запроса в БД либо вывод ошибки 500 при неудаче
  */
 function get_finished_lots(mysqli $connect): mysqli_result
 {
@@ -523,7 +523,6 @@ function get_finished_lots(mysqli $connect): mysqli_result
             WHERE i.winner_id IS NULL AND i.completed_at <= CURDATE()
             ORDER BY bet_id';
 
-
     $result_finished_lots = mysqli_query($connect, $sql_finished_lots);
 
     if (!$result_finished_lots) {
@@ -534,11 +533,11 @@ function get_finished_lots(mysqli $connect): mysqli_result
 
 
 /**
- * Функция отправляет сообщение о выигрыше ставки победителю лота
- * @param array $winner Массив с данными победителя лота
- * @return string Отправленное сообщение
+ * Функция отправляет сообщение о выигрыше ставки победителю лота через Swift Mailer
+ * @param array $winner Массив с элементами в виде данных победителя лота
+ * @return string Отправленное сообщение о выигрыше
  */
-function send_email_to_winner(array $winner)
+function send_email_to_winner(array $winner): string
 {
     // конфигурация транспорта для доступа к SMTP-серверу
     $transport = (new Swift_SmtpTransport(SMTP_CONFIG['host'], SMTP_CONFIG['port'], SMTP_CONFIG['encryption']))
@@ -579,9 +578,9 @@ function send_email_to_winner(array $winner)
  * @param mysqli $connect данные о подключении к базе данных
  * @param int $user ID пользователя, выигравшего лот
  * @param int $item ID лота, который выиграл пользователь
- * @return mysqli_result Результат запроса в БД
+ * @return mysqli_result Результат запроса в БД или вывод ошибки 500 в случае невыполненного запроса
  */
-function identify_winner_lot(mysqli $connect, int $user, int $item): ?mysqli_result
+function identify_winner_lot(mysqli $connect, int $user, int $item): bool
 {
     $sql_winner = "UPDATE item SET winner_id = $user WHERE id = $item";
 
@@ -594,10 +593,10 @@ function identify_winner_lot(mysqli $connect, int $user, int $item): ?mysqli_res
 }
 
 /**
- * Функция запроса на поиск в БД записи в таблице пользователей по введенному в форме email
+ * Функция запроса на основе подготовленного выражения на поиск в БД записи в таблице пользователей по введенному в форме email
  * @param mysqli $connect Данные о подключении к БД
  * @param string $check_email Введенный в форму e-mail пользователя
- * @return mysqli_result|false Переданный запрос в БД
+ * @return mysqli_result Результат запроса на основе подготовленного выражения в БД
  */
 function verify_existence_email_db(mysqli $connect, string $check_email): ?mysqli_result
 {
