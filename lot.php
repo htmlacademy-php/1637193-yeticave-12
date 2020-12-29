@@ -57,7 +57,7 @@ $show_bet_add = true; //добавлять новую ставку по-умол
 if (
     is_user_guest($user_id) ||
     is_lot_completed($lot) ||
-    is_user_author_of_lot($lot, $user_id)||
+    is_user_author_of_lot($lot, $user_id) ||
     is_user_made_last_bet($bets, $user_id)
 ) {
     $show_bet_add = false;
