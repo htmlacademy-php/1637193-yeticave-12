@@ -14,11 +14,13 @@
     <div class="lot-item__content">
         <div class="lot-item__left">
             <div class="lot-item__image">
-                <img src="../<?= htmlspecialchars($lot['image_url'] ?? '#', ENT_QUOTES | ENT_HTML5) ?>" width="730" height="548"
+                <img src="../<?= htmlspecialchars($lot['image_url'] ?? '#', ENT_QUOTES | ENT_HTML5) ?>" width="730"
+                     height="548"
                      alt="<?= htmlspecialchars($lot['title'] ?? 'Без названия', ENT_QUOTES | ENT_HTML5) ?>">
             </div>
             <p class="lot-item__category">Категория:
-                <span><?= htmlspecialchars($lot['category_title'] ?? 'Без категории', ENT_QUOTES | ENT_HTML5) ?></span></p>
+                <span><?= htmlspecialchars($lot['category_title'] ?? 'Без категории', ENT_QUOTES | ENT_HTML5) ?></span>
+            </p>
             <p class="lot-item__description"><?= htmlspecialchars($lot['description'] ?? 'Описание отсутствует',
                     ENT_QUOTES | ENT_HTML5) ?></p>
         </div>

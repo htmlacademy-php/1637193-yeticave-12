@@ -28,8 +28,8 @@
                 <img src="/img/logo.svg" width="160" height="39" alt="Логотип компании YetiCave">
             </a>
             <form class="main-header__search" method="get" action="/search.php" autocomplete="off">
-                    <input type="search" name="search" placeholder="Поиск лота"
-                           value="<?= isset($search) ? htmlspecialchars($search, ENT_QUOTES | ENT_HTML5) : "" ?>">
+                <input type="search" name="search" placeholder="Поиск лота"
+                       value="<?= isset($search) ? htmlspecialchars($search, ENT_QUOTES | ENT_HTML5) : "" ?>">
                 <input class="main-header__search-btn" type="submit" name="find" value="Найти" id="search">
             </form>
             <?php if (isset($is_auth)): ?>

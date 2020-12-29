@@ -7,13 +7,15 @@
 ?>
 <div class="container">
     <section class="lots">
-        <h2>Результаты поиска по запросу «<span><?= htmlspecialchars($search, ENT_QUOTES | ENT_HTML5) ?? '' ?></span>»</h2>
+        <h2>Результаты поиска по запросу «<span><?= htmlspecialchars($search, ENT_QUOTES | ENT_HTML5) ?? '' ?></span>»
+        </h2>
         <ul class="lots__list">
             <?php if (!empty($ad_information)): ?>
                 <?php foreach ($ad_information as $ad_value): ?>
                     <li class="lots__item lot">
                         <div class="lot__image">
-                            <img src="../<?= htmlspecialchars($ad_value['image_url'] ?? '#', ENT_QUOTES | ENT_HTML5) ?>" width="350"
+                            <img src="../<?= htmlspecialchars($ad_value['image_url'] ?? '#', ENT_QUOTES | ENT_HTML5) ?>"
+                                 width="350"
                                  height="260"
                                  alt="<?= htmlspecialchars($ad_value['title'] ?? 'Без названия',
                                      ENT_QUOTES | ENT_HTML5) ?>">
@@ -45,7 +47,8 @@
                     </li>
                 <?php endforeach; ?>
             <?php else: ?>
-                <p>По вашему запросу <b>"<?= htmlspecialchars($search, ENT_QUOTES | ENT_HTML5) ?>"</b> нет подходящих лотов.</p>
+                <p>По вашему запросу <b>"<?= htmlspecialchars($search, ENT_QUOTES | ENT_HTML5) ?>"</b> нет подходящих
+                    лотов.</p>
             <?php endif; ?>
         </ul>
     </section>

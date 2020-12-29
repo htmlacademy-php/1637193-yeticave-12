@@ -131,7 +131,7 @@ function include_template(string $name, array $data = []): string
     }
 
     ob_start();
-    extract($data,EXTR_OVERWRITE);
+    extract($data, EXTR_OVERWRITE);
     require $name;
 
     $result = ob_get_clean();

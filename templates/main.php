@@ -28,7 +28,8 @@
         <?php foreach ($ad_information as $ad_value): ?>
             <li class="lots__item lot">
                 <div class="lot__image">
-                    <img src="../<?= htmlspecialchars($ad_value['image_url'] ?? '#', ENT_QUOTES | ENT_HTML5) ?>" width="350" height="260"
+                    <img src="../<?= htmlspecialchars($ad_value['image_url'] ?? '#', ENT_QUOTES | ENT_HTML5) ?>"
+                         width="350" height="260"
                          alt="<?= htmlspecialchars($ad_value['title'] ?? 'Без названия', ENT_QUOTES | ENT_HTML5) ?>">
                 </div>
                 <div class="lot__info">

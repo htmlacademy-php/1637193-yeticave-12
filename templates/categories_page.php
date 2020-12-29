@@ -13,8 +13,10 @@
             <?php foreach ($category_items as $item): ?>
                 <li class="lots__item lot">
                     <div class="lot__image">
-                        <img src="../<?= htmlspecialchars($item['image_url'] ?? '#', ENT_QUOTES | ENT_HTML5) ?>" width="350" height="260"
-                             alt="<?= htmlspecialchars($item['item_title'] ?? 'Без названия', ENT_QUOTES | ENT_HTML5) ?>">
+                        <img src="../<?= htmlspecialchars($item['image_url'] ?? '#', ENT_QUOTES | ENT_HTML5) ?>"
+                             width="350" height="260"
+                             alt="<?= htmlspecialchars($item['item_title'] ?? 'Без названия',
+                                 ENT_QUOTES | ENT_HTML5) ?>">
                     </div>
                     <div class="lot__info">
                         <span class="lot__category"><?= htmlspecialchars($item['category'] ?? 'Без категории',

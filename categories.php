@@ -8,15 +8,18 @@ require_once './functions/bootstrap.php'; //подключает все поль
 $connect = db_connection();
 $categories = get_categories_from_db($connect);
 
-$category_id = filter_input(INPUT_GET, 'id', FILTER_SANITIZE_NUMBER_INT); //получаем ID категории
-$category_index = array_search($category_id, array_column($categories, 'id'), true); //получаем индекс элемента массива категорий с указанным ID
+//получаем ID категории
+$category_id = filter_input(INPUT_GET, 'id', FILTER_SANITIZE_NUMBER_INT);
+//получаем индекс элемента массива категорий с указанным ID
+$category_index = array_search($category_id, array_column($categories, 'id'), true);
 //если такого индекса категории нет, выводим ошибку
 if (!isset($category_index) || $category_index === '' || $category_index === false) {
     error_output(404);
 }
 
 $category_title_output = 'Категории не существует';
-$category_title = htmlspecialchars($categories[$category_index]['title'], ENT_QUOTES | ENT_HTML5); //получаем название категории по индексу
+//получаем название категории по индексу
+$category_title = htmlspecialchars($categories[$category_index]['title'], ENT_QUOTES | ENT_HTML5);
 
 if (isset($category_title) && $category_title !== '') {
     $category_title_output = 'Все лоты в категории "' . $category_title . '"'; //вывод заголовка для страницы категории

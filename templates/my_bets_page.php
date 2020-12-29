@@ -14,7 +14,8 @@
                 <?php endif; ?>">
                     <td class="rates__info">
                         <div class="rates__img">
-                            <img src="../<?= htmlspecialchars($bet['image_url'] ?? '#', ENT_QUOTES | ENT_HTML5) ?>" width="54" height="40"
+                            <img src="../<?= htmlspecialchars($bet['image_url'] ?? '#', ENT_QUOTES | ENT_HTML5) ?>"
+                                 width="54" height="40"
                                  alt="<?= htmlspecialchars($bet['title'] ?? 'Без названия', ENT_QUOTES | ENT_HTML5) ?>">
                         </div>
                         <div>
