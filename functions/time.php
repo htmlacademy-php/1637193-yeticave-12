@@ -43,21 +43,23 @@ function get_date_range(string $get_end_date): array
  */
 function get_correct_bet_time(string $bet_time): string
 {
-    $bet_time_strtotime = strtotime('now') - strtotime($bet_time);
+    $bet_time_strtotime = time() - strtotime($bet_time);
     $bet_time_minutes = ceil($bet_time_strtotime / 60);
     $bet_time_hours = floor($bet_time_strtotime / 3600);
     $ago = ' назад';
     if ((int)$bet_time_hours === 0 && (int)$bet_time_minutes === 0 && (int)$bet_time_strtotime < 60) {
         return 'Только что';
-    } elseif ((int)$bet_time_hours === 0 && ((int)$bet_time_minutes >= 1 || ((int)$bet_time_minutes < 60))) {
-        return $bet_time_minutes . ' ' . get_noun_plural_form($bet_time_minutes, 'минута', 'минуты', 'минут') . $ago;
-    } elseif ((int)$bet_time_hours === 1) {
-        return 'час' . $ago;
-    } elseif ((int)$bet_time_hours > 1 && (int)$bet_time_hours < 12) {
-        return $bet_time_hours . ' ' . get_noun_plural_form($bet_time_hours, 'час', 'часа', 'часов') . $ago;
-    } else {
-        return date_format(date_create($bet_time), 'd.m.y в H:i');
     }
+    if ((int)$bet_time_hours === 0 && ((int)$bet_time_minutes >= 1 || ((int)$bet_time_minutes < 60))) {
+        return $bet_time_minutes . ' ' . get_noun_plural_form($bet_time_minutes, 'минута', 'минуты', 'минут') . $ago;
+    }
+    if ((int)$bet_time_hours === 1) {
+        return 'час' . $ago;
+    }
+    if ((int)$bet_time_hours > 1 && (int)$bet_time_hours < 12) {
+        return $bet_time_hours . ' ' . get_noun_plural_form($bet_time_hours, 'час', 'часа', 'часов') . $ago;
+    }
+    return date_format(date_create($bet_time), 'd.m.y в H:i');
 }
 
 /**

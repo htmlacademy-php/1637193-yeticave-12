@@ -7,7 +7,7 @@ $connect = db_connection();
 // список последних ставок по лотам без победителей, дата истечения которых меньше или равна текущей
 $result_finished_lots = get_finished_lots($connect);
 
-//Получим список победитилей в виде массива
+//Получим список победителей в виде массива
 if ($result_finished_lots && mysqli_num_rows($result_finished_lots)) {
     $winners = mysqli_fetch_all($result_finished_lots, MYSQLI_ASSOC);
 

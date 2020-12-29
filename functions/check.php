@@ -1,30 +1,30 @@
 <?php
 
 /**
- * Функция перенаправляет на страницу вывода ошибки с сооветствующим текстом описания ошибки
+ * Функция перенаправляет на страницу вывода ошибки с соответствующим текстом описания ошибки
  * @param int $http_code Код состояния HTTP
  * @param string $redirect_page страница, с которой было перенаправление в ходе ошибки, без .php в конце [необязательный параметр]
- * return string Строка с описанием ошибок, перенаправляющая на страницу вывода ошибки.
+ * @return string Строка с описанием ошибок, перенаправляющая на страницу вывода ошибки.
  */
 function error_output(int $http_code, string $redirect_page = ''): string
 {
     http_response_code($http_code);
     $error = 'Произошла ошибка: ' . $http_code . ' &#129298; ';
     $error_description = 'Такой страницы не существует на сайте.';
-    $error_link = '/index.php';
-    $error_link_description = 'Предлагаем вернуться на главную.';
+    $link = '/index.php';
+    $link_description = 'Предлагаем вернуться на главную.';
 
     if ($http_code === 403) {
         switch ($redirect_page) {
             case 'add':
                 $error_description = 'Для добавления лота необходимо пройти регистрацию на сайте.';
-                $error_link = '/sign-up.php';
-                $error_link_description = 'Зарегистрироваться можно по этой ссылке.';
+                $link = '/sign-up.php';
+                $link_description = 'Зарегистрироваться можно по этой ссылке.';
                 break;
             case 'my_bets':
                 $error_description = 'Для просмотра сделанных ставок необходимо пройти авторизацию на сайте.';
-                $error_link = '/enter.php';
-                $error_link_description = 'Авторизоваться можно по этой ссылке.';
+                $link = '/enter.php';
+                $link_description = 'Авторизоваться можно по этой ссылке.';
                 break;
             case 'enter':
                 $error_description = 'Вы уже авторизованы на нашем сайте. &#128517;';
@@ -35,10 +35,10 @@ function error_output(int $http_code, string $redirect_page = ''): string
         }
     } elseif ($http_code >= 500) {
         $error_description = 'У нас произошла внутренняя техническая ошибка сервера. &#128532;';
-        $error_link_description = 'Возвращайтесь к нам немного позже.';
+        $link_description = 'Возвращайтесь к нам немного позже.';
     }
 
-    return include_template_error($error, $error_description, $error_link, $error_link_description, $http_code);
+    return include_template_error($error, $error_description, $link, $link_description, $http_code);
 }
 
 /**
@@ -83,10 +83,10 @@ function validate_file_before_saving(string $file): ?string
         $file_size = $_FILES[$file]['size'];
         $type_file = mime_content_type($file_name);
 
-        if (($type_file === 'image/jpeg' || $type_file === 'image/png' || $type_file === 'image/jpg')
-            && ($file_size <= UPLOAD_MAX_SIZE)) {
+        if (($file_size <= UPLOAD_MAX_SIZE) && in_array($type_file, ['image/jpeg', 'image/png', 'image/jpg'])) {
             return null;
         }
+
         if ($file_size > UPLOAD_MAX_SIZE) {
             return "Максимальный размер файла: 2 Мб";
         }
@@ -106,9 +106,13 @@ function validate_number_value(string $number): ?string
 {
     if ($empty = validate_filled($number, '')) {
         return $empty;
-    } elseif (!is_numeric($_POST[$number])) {
+    }
+
+    if (!is_numeric($_POST[$number])) {
         return 'Значение должно быть числом';
-    } elseif ($_POST[$number] <= 0) {
+    }
+
+    if ($_POST[$number] <= 0) {
         return 'Значение должно быть больше нуля';
     }
     return null;
@@ -126,9 +130,13 @@ function validate_date_end(string $end_date): ?string
 
     if ($empty = validate_filled($end_date, 'Дата окончания торгов')) {
         return $empty;
-    } elseif (!is_date_valid($_POST[$end_date], CORRECT_DATE_TIME)) {
+    }
+
+    if (!is_date_valid($_POST[$end_date], CORRECT_DATE_TIME)) {
         return 'Некорректный формат даты, исправьте на "ГГГГ-ММ-ДД"';
-    } elseif (date_create($_POST[$end_date]) < $tomorrow_date) {
+    }
+
+    if (date_create($_POST[$end_date]) < $tomorrow_date) {
         return 'Некорректная дата завершения лота';
     }
     return null;
@@ -147,13 +155,13 @@ function validate_password(string $password): ?string
     if (strlen($password) < 8) {
         return "Придуманный пароль должен быть не менее 8 символов, попробуйте дополнить.";
     }
-    if (preg_match("([а-яА-ЯёЁ]+)", $password)) {
+    if (preg_match('/([а-яА-ЯёЁ]+)/u', $password)) {
         return "В придуманном пароле не должно быть букв из кириллицы: допустимы только латинские буквы, цифры и спец. символы";
     }
-    if (!preg_match("([0-9]+)", $password)) {
+    if (!preg_match('/\d+/', $password)) {
         return "В введенном пароле не хватает цифр";
     }
-    if (!preg_match("/([a-zA-Z]+)/", $password)) {
+    if (!preg_match('/([a-zA-Z]+)/', $password)) {
         return "В введенном пароле не хватает латинских букв";
     }
     return null;
@@ -219,11 +227,17 @@ function validate_bet_add(string $bet_field, int $min_bet): ?string
     $empty = validate_filled($bet_field, 'Ваша ставка');
     if ($_POST[$bet_field] !== "0" && $empty) {
         return $empty;
-    } elseif (!filter_var($_POST[$bet_field], FILTER_VALIDATE_INT)) {
+    }
+
+    if (!filter_var($_POST[$bet_field], FILTER_VALIDATE_INT)) {
         return 'Шаг ставки должен быть целым числом больше ноля';
-    } elseif ((int)$_POST[$bet_field] < $min_bet) {
+    }
+
+    if ((int)$_POST[$bet_field] < $min_bet) {
         return 'Ваша ставка должна быть не меньше размера минимальной ставки';
-    } elseif ((int)$_POST[$bet_field] > 100000000) {
+    }
+
+    if ((int)$_POST[$bet_field] > 100000000) {
         return 'Ваша ставка должна быть меньше 100 млн. рублей';
     }
     return null;
@@ -231,23 +245,24 @@ function validate_bet_add(string $bet_field, int $min_bet): ?string
 
 /**
  * Функция проверяет, заполнены ли поля в форме авторизации пользователя
+ * @param array $form Массив, содержащий данные из формы, введенные пользователем
  * @return array Массив, содержащий строки в виде возможных ошибок
  */
-function validate_if_filled_in(): array
+function validate_if_filled_in(array $form): array
 {
     //массив, где будут храниться ошибки
     $errors = [];
     //обязательные для заполнения поля
     $rules = [
-        'email' => function () {
+        'email' => static function () {
             return validate_filled('email', 'e-mail');
         },
-        'password' => function () {
+        'password' => static function () {
             return validate_filled('password', 'пароль');
         }
     ];
     //Проверяем все поля на заполненность
-    foreach ($form = $_POST as $key => $value) {
+    foreach ($form as $key => $value) {
         if (isset($rules[$key])) {
             $rule = $rules[$key];
             $errors[$key] = $rule();
@@ -257,7 +272,7 @@ function validate_if_filled_in(): array
 }
 
 /**
- * Фукнция проверяет, является ли текущий пользователь неавторизованным
+ * Функция проверяет, является ли текущий пользователь неавторизованным
  * @param int|null $user_id ID текущего пользователя
  * @return bool Возвращает true при положительном ответе и false при отрицательном
  */
@@ -292,7 +307,7 @@ function is_user_author_of_lot(array $lot, int $user_id): bool
 }
 
 /**
- * Фукнция проверяет, сделал ли данный пользователь последнюю ставку по данному лоту
+ * Функция проверяет, сделал ли данный пользователь последнюю ставку по данному лоту
  * @param array $bets Массив с информацией о последних 10 ставках по лоту
  * @param int $user_id ID текущего пользователя
  * @return bool Возвращает true, если последнюю ставку сделал этот пользователь, иначе false

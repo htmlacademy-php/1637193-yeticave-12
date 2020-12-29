@@ -20,16 +20,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') { //Проверяем, что фор
     $errors = []; // массив, где будут храниться ошибки
 
     $rules = [
-        'email' => function () {
+        'email' => static function () {
             return validate_email($_POST['email']);
         },
-        'password' => function () {
+        'password' => static function () {
             return validate_password($_POST['password']);
         },
-        'name' => function () {
+        'name' => static function () {
             return validate_filled('name', 'имя пользователя');
         },
-        'message' => function () {
+        'message' => static function () {
             return validate_contacts($_POST['message']);
         }
     ];

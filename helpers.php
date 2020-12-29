@@ -49,7 +49,7 @@ function db_get_prepare_stmt(mysqli $link, string $sql, array $data = []): mysql
                 $type = 'i';
             } elseif (is_string($value)) {
                 $type = 's';
-            } elseif (is_double($value)) {
+            } elseif (is_float($value)) {
                 $type = 'd';
             }
 
@@ -93,20 +93,14 @@ function db_get_prepare_stmt(mysqli $link, string $sql, array $data = []): mysql
  * @param string $two Форма множественного числа для 2, 3, 4: яблока, часа, минуты
  * @param string $many Форма множественного числа для остальных чисел
  *
- * @return string Рассчитанная форма множественнго числа
+ * @return string Рассчитанная форма множественного числа
  */
 function get_noun_plural_form(int $number, string $one, string $two, string $many): string
 {
-    $number = (int)$number;
     $mod10 = $number % 10;
     $mod100 = $number % 100;
 
     switch (true) {
-        case ($mod100 >= 11 && $mod100 <= 20):
-            return $many;
-
-        case ($mod10 > 5):
-            return $many;
 
         case ($mod10 === 1):
             return $one;
@@ -114,6 +108,8 @@ function get_noun_plural_form(int $number, string $one, string $two, string $man
         case ($mod10 >= 2 && $mod10 <= 4):
             return $two;
 
+        case ($mod100 >= 11 && $mod100 <= 20):
+        case ($mod10 > 5):
         default:
             return $many;
     }
@@ -135,7 +131,7 @@ function include_template(string $name, array $data = []): string
     }
 
     ob_start();
-    extract($data);
+    extract($data,EXTR_OVERWRITE);
     require $name;
 
     $result = ob_get_clean();

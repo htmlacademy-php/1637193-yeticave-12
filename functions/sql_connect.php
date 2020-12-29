@@ -35,7 +35,7 @@ function get_categories_from_db(mysqli $connect): array
 }
 
 /**
- * Фукнция считает количество лотов, принадлежащих выбранной категории, для пагинации
+ * Функция считает количество лотов, принадлежащих выбранной категории, для пагинации
  * @param mysqli $connect Данные о подключении к БД
  * @param int $category_id номер данной категории из БД
  * @return array|null Возвращает массив с количеством элементов, равных количеству лотов из выбранной категории, либо null, если лоты из категории не найдены
@@ -115,7 +115,7 @@ function get_ad_information_from_db(mysqli $connect): array
                          LEFT JOIN bet ON item.id = bet.item_id
                 WHERE item.completed_at > NOW()
                 GROUP BY item.id
-                ORDER BY item.created_at DESC";
+                ORDER BY 'created_at' DESC";
 
     $result_items = mysqli_query($connect, $sql_item);
 
@@ -127,7 +127,7 @@ function get_ad_information_from_db(mysqli $connect): array
 
 
 /**
- * Фукнция получает массив с самыми новыми, открытыми лотами из базы данных yeticave с ограничением числа лотов на 1 странице
+ * Функция получает массив с самыми новыми, открытыми лотами из базы данных yeticave с ограничением числа лотов на 1 странице
  * @param mysqli $connect Данные о подключении к БД
  * @param int $offset Смещение выборки количества запросов на 1 странице, т.е. начиная с какой записи будут возвращены ограничения по выборке
  * @return array Ассоциативный массив с данными о лотах для показа на 1 странице
@@ -147,7 +147,7 @@ function get_pagination_info_about_items(mysqli $connect, int $offset): array
                 LEFT JOIN bet ON item.id = bet.item_id
                 WHERE item.completed_at > NOW()
                 GROUP BY item.id
-                ORDER BY item.created_at DESC
+                ORDER BY 'created_at' DESC
                 LIMIT ?
                 OFFSET ?";
     $result_items = get_stmt_result($connect, $sql_item, [LIMIT_OF_SEARCH_RESULT, $offset]);
@@ -161,10 +161,9 @@ function get_pagination_info_about_items(mysqli $connect, int $offset): array
  * дату завершения лота, стартовую цену, шаг ставки, текущую цену, название категории;
  * @param int $item_id - ID Товара
  * @param mysqli $connect - данные о подключении к базе данных
- * @param array $categories - массив со списком категорий размещенных лотов
  * @return array Массив с данными о лоте с указанным ID либо вывод ошибки 404 при отсутствии лота с таким ID
  */
-function get_info_about_lot_from_db(int $item_id, mysqli $connect, array $categories): array
+function get_info_about_lot_from_db(int $item_id, mysqli $connect): array
 {
     $sql_lot = 'SELECT item.id,
                     item.created_at,
@@ -194,7 +193,7 @@ function get_info_about_lot_from_db(int $item_id, mysqli $connect, array $catego
 }
 
 /**
- * Фукнция подготавливает запрос в БД о показе последних 10 ставок о конкретном лоте
+ * Функция подготавливает запрос в БД о показе последних 10 ставок о конкретном лоте
  * @param int $item_id - ID Товара
  * @param mysqli $connect - данные о подключении к базе данных
  * @return mysqli_result результат в виде выполненного запроса в БД о показе последних 10 ставок о конкретном лоте
@@ -214,7 +213,7 @@ function get_bet_history(int $item_id, mysqli $connect): mysqli_result
 
 
 /**
- * Фукнция проверяет отправку запроса в БД о добавлении новой ставки к конкретному лоту
+ * Функция проверяет отправку запроса в БД о добавлении новой ставки к конкретному лоту
  * @param int $item_id - ID Товара
  * @param mysqli $connect - данные о подключении к базе данных
  * @param int $user_id - ID пользователя, который добавляет ставку
@@ -262,7 +261,7 @@ function get_post_value(string $name): string
 function save_file(string $file): ?string
 {
     if (isset($_FILES[$file])) {
-        $prefix = uniqid();
+        $prefix = uniqid('', true);
         $file_name = $prefix . '_' . $_FILES[$file]['name'];
         $file_path = $_SERVER['DOCUMENT_ROOT'] . _DS . NAME_FOLDER_UPLOADS_FILE . _DS;
         $file_url = _DS . NAME_FOLDER_UPLOADS_FILE . _DS . $file_name;
@@ -283,7 +282,7 @@ function save_file(string $file): ?string
  */
 function show_add_lot_page(string $user_name, array $categories, array $errors = []): void
 {
-    $selected_category = $_POST['category'] ?? 0;
+    $selected_category = $_POST['category'] ?? '0';
     $page_content = include_template('/add_lot.php', compact('categories', 'errors', 'selected_category'));
 
     $layout_content = include_template(
@@ -313,16 +312,16 @@ function redirect_to_main()
  * Функция подготавливает вывод ошибки для функции include_template в шаблон error_page.php
  * @param string $error Сообщение, что произошла ошибка
  * @param string $error_description Описание ошибки
- * @param string $error_link Ссылка на страницу, куда стоит перейти, чтобы избежать ошибки
- * @param string $error_link_description Описание действия, чтобы избавиться от последствий ошибки
+ * @param string $link Ссылка на страницу, куда стоит перейти, чтобы избежать ошибки
+ * @param string $link_description Описание действия, чтобы избавиться от последствий ошибки
  * @param int $http_code Код состояния HTTP
  * @return string вывод ошибки для функции include_template в шаблон error_page.php
  */
 function include_template_error(
     string $error,
     string $error_description,
-    string $error_link,
-    string $error_link_description,
+    string $link,
+    string $link_description,
     int $http_code = 0
 ): string {
     $page_content = include_template(
@@ -330,8 +329,8 @@ function include_template_error(
         [
             'error' => $error,
             'error_description' => $error_description,
-            'error_link' => $error_link,
-            'error_link_description' => $error_link_description
+            'error_link' => $link,
+            'error_link_description' => $link_description
         ]
     );
     $layout_content = include_template('/layout.php', [
@@ -340,7 +339,7 @@ function include_template_error(
         'title' => 'Ошибка ' . $http_code
     ]);
 
-    exit($layout_content);
+    return exit($layout_content);
 }
 
 /**
@@ -356,7 +355,7 @@ function check_errors_before_add_bet(array $lot, array $errors): array
 
     //правило для обязательного поля ввода новой ставки
     $rules = [
-        'cost' => function () use ($min_bet) {
+        'cost' => static function () use ($min_bet) {
             return validate_bet_add('cost', $min_bet);
         }
     ];
@@ -481,7 +480,9 @@ function get_search_items_count(mysqli $connect, string $search): int
 function get_search_items(mysqli $connect, string $search, int $offset): array
 {
     //SQL запрос на поиск с использованием директивы MATCH(поля,где ищем)..AGAINST(поисковый запрос). На месте искомой строки стоит плейсхолдер
-    $sql_search = "SELECT item.id,
+    $sql_search = "# noinspection SqlAggregates
+
+SELECT item.id,
                    item.title,
                    item.start_price,
                    item.image_url,
@@ -578,7 +579,7 @@ function send_email_to_winner(array $winner): string
  * @param mysqli $connect данные о подключении к базе данных
  * @param int $user ID пользователя, выигравшего лот
  * @param int $item ID лота, который выиграл пользователь
- * @return mysqli_result Результат запроса в БД или вывод ошибки 500 в случае невыполненного запроса
+ * @return bool Результат запроса в БД или вывод ошибки 500 в случае невыполненного запроса
  */
 function identify_winner_lot(mysqli $connect, int $user, int $item): bool
 {

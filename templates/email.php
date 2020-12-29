@@ -7,8 +7,9 @@
  */
 ?>
 <h1>Поздравляем с победой</h1>
-<p>Здравствуйте, <?= htmlspecialchars($user_name); ?></p>
-<p>Ваша ставка для лота <a href="<?= $host_url . $item_link ?>"><?= htmlspecialchars($item_title) ?></a>
+<p>Здравствуйте, <?= htmlspecialchars($user_name, ENT_QUOTES | ENT_HTML5) ?></p>
+<p>Ваша ставка для лота <a href="<?= $host_url . $item_link ?>"><?= htmlspecialchars($item_title,
+            ENT_QUOTES | ENT_HTML5) ?></a>
     победила.</p>
 <p>Перейдите по ссылке <a href="<?= $host_url ?>/my_bets.php">мои ставки</a>,
     чтобы связаться с автором объявления</p>

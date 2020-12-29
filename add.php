@@ -23,22 +23,22 @@ if (!isset($_POST['category'])) {
 
 // применение функций для проверки полей формы к каждому элементу формы внутри цикла
 $rules = [
-    'lot-name' => function () {
+    'lot-name' => static function () {
         return validate_filled('lot-name', 'наименование лота');
     },
-    'category' => function () {
+    'category' => static function () {
         return validate_category('category');
     },
-    'message' => function () {
+    'message' => static function () {
         return validate_filled('message', 'описание лота');
     },
-    'lot-rate' => function () {
+    'lot-rate' => static function () {
         return validate_number_value('lot-rate');
     },
-    'lot-step' => function () {
+    'lot-step' => static function () {
         return validate_number_value('lot-step');
     },
-    'lot-date' => function () {
+    'lot-date' => static function () {
         return validate_date_end('lot-date');
     }
 ];

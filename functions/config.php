@@ -2,7 +2,7 @@
 /**
  * Статус авторизации пользователя
  */
-$is_auth = isset($_SESSION['user']['name']) ?? false;
+$is_auth = isset($_SESSION['user']['name']);
 
 /**
  * Имя авторизованного пользователя
