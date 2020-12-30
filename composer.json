@@ -1,22 +1,21 @@
 {
-    "name": "al-galkin/yeticave",
-    "description": "Website for auction",
-    "type": "project",
-    "license": "MIT",
-    "authors": [
-        {
-            "name": "Aleksandr Galkin",
-            "email": "xgalkin@gmail.com"
-        }
-    ],
-    "require": {
-        "swiftmailer/swiftmailer": "^6.2",
-        "phpmd/phpmd": "^2.9",
-      "ext-mysqli": "*",
-      "ext-fileinfo": "*"
+  "name": "al-galkin/yeticave",
+  "description": "Website for auction",
+  "type": "project",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Aleksandr Galkin",
+      "email": "xgalkin@gmail.com"
     }
-  ,
+  ],
+  "require": {
+    "swiftmailer/swiftmailer": "^6.2",
+    "ext-mysqli": "*",
+    "ext-fileinfo": "*"
+  },
   "require-dev": {
+    "phpmd/phpmd": "^2.9",
     "roave/security-advisories": "dev-master"
   }
 }
