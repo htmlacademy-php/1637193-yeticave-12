@@ -14,23 +14,25 @@
                 <?php endif; ?>">
                     <td class="rates__info">
                         <div class="rates__img">
-                            <img src="../<?= htmlspecialchars($bet['image_url'] ?? '#') ?>" width="54" height="40"
-                                 alt="<?= htmlspecialchars($bet['title'] ?? 'Без названия') ?>">
+                            <img src="../<?= htmlspecialchars($bet['image_url'] ?? '#', ENT_QUOTES | ENT_HTML5) ?>"
+                                 width="54" height="40"
+                                 alt="<?= htmlspecialchars($bet['title'] ?? 'Без названия', ENT_QUOTES | ENT_HTML5) ?>">
                         </div>
                         <div>
                             <h3 class="rates__title"><a
-                                    href="/lot.php?id=<?= htmlspecialchars($bet['item_id']); ?>">
-                                    <?= htmlspecialchars($bet['title']) ?></a>
+                                    href="/lot.php?id=<?= htmlspecialchars($bet['item_id'], ENT_QUOTES | ENT_HTML5) ?>">
+                                    <?= htmlspecialchars($bet['title'], ENT_QUOTES | ENT_HTML5) ?></a>
                             </h3>
-                            <?php if (isset($bet['winner']) && $bet['winner']): ?>
-                                <p><?= htmlspecialchars($bet['contacts'] ?? 'Контактов не оставили.') ?></p>
+                            <?php if (!empty($bet['winner'])): ?>
+                                <p><?= htmlspecialchars($bet['contacts'] ?? 'Контактов не оставили.',
+                                        ENT_QUOTES | ENT_HTML5) ?></p>
                             <?php endif; ?>
                         </div>
                     </td>
                     <td class="rates__category">
-                        <?= htmlspecialchars($bet['category']) ?>
+                        <?= htmlspecialchars($bet['category'], ENT_QUOTES | ENT_HTML5) ?>
                     </td>
-                    <?php if (isset($bet['winner']) && $bet['winner']): ?>
+                    <?php if (!empty($bet['winner'])): ?>
                         <td class="rates__timer">
                             <div class="timer timer--win">Ставка выиграла</div>
                         </td>
@@ -48,10 +50,10 @@
                         </td>
                     <?php endif; ?>
                     <td class="rates__price">
-                        <?= htmlspecialchars(formatted_sum($bet['current_price'] ?? 0)); ?>
+                        <?= htmlspecialchars(formatted_sum($bet['current_price'] ?? 0), ENT_QUOTES | ENT_HTML5) ?>
                     </td>
                     <td class="rates__time">
-                        <?= get_correct_bet_time($bet['bet_date']) ?? ''; ?>
+                        <?= get_correct_bet_time($bet['bet_date']) ?? '' ?>
                     </td>
                 </tr>
             <?php endforeach; ?>
@@ -61,7 +63,7 @@
     <?php endif; ?>
     <br>
     <?php if (isset($pagination) && !($pagination === '')): ?>
-        <?= $pagination; ?>
+        <?= $pagination ?>
     <?php endif; ?>
 </section>
 

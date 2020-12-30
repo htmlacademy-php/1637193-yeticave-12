@@ -12,10 +12,10 @@
  * is_date_valid('10/10/2010 12:00:55'); // false
  *
  * @param string $date Дата в виде строки
- * @param $required_format string контстанта CORRECT_DATE_TIME при необходимом формате 'ГГГГ-ММ-ДД' или CORRECT_DATE_TIME_FORMAT при необходимом формате 'ГГГГ-ММ-ДД ЧЧ:ММ:СС'
+ * @param string $required_format константа CORRECT_DATE_TIME при необходимом формате 'ГГГГ-ММ-ДД' или CORRECT_DATE_TIME_FORMAT при необходимом формате 'ГГГГ-ММ-ДД ЧЧ:ММ:СС'
  * @return bool true при совпадении с форматом 'ГГГГ-ММ-ДД' или 'ГГГГ-ММ-ДД ЧЧ:ММ:СС', иначе false
  */
-function is_date_valid(string $date, $required_format): bool
+function is_date_valid(string $date, string $required_format): bool
 {
     $dateTimeObj = date_create_from_format($required_format, $date);
 
@@ -29,7 +29,7 @@ function is_date_valid(string $date, $required_format): bool
  * @param $data array  Данные для вставки на место плейсхолдеров
  * @return mysqli_stmt Подготовленное выражение
  */
-function db_get_prepare_stmt($link, $sql, $data = [])
+function db_get_prepare_stmt(mysqli $link, string $sql, array $data = []): mysqli_stmt
 {
     $stmt = mysqli_prepare($link, $sql);
 
@@ -47,14 +47,10 @@ function db_get_prepare_stmt($link, $sql, $data = [])
 
             if (is_int($value)) {
                 $type = 'i';
-            } else {
-                if (is_string($value)) {
-                    $type = 's';
-                } else {
-                    if (is_double($value)) {
-                        $type = 'd';
-                    }
-                }
+            } elseif (is_string($value)) {
+                $type = 's';
+            } elseif (is_float($value)) {
+                $type = 'd';
             }
 
             if ($type) {
@@ -97,20 +93,14 @@ function db_get_prepare_stmt($link, $sql, $data = [])
  * @param string $two Форма множественного числа для 2, 3, 4: яблока, часа, минуты
  * @param string $many Форма множественного числа для остальных чисел
  *
- * @return string Рассчитанная форма множественнго числа
+ * @return string Рассчитанная форма множественного числа
  */
 function get_noun_plural_form(int $number, string $one, string $two, string $many): string
 {
-    $number = (int)$number;
     $mod10 = $number % 10;
     $mod100 = $number % 100;
 
     switch (true) {
-        case ($mod100 >= 11 && $mod100 <= 20):
-            return $many;
-
-        case ($mod10 > 5):
-            return $many;
 
         case ($mod10 === 1):
             return $one;
@@ -118,6 +108,8 @@ function get_noun_plural_form(int $number, string $one, string $two, string $man
         case ($mod10 >= 2 && $mod10 <= 4):
             return $two;
 
+        case ($mod100 >= 11 && $mod100 <= 20):
+        case ($mod10 > 5):
         default:
             return $many;
     }
@@ -129,7 +121,7 @@ function get_noun_plural_form(int $number, string $one, string $two, string $man
  * @param array $data Ассоциативный массив с данными для шаблона
  * @return string Итоговый HTML
  */
-function include_template($name, array $data = [])
+function include_template(string $name, array $data = []): string
 {
     $name = 'templates/' . $name;
     $result = '';
@@ -139,7 +131,7 @@ function include_template($name, array $data = [])
     }
 
     ob_start();
-    extract($data);
+    extract($data, EXTR_OVERWRITE);
     require $name;
 
     $result = ob_get_clean();

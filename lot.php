@@ -23,7 +23,7 @@ if (isset($_POST['cost']) && $_POST['cost'] !== '') {
 
 $item_id = (int)$_GET['id']; //получаем ID текущего лота
 $categories = get_categories_from_db($connect); //получаем список категорий из БД
-$lot = get_info_about_lot_from_db($item_id, $connect, $categories); //получаем информацию о лотах из БД
+$lot = get_info_about_lot_from_db($item_id, $connect); //получаем информацию о лотах из БД
 
 $sql_bet_history = get_bet_history($item_id, $connect); //история о последних 10 ставках по этому лоту
 
@@ -38,7 +38,7 @@ $user_id = $_SESSION['user']['id'] ?? null; //проверяем, авториз
 
 // отправка нового значения ставки
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $errors = check_errors_before_add_bet($lot);
+    $errors = check_errors_before_add_bet($lot, $errors);
     //если ошибок нет, то добавляем ставку в БД:
     if (empty($errors)) {
         $result_add_bet = add_bet_in_db($item_id, $connect, $user_id); //отправляем запрос о добавлении новой ставки
@@ -54,8 +54,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 $show_bet_add = true; //добавлять новую ставку по-умолчанию можно
 
 //проверка ограничений показа блока добавления ставки
-if (is_user_guest($user_id) || is_lot_completed($lot) || is_user_author_of_lot($lot,
-        $user_id) || is_user_made_last_bet($bets, $user_id)) {
+if (
+    is_user_guest($user_id) ||
+    is_lot_completed($lot) ||
+    is_user_author_of_lot($lot, $user_id) ||
+    is_user_made_last_bet($bets, $user_id)
+) {
     $show_bet_add = false;
 }
 
@@ -65,7 +69,7 @@ $page_content = include_template('/lot_page.php',
 $layout_content = include_template('/layout.php', [
     'content' => $page_content,
     'categories' => $categories,
-    'title' => htmlspecialchars($lot['title']),
+    'title' => htmlspecialchars($lot['title'], ENT_QUOTES | ENT_HTML5),
     'user_name' => $user_name,
     'is_auth' => $is_auth
 ]);

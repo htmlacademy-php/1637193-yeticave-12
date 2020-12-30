@@ -14,7 +14,7 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title><?= htmlspecialchars($title ?? "YetiCave") ?></title>
+    <title><?= htmlspecialchars($title ?? "YetiCave", ENT_QUOTES | ENT_HTML5) ?></title>
     <link href="/css/normalize.min.css" rel="stylesheet">
     <link href="/css/style.css" rel="stylesheet">
     <link href="/css/flatpickr.min.css" rel="stylesheet">
@@ -29,7 +29,7 @@
             </a>
             <form class="main-header__search" method="get" action="/search.php" autocomplete="off">
                 <input type="search" name="search" placeholder="Поиск лота"
-                       value="<?= isset($search) ? htmlspecialchars($search) : "" ?>">
+                       value="<?= isset($search) ? htmlspecialchars($search, ENT_QUOTES | ENT_HTML5) : "" ?>">
                 <input class="main-header__search-btn" type="submit" name="find" value="Найти" id="search">
             </form>
             <?php if (isset($is_auth)): ?>
@@ -39,7 +39,7 @@
                 <nav class="user-menu">
                     <?php if ($is_auth): ?>
                         <div class="user-menu__logged">
-                            <p><?= htmlspecialchars($user_name ?? '') ?></p>
+                            <p><?= htmlspecialchars($user_name ?? '', ENT_QUOTES | ENT_HTML5) ?></p>
                             <a class="user-menu__bets" href="/my_bets.php">Мои ставки</a>
                             <a class="user-menu__logout" href="/logout.php">Выход</a>
                         </div>
@@ -64,7 +64,8 @@
                     <?php if (isset($categories)): ?>
                         <?php foreach ($categories as $category_name): ?>
                             <li class="nav__item">
-                                <a href="/categories.php?id=<?= $category_name['id'] ?? 0 ?>"><?= htmlspecialchars($category_name['title'] ?? 'Название категории'); ?></a>
+                                <a href="/categories.php?id=<?= $category_name['id'] ?? 0 ?>"><?= htmlspecialchars($category_name['title'] ?? 'Название категории',
+                                        ENT_QUOTES | ENT_HTML5) ?></a>
                             </li>
                         <?php endforeach; ?>
                     <?php endif; ?>
@@ -72,7 +73,7 @@
             </nav>
         <?php endif; ?>
         <?php if (isset($content)): ?>
-            <?= $content; ?>
+            <?= $content ?>
         <?php endif; ?>
     </main>
 </div>
@@ -82,7 +83,8 @@
             <?php if (isset($categories)): ?>
                 <?php foreach ($categories as $category_name): ?>
                     <li class="nav__item">
-                        <a href="/categories.php?id=<?= $category_name['id'] ?? 0 ?>"><?= htmlspecialchars($category_name['title'] ?? 'Название категории'); ?></a>
+                        <a href="/categories.php?id=<?= $category_name['id'] ?? 0 ?>"><?= htmlspecialchars($category_name['title'] ?? 'Название категории',
+                                ENT_QUOTES | ENT_HTML5) ?></a>
                     </li>
                 <?php endforeach; ?>
             <?php endif; ?>
@@ -131,7 +133,7 @@
                 </svg>
             </a>
         </div>
-        <?php if (isset($is_auth) && $is_auth): ?>
+        <?php if (!empty($is_auth)): ?>
             <a class="main-footer__add-lot button" href="/add.php">Добавить лот</a>
         <?php endif; ?>
         <div class="main-footer__developed-by">

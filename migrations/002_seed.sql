@@ -1,3 +1,5 @@
+# noinspection NonAsciiCharactersForFile
+
 -- Используем базу данных
 USE yeticave;
 
@@ -96,7 +98,7 @@ FROM item
          LEFT JOIN bet ON item.id = bet.item_id
 WHERE item.completed_at > NOW()
 GROUP BY item.id
-ORDER BY item.created_at DESC;
+ORDER BY 'created_at' DESC;
 
 
 -- показ лота по его id. Получение названия категории, к которой принадлежит лот;
@@ -112,12 +114,14 @@ SET item.title = 'Такой-то лот'
 WHERE item.id = 2;
 
 -- получение списка ставок для лота по его идентификатору с сортировкой по дате.
-SELECT users.name     AS 'Пользователь',
-       item.title     AS 'Название товара в лоте',
-       bet.total      AS 'Размер ставки',
-       bet.created_at AS 'Дата и время ставки'
+# noinspection NonAsciiCharacters
+
+SELECT users.name     AS user_name,
+       item.title     AS item_title,
+       bet.total      AS bet_total,
+       bet.created_at AS bet_created_at
 FROM bet
          INNER JOIN users ON bet.user_id = users.id
          INNER JOIN item ON bet.item_id = item.id
 WHERE bet.item_id = 6
-ORDER BY bet.created_at ASC;
+ORDER BY bet_created_at;

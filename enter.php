@@ -7,6 +7,7 @@ require_once './functions/bootstrap.php'; //подключает все поль
 
 $connect = db_connection();
 $categories = get_categories_from_db($connect);
+$page_content = '';
 
 if (!($_SERVER['REQUEST_METHOD'] === 'POST')) {
     //если форма не отправлена, то проверяем наличие сессии у пользователя:
@@ -21,7 +22,7 @@ if (!($_SERVER['REQUEST_METHOD'] === 'POST')) {
     }
 } else {//Проверяем, что форма была отправлена
     $form = $_POST;
-    $errors = validate_if_filled_in(); //проверяем, заполнены ли поля в форме авторизации пользователя
+    $errors = validate_if_filled_in($form); //проверяем, заполнены ли поля в форме авторизации пользователя
 
     //Проверим, есть ли в БД пользователь с переданным в форме email.
     $check_email = strtolower($form['email']);
@@ -32,7 +33,7 @@ if (!($_SERVER['REQUEST_METHOD'] === 'POST')) {
     // иначе данных о пользователе в БД еще нет
     $user = $check_result_sql ? mysqli_fetch_array($check_result_sql, MYSQLI_ASSOC) : null;
 
-    if (!count($errors) and $user) {
+    if ($user && !count($errors)) {
         //Проверяем, что сохраненный хеш пароля и введенный пароль из формы совпадают.
         if (password_verify($form['password'], $user['password'])) {
             //если совпадение есть, значит пользователь указал верный пароль.

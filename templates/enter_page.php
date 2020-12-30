@@ -12,7 +12,8 @@
     <span class="form__error form__error--bottom"><?= $verify_user_error ?></span>
     <div class="form__item <?= $classname ?>">
         <label for="email">E-mail <sup>*</sup></label>
-        <input id="email" type="text" name="email" placeholder="Введите e-mail" value="<?= htmlspecialchars($value) ?>">
+        <input id="email" type="text" name="email" placeholder="Введите e-mail" value="<?= htmlspecialchars($value,
+            ENT_QUOTES | ENT_HTML5) ?>">
         <?php if ($classname): ?>
             <span class="form__error"><?= $errors['email'] ?? '' ?></span>
         <?php endif; ?>
@@ -22,7 +23,7 @@
     <div class="form__item form__item--last <?= $classname ?>">
         <label for="password">Пароль <sup>*</sup></label>
         <input id="password" type="password" name="password" placeholder="Введите пароль"
-               value="<?= htmlspecialchars($value) ?>">
+               value="<?= htmlspecialchars($value, ENT_QUOTES | ENT_HTML5) ?>">
         <?php if ($classname): ?>
             <span class="form__error"><?= $errors['password'] ?? '' ?></span>
         <?php endif; ?>

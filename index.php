@@ -8,7 +8,7 @@
 require_once './functions/bootstrap.php'; //подключает все пользовательские функции и константы
 require_once './getwinner.php'; //подключает сценарий "отправка письма победителю аукциона"
 
-$connect = db_connection(); //подлкючение к БД
+$connect = db_connection(); //подключение к БД
 $categories = get_categories_from_db($connect); //вывод категорий лотов
 $ad_information = get_ad_information_from_db($connect); //массив с информацией о всех открытых лотах
 
@@ -18,14 +18,14 @@ $pagination = null; //пагинация по умолчанию отсутст�
 //но если число открытых лотов больше 9, то подключим пагинацию:
 if ($items_count > LIMIT_OF_SEARCH_RESULT) {
     $current_page = (int)filter_input(INPUT_GET, 'page', FILTER_SANITIZE_NUMBER_INT); //Получаем номер текущей страницы.
-    if (!$current_page || !isset($current_page)) {
+    if ($current_page === 0) {
         $current_page = 1;
     }
 
     $pages_count = ceil($items_count / LIMIT_OF_SEARCH_RESULT); //Считаем кол-во страниц, которые нужны для вывода результата
     $offset = ($current_page - 1) * LIMIT_OF_SEARCH_RESULT; //Считаем смещение
 
-    $search_page = pathinfo($_SERVER['SCRIPT_NAME'])['basename'] ?? 'index.php';
+    $search_page = pathinfo($_SERVER['SCRIPT_NAME'], PATHINFO_BASENAME) ?? 'index.php';
 
     $pagination = get_pagination($pages_count, $current_page, $search_page); //подключаем пагинацию
 
